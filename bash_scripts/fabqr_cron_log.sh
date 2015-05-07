@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 #    This file is part of FabQR. (https://github.com/FroChr123/FabQR)
 #
