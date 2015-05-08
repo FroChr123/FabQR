@@ -157,7 +157,7 @@ function get_fabqr_file
     # Local folder
     if [ -e "$3" ]
     then
-        output_text "[INFO] Moving FabQR file $1/$3 to target $2/3"
+        output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
         command_success "mv $3 $2/$3"
         return 0
     fi
@@ -165,7 +165,7 @@ function get_fabqr_file
     # Local folder, subfolder
     if [ -e "$1/$3" ]
     then
-        output_text "[INFO] Moving FabQR file $1/$3 to target $2/3"
+        output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
         command_success "mv $1/$3 $2/$3"
         return 0
     fi
@@ -173,7 +173,7 @@ function get_fabqr_file
     # Parent folder
     if [ -e "../$3" ]
     then
-        output_text "[INFO] Moving FabQR file $1/$3 to target $2/3"
+        output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
         command_success "mv ../$3 $2/$3"
         return 0
     fi
@@ -181,13 +181,13 @@ function get_fabqr_file
     # Parent folder, subfolder
     if [ -e "../$1/$3" ]
     then
-        output_text "[INFO] Moving FabQR file $1/$3 to target $2/3"
+        output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
         command_success "mv ../$1/$3 $2/$3"
         return 0
     fi
 
     # Download from github
-    output_text "[INFO] FabQR file $1/$3 not found in local file system, downloading to target $2/3"
+    output_text "[INFO] FabQR file $1/$3 not found in local file system, downloading to target $2/$3"
     command_success "wget -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3"
     return 0
 }
@@ -363,8 +363,38 @@ then
     command_success "chmod 770 /home/fabqr/fabqr_install.sh"
 fi
 
-# Setup cronjob for log
+# Crontab : Get file
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh"
+
+# Crontab : Check permission
+if [ $( stat -c %A /home/fabqr/fabqr_cron_log.sh ) != "-rwxrwx---" ]
+then
+    output_text "[INFO] Permissions of file /home/fabqr/fabqr_cron_log.sh were incorrect, set to 770"
+    command_success "chmod 770 /home/fabqr/fabqr_cron_log.sh"
+fi
+
+# Crontab : User does not have crontab or fabqr_cron_log.sh is not in crontab yet
+if ! ( ( crontab -u fabqr -l | grep fabqr_cron_log.sh ) &> /dev/null )
+then
+    # Crontab : If user already has crontab, need to save it
+    if ( crontab -u fabqr -l &> /dev/null )
+    then
+       command_success "crontab -u fabqr -l > /home/fabqr/fabqr_crontab"
+    fi
+
+    # Crontab: Write new command to crontab file
+    command_success "echo >> /home/fabqr/fabqr_crontab"
+    command_success "echo '# FabQR log script every 5 minutes' >> /home/fabqr/fabqr_crontab"
+    command_success "echo */5 * * * * /home/fabqr/fabqr_cron_log.sh >> /home/fabqr/fabqr_crontab"
+
+    # Crontab: Load crontab file for user fabqr and remove temporary file
+    command_success "chmod 777 /home/fabqr/fabqr_crontab"
+    command_success "crontab -u fabqr /home/fabqr/fabqr_crontab"
+    command_success "rm /home/fabqr/fabqr_crontab"
+    output_text "[INFO] Created crontab entry for user fabqr and command fabqr_cron_log.sh"
+else
+    output_text "[INFO] User fabqr already has correct crontab entry for command fabqr_cron_log.sh"
+fi
 
 # Exit correctly without errors
 output_text "[INFO] QUIT FABQR INSTALLER SUCCESSFULLY"
