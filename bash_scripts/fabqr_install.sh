@@ -216,7 +216,7 @@ fi
 # ##################################################################
 
 output_text "[INFO] Checking required packges"
-output_text "[INFO] Upadting package lists"
+output_text "[INFO] Updating package lists"
 
 command_success `apt-get update`
 
