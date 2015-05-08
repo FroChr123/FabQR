@@ -72,8 +72,8 @@ if [ -e "/home/fabqr/fabqr.log" ]
 then
     if [ $( cat /home/fabqr/fabqr.log | wc -l ) -gt 2500 ]
     then
-        command_success "tail -n 2000 /home/fabqr/fabqr.log > /home/fabqr/tmp_fabqr.log"
-        command_success "mv /home/fabqr/tmp_fabqr.log /home/fabqr/fabqr.log"
+        command_success `tail -n 2000 /home/fabqr/fabqr.log > /home/fabqr/tmp_fabqr.log`
+        command_success `mv /home/fabqr/tmp_fabqr.log /home/fabqr/fabqr.log`
         output_text_log "[INFO] Truncated log to 2000 entries"
     fi
 
