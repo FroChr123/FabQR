@@ -140,6 +140,58 @@ function check_package_install
     return 0
 }
 
+# Function to check if a package is installed and install if it is missing
+# Search for file in different directories, if nothing found, direct download from github
+# Argument 1: Directory name
+# Argument 2: Target directory
+# Argument 3: File name
+function get_fabqr_file
+{
+    # Check if file already exists
+    if [ -e "$2/$3" ]
+    then
+        output_text "[INFO] FabQR file $1/$3 already exists at target $2/$3"
+        return 1
+    fi
+
+    # Local folder
+    if [ -e "$3" ]
+    then
+        output_text "[INFO] Moving FabQR file $1/$3 to target $2/3"
+        command_success "mv $3 $2/$3"
+        return 0
+    fi
+
+    # Local folder, subfolder
+    if [ -e "$1/$3" ]
+    then
+        output_text "[INFO] Moving FabQR file $1/$3 to target $2/3"
+        command_success "mv $1/$3 $2/$3"
+        return 0
+    fi
+
+    # Parent folder
+    if [ -e "../$3" ]
+    then
+        output_text "[INFO] Moving FabQR file $1/$3 to target $2/3"
+        command_success "mv ../$3 $2/$3"
+        return 0
+    fi
+
+    # Parent folder, subfolder
+    if [ -e "../$1/$3" ]
+    then
+        output_text "[INFO] Moving FabQR file $1/$3 to target $2/3"
+        command_success "mv ../$1/$3 $2/$3"
+        return 0
+    fi
+
+    # Download from github
+    output_text "[INFO] FabQR file $1/$3 not found in local file system, downloading to target $2/3"
+    command_success "wget -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3"
+    return 0
+}
+
 # ##################################################################
 # MAIN
 # ##################################################################
@@ -175,7 +227,7 @@ check_package_install "cron"
 check_package_install "usbmount"
 
 # Check if usbmount.conf is in correct directory
-if ! [ -f "/etc/usbmount/usbmount.conf" ]
+if ! [ -e "/etc/usbmount/usbmount.conf" ]
 then
     output_text "[ERROR] usbmount is installed, but file /etc/usbmount/usbmount.conf does not exist!"
     quit_error
@@ -288,7 +340,7 @@ fi
 output_text "[INFO] User fabqr checked successfully"
 
 # ##################################################################
-# FABQR FILES AND DIRECTORIES
+# FABQR FILES / SETTINGS
 # ##################################################################
 
 # Copy current log to user location, if it does not exist yet
@@ -310,6 +362,9 @@ then
     command_success "chgrp fabqr /home/fabqr/fabqr_install.sh"
     command_success "chmod 770 /home/fabqr/fabqr_install.sh"
 fi
+
+# Setup cronjob for log
+get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh"
 
 # Exit correctly without errors
 output_text "[INFO] QUIT FABQR INSTALLER SUCCESSFULLY"
