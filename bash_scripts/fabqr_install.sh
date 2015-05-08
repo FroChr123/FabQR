@@ -68,7 +68,6 @@ function command_success
     return 0
 }
 
-
 # Function to quit correctly
 function quit_error
 {
@@ -151,6 +150,7 @@ function get_fabqr_file
     if [ -e "$2/$3" ]
     then
         output_text "[INFO] FabQR file $1/$3 already exists at target $2/$3"
+        file_defaults "$2/$3"
         return 1
     fi
 
@@ -189,6 +189,35 @@ function get_fabqr_file
     # Download from github
     output_text "[INFO] FabQR file $1/$3 not found in local file system, downloading to target $2/$3"
     command_success `wget -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3`
+    file_defaults "$2/$3"
+    return 0
+}
+
+# Function to check and change owner, group and permissions if neccessary
+# Argument 1: File path
+function file_defaults
+{
+    # Check owner
+    if [ $( stat -c %U $1 ) != "fabqr" ]
+    then
+        output_text "[INFO] Owner of file $1 was incorrect, set to default fabqr"
+        command_success `chown fabqr $1`
+    fi
+
+    # Check group
+    if [ $( stat -c %G $1 ) != "fabqr" ]
+    then
+        output_text "[INFO] Group of file $1 was incorrect, set to default fabqr"
+        command_success `chgrp fabqr $1`
+    fi
+
+    # Check permission
+    if [ $( stat -c %A $1 ) != "-rwxrwx---" ]
+    then
+        output_text "[INFO] Permissions of file $1 were incorrect, set to default 770"
+        command_success `chmod 770 $1`
+    fi
+
     return 0
 }
 
@@ -365,13 +394,6 @@ fi
 
 # Crontab : Get file
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh"
-
-# Crontab : Check permission
-if [ $( stat -c %A /home/fabqr/fabqr_cron_log.sh ) != "-rwxrwx---" ]
-then
-    output_text "[INFO] Permissions of file /home/fabqr/fabqr_cron_log.sh were incorrect, set to 770"
-    command_success `chmod 770 /home/fabqr/fabqr_cron_log.sh`
-fi
 
 # Crontab : User does not have crontab or fabqr_cron_log.sh is not in crontab yet
 if ! ( ( crontab -u fabqr -l | grep fabqr_cron_log.sh ) &> /dev/null )
