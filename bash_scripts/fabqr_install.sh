@@ -133,7 +133,7 @@ function check_package_install
     then
         if user_confirm "[INFO] Package $1 needs to be installed"
         then
-            command_success "apt-get install $1"
+            command_success `apt-get install $1`
         fi
     fi
 
@@ -158,7 +158,7 @@ function get_fabqr_file
     if [ -e "$3" ]
     then
         output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success "mv $3 $2/$3"
+        command_success `mv $3 $2/$3`
         return 0
     fi
 
@@ -166,7 +166,7 @@ function get_fabqr_file
     if [ -e "$1/$3" ]
     then
         output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success "mv $1/$3 $2/$3"
+        command_success `mv $1/$3 $2/$3`
         return 0
     fi
 
@@ -174,7 +174,7 @@ function get_fabqr_file
     if [ -e "../$3" ]
     then
         output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success "mv ../$3 $2/$3"
+        command_success `mv ../$3 $2/$3`
         return 0
     fi
 
@@ -182,13 +182,13 @@ function get_fabqr_file
     if [ -e "../$1/$3" ]
     then
         output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success "mv ../$1/$3 $2/$3"
+        command_success `mv ../$1/$3 $2/$3`
         return 0
     fi
 
     # Download from github
     output_text "[INFO] FabQR file $1/$3 not found in local file system, downloading to target $2/$3"
-    command_success "wget -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3"
+    command_success `wget -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3`
     return 0
 }
 
@@ -218,7 +218,7 @@ fi
 output_text "[INFO] Checking required packges"
 output_text "[INFO] Upadting package lists"
 
-command_success "apt-get update"
+command_success `apt-get update`
 
 # Tools for script and system
 check_package_install "wget"
@@ -267,7 +267,7 @@ then
 
         if user_confirm "[INFO] User fabqr home path needs to be changed, contents of old home path are moved"
         then
-            command_success "usermod --home /home/fabqr --move-home --shell /bin/bash fabqr"
+            command_success `usermod --home /home/fabqr --move-home --shell /bin/bash fabqr`
         fi
     fi
 
@@ -275,24 +275,24 @@ then
     if ! ( getent group fabqr > /dev/null )
     then
         output_text "[INFO] Creating missing group fabqr"
-        command_success "groupadd fabqr"
+        command_success `groupadd fabqr`
     fi
 
     # Check if user fabqr is in group fabqr
     if ! ( ( ( groups fabqr | awk -F ' : ' '{print $2}' ) | grep fabqr ) > /dev/null )
     then
         output_text "[INFO] Adding user fabqr to group fabqr"
-        command_success "usermod -g fabqr fabqr"
+        command_success `usermod -g fabqr fabqr`
     fi
 
     # Does home path exist?
     if ! [ -d "/home/fabqr" ]
     then
         output_text "[INFO] Creating missing folder /home/fabqr with correct settings"
-        command_success "mkdir /home/fabqr"
-        command_success "chown fabqr /home/fabqr -R"
-        command_success "chgrp fabqr /home/fabqr -R"
-        command_success "chmod 770 /home/fabqr -R"
+        command_success `mkdir /home/fabqr`
+        command_success `chown fabqr /home/fabqr -R`
+        command_success `chgrp fabqr /home/fabqr -R`
+        command_success `chmod 770 /home/fabqr -R`
     fi
 
     # Check owner
@@ -300,7 +300,7 @@ then
     then
         if user_confirm "[INFO] Owner of /home/fabqr needs to be reset recursively"
         then
-            command_success "chown fabqr /home/fabqr -R"
+            command_success `chown fabqr /home/fabqr -R`
         fi
     fi
 
@@ -309,7 +309,7 @@ then
     then
         if user_confirm "[INFO] Group of /home/fabqr needs to be reset recursively"
         then
-            command_success "chgrp fabqr /home/fabqr -R"
+            command_success `chgrp fabqr /home/fabqr -R`
         fi
     fi
 
@@ -318,7 +318,7 @@ then
     then
         if user_confirm "[INFO] Permissions of /home/fabqr need to be reset to 770 recursively"
         then
-            command_success "chmod 770 /home/fabqr -R"
+            command_success `chmod 770 /home/fabqr -R`
         fi
     fi
 
@@ -328,13 +328,13 @@ else
 
     # Create fabqr user and set password
     output_text "[INFO] Adding user fabqr with home /home/fabqr and shell /bin/bash"
-    command_success "useradd --home /home/fabqr --create-home --shell /bin/bash --user-group fabqr"
-    command_success "chown fabqr /home/fabqr/fabqr_install.sh"
-    command_success "chgrp fabqr /home/fabqr/fabqr_install.sh"
-    command_success "chmod 770 /home/fabqr/fabqr_install.sh"
+    command_success `useradd --home /home/fabqr --create-home --shell /bin/bash --user-group fabqr`
+    command_success `chown fabqr /home/fabqr/fabqr_install.sh`
+    command_success `chgrp fabqr /home/fabqr/fabqr_install.sh`
+    command_success `chmod 770 /home/fabqr/fabqr_install.sh`
     output_text "[INFO] Remember the password for your fabqr user!"
     output_text "[INFO] For security reasons, you might want to manually allow SSH key login only!"
-    command_success "passwd fabqr"
+    command_success `passwd fabqr`
 fi
 
 output_text "[INFO] User fabqr checked successfully"
@@ -347,20 +347,20 @@ output_text "[INFO] User fabqr checked successfully"
 if ! [ -e "/home/fabqr/fabqr.log" ]
 then
     output_text "[INFO] Moving log to fabqr home directory"
-    command_success "mv fabqr.log /home/fabqr/fabqr.log"
-    command_success "chown fabqr /home/fabqr/fabqr.log"
-    command_success "chgrp fabqr /home/fabqr/fabqr.log"
-    command_success "chmod 770 /home/fabqr/fabqr.log"
+    command_success `mv fabqr.log /home/fabqr/fabqr.log`
+    command_success `chown fabqr /home/fabqr/fabqr.log`
+    command_success `chgrp fabqr /home/fabqr/fabqr.log`
+    command_success `chmod 770 /home/fabqr/fabqr.log`
 fi
 
 # Copy current script to user location, if it does not exist yet
 if ! [ -e "/home/fabqr/fabqr_install.sh" ]
 then
     output_text "[INFO] Copying install script to fabqr home directory"
-    command_success "cp $( dirname "$0" )/$( basename "$0" ) /home/fabqr/fabqr_install.sh"
-    command_success "chown fabqr /home/fabqr/fabqr_install.sh"
-    command_success "chgrp fabqr /home/fabqr/fabqr_install.sh"
-    command_success "chmod 770 /home/fabqr/fabqr_install.sh"
+    command_success `cp $( dirname "$0" )/$( basename "$0" ) /home/fabqr/fabqr_install.sh`
+    command_success `chown fabqr /home/fabqr/fabqr_install.sh`
+    command_success `chgrp fabqr /home/fabqr/fabqr_install.sh`
+    command_success `chmod 770 /home/fabqr/fabqr_install.sh`
 fi
 
 # Crontab : Get file
@@ -370,7 +370,7 @@ get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh"
 if [ $( stat -c %A /home/fabqr/fabqr_cron_log.sh ) != "-rwxrwx---" ]
 then
     output_text "[INFO] Permissions of file /home/fabqr/fabqr_cron_log.sh were incorrect, set to 770"
-    command_success "chmod 770 /home/fabqr/fabqr_cron_log.sh"
+    command_success `chmod 770 /home/fabqr/fabqr_cron_log.sh`
 fi
 
 # Crontab : User does not have crontab or fabqr_cron_log.sh is not in crontab yet
@@ -379,21 +379,21 @@ then
     # Crontab : If user already has crontab, need to save it
     if ( crontab -u fabqr -l &> /dev/null )
     then
-       command_success "crontab -u fabqr -l > /home/fabqr/fabqr_crontab"
+       command_success `crontab -u fabqr -l > /home/fabqr/fabqr_crontab`
     fi
 
     # Crontab: Write new command to crontab file
-    command_success "echo >> /home/fabqr/fabqr_crontab"
-    command_success "echo '# FabQR log script every 5 minutes' >> /home/fabqr/fabqr_crontab"
-    command_success "echo */5 * * * * /home/fabqr/fabqr_cron_log.sh >> /home/fabqr/fabqr_crontab"
+    command_success `echo >> /home/fabqr/fabqr_crontab`
+    command_success `echo "# FabQR log script every 5 minutes" >> /home/fabqr/fabqr_crontab`
+    command_success `echo "*/5 * * * * /home/fabqr/fabqr_cron_log.sh" >> /home/fabqr/fabqr_crontab`
 
     # Crontab: Load crontab file for user fabqr and remove temporary file
-    command_success "chmod 777 /home/fabqr/fabqr_crontab"
-    command_success "crontab -u fabqr /home/fabqr/fabqr_crontab"
-    command_success "rm /home/fabqr/fabqr_crontab"
-    output_text "[INFO] Created crontab entry for user fabqr and command fabqr_cron_log.sh"
+    command_success `chmod 777 /home/fabqr/fabqr_crontab`
+    command_success `crontab -u fabqr /home/fabqr/fabqr_crontab`
+    command_success `rm /home/fabqr/fabqr_crontab`
+    output_text "[INFO] Crontab entry for command fabqr_cron_log.sh created"
 else
-    output_text "[INFO] User fabqr already has correct crontab entry for command fabqr_cron_log.sh"
+    output_text "[INFO] Crontab entry for command fabqr_cron_log.sh is already correct"
 fi
 
 # Exit correctly without errors
