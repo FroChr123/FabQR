@@ -458,7 +458,13 @@ get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh" "true"
 # FabQR service : Get file
 get_fabqr_file "bash_scripts" "/etc/init.d" "fabqr_service" "false"
 file_properties "/etc/init.d/fabqr_service" "root" "root" "-rwxr-xr-x" "755"
-command_success "update-rc.d fabqr_service defaults"
+
+# FabQR service : Auto start entry for system boot, if it does not exist yet
+if ! ( ( ls -l /etc/rc2.d | grep fabqr_service ) > /dev/null )
+then
+    output_text "[INFO] Creating auto start entry for fabqr_service"
+    command_success "update-rc.d fabqr_service defaults > /dev/null"
+fi
 
 # crontab : Get file
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh" "true"
