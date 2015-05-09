@@ -120,7 +120,6 @@ function is_package_installed
         return 1
     fi
 
-    output_text "[INFO] Package $1 is already installed"
     return 0
 }
 
@@ -150,8 +149,6 @@ function get_fabqr_file
     # Check if file already exists
     if [ -e "$2/$3" ]
     then
-        output_text "[INFO] FabQR file $1/$3 already exists at target $2/$3"
-
         # Set default file properties if argument 4 is true
         if ( $4 )
         then
@@ -324,6 +321,8 @@ check_package_install "php5-gd"
 check_package_install "g++"
 check_package_install "libpng12-dev"
 
+output_text "[INFO] Required packges checked successfully"
+
 # ##################################################################
 # USER SETTINGS
 # ##################################################################
@@ -431,6 +430,8 @@ output_text "[INFO] User settings checked successfully"
 # FABQR FILES / SETTINGS
 # ##################################################################
 
+output_text "[INFO] Checking FabQR files and settings"
+
 # Copy current log to user location, if it does not exist yet
 if ! [ -e "/home/fabqr/fabqr.log" ]
 then
@@ -485,8 +486,6 @@ then
     command_success `crontab -u fabqr /home/fabqr/fabqr_crontab.tmp`
     command_success `rm /home/fabqr/fabqr_crontab.tmp`
     output_text "[INFO] Crontab entry for command fabqr_cron_log.sh created"
-else
-    output_text "[INFO] Crontab entry for command fabqr_cron_log.sh is already correct"
 fi
 
 # usbmount : Set option MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007" in usbmount config
@@ -547,12 +546,18 @@ fi
 # TODO iptables
 # Add to packages, need to config to prevent attacks
 
+output_text "[INFO] FabQR files and settings checked successfully"
+
 # ##################################################################
 # FABQR GRAPHICS
 # ##################################################################
 
+output_text "[INFO] Checking FabQR graphics"
+
 # TODO
 # Download graphics c file, compile program
+
+output_text "[INFO] FabQR graphics checked successfully"
 
 # ##################################################################
 # EXIT AND START FABQR
