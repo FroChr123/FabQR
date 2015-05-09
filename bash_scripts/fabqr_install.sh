@@ -258,10 +258,10 @@ fi
 # STOP FABQR
 # ##################################################################
 
-if [ -e "home/fabqr/fabqr_stop" ]
+if [ -e "/etc/init.d/fabqr_service" ] && [ -e "/home/fabqr/fabqr_stop.sh" ]
 then
     output_text "[INFO] Stopping FabQR services"
-    home/fabqr/fabqr_stop
+    command_success "service fabqr_service stop"
     return 0
 fi
 
@@ -456,9 +456,10 @@ get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_start.sh" "true"
 # FabQR stop : Get file
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh" "true"
 
-# TODO service file
-# File: /etc/init.d/fabqr_service
-# Autostart: update-rc.d fabqr enable
+# FabQR service : Get file
+get_fabqr_file "bash_scripts" "/etc/init.d" "fabqr_service" "false"
+file_properties "/etc/init.d/fabqr_service" "root" "root" "-rwxr-xr-x" "755"
+update-rc.d fabqr_service enable
 
 # crontab : Get file
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh" "true"
@@ -567,5 +568,5 @@ output_text "[INFO] FabQR graphics checked successfully"
 
 # Exit correctly without errors
 output_text "[INFO] QUIT FABQR INSTALLER SUCCESSFULLY"
-/home/fabqr/fabqr_start.sh
+command_success "service fabqr_service start"
 exit 0
