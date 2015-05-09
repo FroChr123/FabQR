@@ -527,7 +527,7 @@ file_properties "/etc/apache2/sites-available/fabqr-apache-private" "root" "root
 # apache2 : Warning default site enabled
 if [ -e "/etc/apache2/sites-enabled/000-default" ]
 then
-    output_text "[INFO] Default site of apache is enabled, you might want to disable it: sudo a2dissite default && sudo service apache2 reload"
+    output_text "[INFO] Default site of apache is enabled, you might want to disable it and remove port 80 from port config"
 fi
 
 # TODO apache port conf
