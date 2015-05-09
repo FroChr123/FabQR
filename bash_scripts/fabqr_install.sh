@@ -506,11 +506,11 @@ command_success `sed -r -i 's/^(MOUNTOPTIONS=.*?)$/# \1/g' /etc/usbmount/usbmoun
 command_success `sed -r -i 's/^# (MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007")$/\1/g' /etc/usbmount/usbmount.conf`
 
 # usbmount : If file does not contain line MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007", then add it
-if ! ( ( cat /etc/usbmount/usbmount.conf | grep ^MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007"$ ) > /dev/null )
+if ! ( ( cat /etc/usbmount/usbmount.conf | grep ^MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"$ ) > /dev/null )
 then
     output_text "[INFO] Adding line MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" to file /etc/usbmount/usbmount.conf"
     command_success `echo >> /etc/usbmount/usbmount.conf`
-    command_success `echo "# FabQR allow access for all users" >> /etc/usbmount/usbmount.conf`
+    command_success `echo "# FabQR allow access for all users in group fabqr" >> /etc/usbmount/usbmount.conf`
     command_success `echo MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" >> /etc/usbmount/usbmount.conf`
 fi
 
