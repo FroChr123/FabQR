@@ -260,7 +260,6 @@ fi
 
 if [ -e "/etc/init.d/fabqr_service" ] && [ -e "/home/fabqr/fabqr_stop.sh" ]
 then
-    output_text "[INFO] Stopping FabQR services"
     command_success "service fabqr_service stop"
 fi
 

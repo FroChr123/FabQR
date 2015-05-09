@@ -58,7 +58,7 @@ function output_text_log
     TIMESTRING=$( date "+%Y-%m-%d %H:%M:%S" )
     if [ -e "/home/fabqr/fabqr.log" ]
     then
-        echo "[$TIMESTRING] [INSTALLER] $1" >> "/home/fabqr/fabqr.log"
+        echo "[$TIMESTRING] [SERVICE] $1" >> "/home/fabqr/fabqr.log"
     fi
     return 0
 }
