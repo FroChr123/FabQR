@@ -61,7 +61,8 @@ function command_success
 {
     if ! ( "$@" > /dev/null )
     then
-        output_text "[ERROR] Error in command '$@'"
+        cmd="$@"
+        output_text "[ERROR] Error in command '$cmd'"
         quit_error
     fi
 
@@ -146,8 +147,8 @@ function check_package_install
 # Argument 4: true = Set default file properties, false = Do not set default file properties
 function get_fabqr_file
 {
-    # Check if file already exists
-    if [ -e "$2/$3" ]
+    # Check if file already exists and is not empty (which could happen because of error in wget)
+    if [ -e "$2/$3" ] && [ -s "$2/$3" ]
     then
         # Set default file properties if argument 4 is true
         if ( $4 )
