@@ -150,7 +150,7 @@ function get_fabqr_file
     if [ -e "$2/$3" ]
     then
         output_text "[INFO] FabQR file $1/$3 already exists at target $2/$3"
-        file_defaults "$2/$3"
+        file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770"
         return 1
     fi
 
@@ -189,33 +189,37 @@ function get_fabqr_file
     # Download from github
     output_text "[INFO] FabQR file $1/$3 not found in local file system, downloading to target $2/$3"
     command_success `wget -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3`
-    file_defaults "$2/$3"
+    file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770"
     return 0
 }
 
 # Function to check and change owner, group and permissions if neccessary
 # Argument 1: File path
-function file_defaults
+# Argument 2: Owner name
+# Argument 3: Group name
+# Argument 4: Permission string
+# Argument 5: Permission bitmask
+function file_properties
 {
     # Check owner
-    if [ $( stat -c %U $1 ) != "fabqr" ]
+    if [ $( stat -c %U $1 ) != "$2" ]
     then
-        output_text "[INFO] Owner of file $1 was incorrect, set to default fabqr"
-        command_success `chown fabqr $1`
+        output_text "[INFO] Owner of file $1 was incorrect, set to $2"
+        command_success `chown $2 $1`
     fi
 
     # Check group
-    if [ $( stat -c %G $1 ) != "fabqr" ]
+    if [ $( stat -c %G $1 ) != "$3" ]
     then
-        output_text "[INFO] Group of file $1 was incorrect, set to default fabqr"
-        command_success `chgrp fabqr $1`
+        output_text "[INFO] Group of file $1 was incorrect, set to $3"
+        command_success `chgrp $3 $1`
     fi
 
     # Check permission
-    if [ $( stat -c %A $1 ) != "-rwxrwx---" ]
+    if [ $( stat -c %A $1 ) != "$4" ]
     then
-        output_text "[INFO] Permissions of file $1 were incorrect, set to default 770"
-        command_success `chmod 770 $1`
+        output_text "[INFO] Permissions of file $1 were incorrect, set to $5"
+        command_success `chmod $5 $1`
     fi
 
     return 0
@@ -241,6 +245,17 @@ then
 fi
 
 # ##################################################################
+# STOP FABQR
+# ##################################################################
+
+if [ -e "home/fabqr/fabqr_stop" ]
+then
+    output_text "[INFO] Stopping FabQR services"
+    command_success `home/fabqr/fabqr_stop`
+    return 0
+fi
+
+# ##################################################################
 # PACKAGES
 # ##################################################################
 
@@ -262,6 +277,13 @@ then
     quit_error
 fi
 
+# TODO usbmount config
+# File: /etc/usbmount/usbmount.conf
+# FS_MOUNTOPTIONS=""
+# =>
+# FS_MOUNTOPTIONS="gid=users,umask=0000"
+# Reload config
+
 # Software for FabQR
 check_package_install "apache2"
 
@@ -272,19 +294,27 @@ then
     quit_error
 fi
 
+# Check if user www-data exists
+if ! ( getent passwd www-data > /dev/null )
+then
+    output_text "[ERROR] apache2 is installed, but user www-data does not exist!"
+    quit_error
+fi
+
 check_package_install "php5"
 check_package_install "php5-cli"
 check_package_install "php5-common"
 check_package_install "libapache2-mod-php5"
 check_package_install "php5-gd"
 check_package_install "g++"
+check_package_install "libpng12-dev"
 
 # ##################################################################
-# FABQR USER
+# USER SETTINGS
 # ##################################################################
 
-# Check fabqr user, ensure that user is configured correctly
-output_text "[INFO] Checking user fabqr"
+# Check user settings, ensure that users are configured correctly
+output_text "[INFO] Checking user settings"
 
 # Does user fabqr exist?
 if ( getent passwd fabqr > /dev/null )
@@ -310,7 +340,7 @@ then
     # Check if user fabqr is in group fabqr
     if ! ( ( ( groups fabqr | awk -F ' : ' '{print $2}' ) | grep fabqr ) > /dev/null )
     then
-        output_text "[INFO] Adding user fabqr to group fabqr"
+        output_text "[INFO] Setting primary group of user fabqr to group fabqr"
         command_success `usermod -g fabqr fabqr`
     fi
 
@@ -358,15 +388,21 @@ else
     # Create fabqr user and set password
     output_text "[INFO] Adding user fabqr with home /home/fabqr and shell /bin/bash"
     command_success `useradd --home /home/fabqr --create-home --shell /bin/bash --user-group fabqr`
-    command_success `chown fabqr /home/fabqr/fabqr_install.sh`
-    command_success `chgrp fabqr /home/fabqr/fabqr_install.sh`
-    command_success `chmod 770 /home/fabqr/fabqr_install.sh`
+    file_properties "/home/fabqr/fabqr_install.sh" "fabqr" "fabqr" "-rwxrwx---" "770"
     output_text "[INFO] Remember the password for your fabqr user!"
     output_text "[INFO] For security reasons, you might want to manually allow SSH key login only!"
     command_success `passwd fabqr`
 fi
 
-output_text "[INFO] User fabqr checked successfully"
+# Existance of user www-data was already checked before
+# Add user www-data to group fabqr, if www-data is not in that group yet
+if ! ( ( ( groups www-data | awk -F ' : ' '{print $2}' ) | grep fabqr ) > /dev/null )
+then
+    output_text "[INFO] Adding user www-data to additional group fabqr"
+    command_success `usermod -G fabqr www-data`
+fi
+
+output_text "[INFO] User settings checked successfully"
 
 # ##################################################################
 # FABQR FILES / SETTINGS
@@ -377,9 +413,7 @@ if ! [ -e "/home/fabqr/fabqr.log" ]
 then
     output_text "[INFO] Moving log to fabqr home directory"
     command_success `mv fabqr.log /home/fabqr/fabqr.log`
-    command_success `chown fabqr /home/fabqr/fabqr.log`
-    command_success `chgrp fabqr /home/fabqr/fabqr.log`
-    command_success `chmod 770 /home/fabqr/fabqr.log`
+    file_properties "/home/fabqr/fabqr.log" "fabqr" "fabqr" "-rwxrwx---" "770"
 fi
 
 # Copy current script to user location, if it does not exist yet
@@ -387,10 +421,18 @@ if ! [ -e "/home/fabqr/fabqr_install.sh" ]
 then
     output_text "[INFO] Copying install script to fabqr home directory"
     command_success `cp $( dirname "$0" )/$( basename "$0" ) /home/fabqr/fabqr_install.sh`
-    command_success `chown fabqr /home/fabqr/fabqr_install.sh`
-    command_success `chgrp fabqr /home/fabqr/fabqr_install.sh`
-    command_success `chmod 770 /home/fabqr/fabqr_install.sh`
+    file_properties "/home/fabqr/fabqr_install.sh" "fabqr" "fabqr" "-rwxrwx---" "770"
 fi
+
+# FabQR start : Get file
+get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_start.sh"
+
+# FabQR stop : Get file
+get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh"
+
+# TODO service file
+# File: /etc/init.d/fabqr
+# Autostart: update-rc.d fabqr enable
 
 # Crontab : Get file
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh"
@@ -401,22 +443,66 @@ then
     # Crontab : If user already has crontab, need to save it
     if ( crontab -u fabqr -l &> /dev/null )
     then
-       command_success `crontab -u fabqr -l > /home/fabqr/fabqr_crontab`
+       command_success `crontab -u fabqr -l > /home/fabqr/fabqr_crontab.tmp`
+
+        if ! [ -e "/home/fabqr/fabqr_crontab.bak" ]
+        then
+            command_success `crontab -u fabqr -l > /home/fabqr/fabqr_crontab.bak`
+            file_properties "/home/fabqr/fabqr_crontab.bak" "fabqr" "fabqr" "-rwxrwx---" "770"
+        fi
     fi
 
     # Crontab: Write new command to crontab file
     command_success `echo >> /home/fabqr/fabqr_crontab`
-    command_success `echo "# FabQR log script every 5 minutes" >> /home/fabqr/fabqr_crontab`
-    command_success `echo "*/5 * * * * /home/fabqr/fabqr_cron_log.sh" >> /home/fabqr/fabqr_crontab`
+    command_success `echo "# FabQR log script every 5 minutes" >> /home/fabqr/fabqr_crontab.tmp`
+    command_success `echo "*/5 * * * * /home/fabqr/fabqr_cron_log.sh" >> /home/fabqr/fabqr_crontab.tmp`
 
     # Crontab: Load crontab file for user fabqr and remove temporary file
-    command_success `chmod 777 /home/fabqr/fabqr_crontab`
-    command_success `crontab -u fabqr /home/fabqr/fabqr_crontab`
-    command_success `rm /home/fabqr/fabqr_crontab`
+    command_success `chmod 777 /home/fabqr/fabqr_crontab.tmp`
+    command_success `crontab -u fabqr /home/fabqr/fabqr_crontab.tmp`
+    command_success `rm /home/fabqr/fabqr_crontab.tmp`
     output_text "[INFO] Crontab entry for command fabqr_cron_log.sh created"
 else
     output_text "[INFO] Crontab entry for command fabqr_cron_log.sh is already correct"
 fi
+
+# TODO symlink data folder
+# Enter / Check / Move path of data dir
+
+# Apache FabQR public config : Get file
+get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr-apache-public"
+file_properties "/etc/apache2/sites-available/fabqr-apache-public" "root" "root" "-rw-r--r--" "644"
+
+# Apache FabQR private config : Get file
+get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr-apache-private"
+file_properties "/etc/apache2/sites-available/fabqr-apache-private" "root" "root" "-rw-r--r--" "644"
+
+# TODO apache port conf
+# File: /etc/apache2/ports.conf
+# NameVirtualHost *:8081
+# Listen 8081
+# NameVirtualHost *:8090
+# Listen 8090
+# Reload config
+
+# TODO display power down time
+# File: /etc/kbd/config
+# BLANK_TIME=30 => BLANK_TIME=0
+# POWERDOWN_TIME=30 => POWERDOWN_TIME=0
+
+# ##################################################################
+# FABQR GRAPHICS
+# ##################################################################
+
+# TODO
+# Download graphics c file, compile program
+
+# ##################################################################
+# START FABQR
+# ##################################################################
+
+output_text "[INFO] Starting FabQR services"
+/home/fabqr/fabqr_start
 
 # Exit correctly without errors
 output_text "[INFO] QUIT FABQR INSTALLER SUCCESSFULLY"
