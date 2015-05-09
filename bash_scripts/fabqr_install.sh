@@ -261,7 +261,7 @@ fi
 if [ -e "home/fabqr/fabqr_stop" ]
 then
     output_text "[INFO] Stopping FabQR services"
-    command_success `home/fabqr/fabqr_stop`
+    home/fabqr/fabqr_stop
     return 0
 fi
 
@@ -455,7 +455,7 @@ get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_start.sh" "true"
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh" "true"
 
 # TODO service file
-# File: /etc/init.d/fabqr
+# File: /etc/init.d/fabqr_service
 # Autostart: update-rc.d fabqr enable
 
 # crontab : Get file
@@ -517,12 +517,12 @@ fi
 # Enter / Check / Move path of data dir
 
 # apache2 : FabQR public config, get file
-get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr-apache-public" "false"
-file_properties "/etc/apache2/sites-available/fabqr-apache-public" "root" "root" "-rw-r--r--" "644"
+get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_public" "false"
+file_properties "/etc/apache2/sites-available/fabqr_apache_public" "root" "root" "-rw-r--r--" "644"
 
 # apache2 : FabQR private config, get file
-get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr-apache-private" "false"
-file_properties "/etc/apache2/sites-available/fabqr-apache-private" "root" "root" "-rw-r--r--" "644"
+get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_private" "false"
+file_properties "/etc/apache2/sites-available/fabqr_apache_private" "root" "root" "-rw-r--r--" "644"
 
 # apache2 : Warning default site enabled
 if [ -e "/etc/apache2/sites-enabled/000-default" ]
