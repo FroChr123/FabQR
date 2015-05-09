@@ -262,7 +262,6 @@ if [ -e "/etc/init.d/fabqr_service" ] && [ -e "/home/fabqr/fabqr_stop.sh" ]
 then
     output_text "[INFO] Stopping FabQR services"
     command_success "service fabqr_service stop"
-    return 0
 fi
 
 # ##################################################################
@@ -459,7 +458,7 @@ get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh" "true"
 # FabQR service : Get file
 get_fabqr_file "bash_scripts" "/etc/init.d" "fabqr_service" "false"
 file_properties "/etc/init.d/fabqr_service" "root" "root" "-rwxr-xr-x" "755"
-update-rc.d fabqr_service enable
+command_success "update-rc.d fabqr_service defaults"
 
 # crontab : Get file
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh" "true"
