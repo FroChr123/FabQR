@@ -144,13 +144,20 @@ function check_package_install
 # Argument 1: Directory name
 # Argument 2: Target directory
 # Argument 3: File name
+# Argument 4: true = Set default file properties, false = Do not set default file properties
 function get_fabqr_file
 {
     # Check if file already exists
     if [ -e "$2/$3" ]
     then
         output_text "[INFO] FabQR file $1/$3 already exists at target $2/$3"
-        file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770"
+
+        # Set default file properties if argument 4 is true
+        if ( $4 )
+        then
+            file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770"
+        fi
+
         return 1
     fi
 
@@ -189,7 +196,13 @@ function get_fabqr_file
     # Download from github
     output_text "[INFO] FabQR file $1/$3 not found in local file system, downloading to target $2/$3"
     command_success `wget -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3`
-    file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770"
+
+    # Set default file properties if argument 4 is true
+    if ( $4 )
+    then
+        file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770"
+    fi
+
     return 0
 }
 
@@ -435,17 +448,17 @@ then
 fi
 
 # FabQR start : Get file
-get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_start.sh"
+get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_start.sh" "true"
 
 # FabQR stop : Get file
-get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh"
+get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh" "true"
 
 # TODO service file
 # File: /etc/init.d/fabqr
 # Autostart: update-rc.d fabqr enable
 
 # crontab : Get file
-get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh"
+get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh" "true"
 
 # crontab : User does not have crontab or fabqr_cron_log.sh is not in crontab yet
 if ! ( ( crontab -u fabqr -l | grep fabqr_cron_log.sh ) &> /dev/null )
@@ -505,11 +518,11 @@ fi
 # Enter / Check / Move path of data dir
 
 # apache2 : FabQR public config, get file
-get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr-apache-public"
+get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr-apache-public" "false"
 file_properties "/etc/apache2/sites-available/fabqr-apache-public" "root" "root" "-rw-r--r--" "644"
 
 # apache2 : FabQR private config, get file
-get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr-apache-private"
+get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr-apache-private" "false"
 file_properties "/etc/apache2/sites-available/fabqr-apache-private" "root" "root" "-rw-r--r--" "644"
 
 # apache2 : Warning default site enabled
@@ -547,5 +560,5 @@ fi
 
 # Exit correctly without errors
 output_text "[INFO] QUIT FABQR INSTALLER SUCCESSFULLY"
-/home/fabqr/fabqr_start
+/home/fabqr/fabqr_start.sh
 exit 0
