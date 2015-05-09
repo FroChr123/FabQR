@@ -192,7 +192,7 @@ function get_fabqr_file
 
     # Download from github
     output_text "[INFO] FabQR file $1/$3 not found in local file system, downloading to target $2/$3"
-    command_success wget -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3
+    command_success wget -q -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3
 
     # Set default file properties if argument 4 is true
     if ( $4 )
@@ -402,7 +402,9 @@ else
     # Create fabqr user and set password
     output_text "[INFO] Adding user fabqr with home /home/fabqr and shell /bin/bash"
     command_success useradd --home /home/fabqr --create-home --shell /bin/bash --user-group fabqr
-    file_properties "/home/fabqr/fabqr_install.sh" "fabqr" "fabqr" "-rwxrwx---" "770"
+    command_success chown fabqr /home/fabqr -R
+    command_success chgrp fabqr /home/fabqr -R
+    command_success chmod 770 /home/fabqr -R
     output_text "[INFO] Remember the password for your fabqr user!"
     output_text "[INFO] For security reasons, you might want to manually allow SSH key login only!"
     command_success passwd fabqr
