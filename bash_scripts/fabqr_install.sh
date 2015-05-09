@@ -59,9 +59,9 @@ function output_text_log
 # Argument 1: Command
 function command_success
 {
-    if ! ( $1 )
+    if ! ( "$@" > /dev/null )
     then
-        output_text "[ERROR] Error in command '$1'"
+        output_text "[ERROR] Error in command '$@'"
         quit_error
     fi
 
@@ -131,7 +131,7 @@ function check_package_install
     then
         if user_confirm "[INFO] Package $1 needs to be installed"
         then
-            command_success `apt-get install $1`
+            command_success apt-get install $1
         fi
     fi
 
@@ -162,7 +162,7 @@ function get_fabqr_file
     if [ -e "$3" ]
     then
         output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success `mv $3 $2/$3`
+        command_success mv $3 $2/$3
         return 0
     fi
 
@@ -170,7 +170,7 @@ function get_fabqr_file
     if [ -e "$1/$3" ]
     then
         output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success `mv $1/$3 $2/$3`
+        command_success mv $1/$3 $2/$3
         return 0
     fi
 
@@ -178,7 +178,7 @@ function get_fabqr_file
     if [ -e "../$3" ]
     then
         output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success `mv ../$3 $2/$3`
+        command_success mv ../$3 $2/$3
         return 0
     fi
 
@@ -186,13 +186,13 @@ function get_fabqr_file
     if [ -e "../$1/$3" ]
     then
         output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success `mv ../$1/$3 $2/$3`
+        command_success mv ../$1/$3 $2/$3
         return 0
     fi
 
     # Download from github
     output_text "[INFO] FabQR file $1/$3 not found in local file system, downloading to target $2/$3"
-    command_success `wget -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3`
+    command_success wget -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3
 
     # Set default file properties if argument 4 is true
     if ( $4 )
@@ -215,21 +215,21 @@ function file_properties
     if [ $( stat -c %U $1 ) != "$2" ]
     then
         output_text "[INFO] Owner of file $1 was incorrect, set to $2"
-        command_success `chown $2 $1`
+        command_success chown $2 $1
     fi
 
     # Check group
     if [ $( stat -c %G $1 ) != "$3" ]
     then
         output_text "[INFO] Group of file $1 was incorrect, set to $3"
-        command_success `chgrp $3 $1`
+        command_success chgrp $3 $1
     fi
 
     # Check permission
     if [ $( stat -c %A $1 ) != "$4" ]
     then
         output_text "[INFO] Permissions of file $1 were incorrect, set to $5"
-        command_success `chmod $5 $1`
+        command_success chmod $5 $1
     fi
 
     return 0
@@ -272,7 +272,7 @@ fi
 output_text "[INFO] Checking required packges"
 output_text "[INFO] Updating package lists"
 
-command_success `apt-get update`
+command_success apt-get update
 
 # Tools for script and system
 check_package_install "grep"
@@ -340,7 +340,7 @@ then
 
         if user_confirm "[INFO] User fabqr home path needs to be changed, contents of old home path are moved"
         then
-            command_success `usermod --home /home/fabqr --move-home --shell /bin/bash fabqr`
+            command_success usermod --home /home/fabqr --move-home --shell /bin/bash fabqr
         fi
     fi
 
@@ -348,24 +348,24 @@ then
     if ! ( getent group fabqr > /dev/null )
     then
         output_text "[INFO] Creating missing group fabqr"
-        command_success `groupadd fabqr`
+        command_success groupadd fabqr
     fi
 
     # Check if user fabqr is in group fabqr
     if ! ( ( ( groups fabqr | awk -F ' : ' '{print $2}' ) | grep fabqr ) > /dev/null )
     then
         output_text "[INFO] Setting primary group of user fabqr to group fabqr"
-        command_success `usermod -g fabqr fabqr`
+        command_success usermod -g fabqr fabqr
     fi
 
     # Does home path exist?
     if ! [ -d "/home/fabqr" ]
     then
         output_text "[INFO] Creating missing folder /home/fabqr with correct settings"
-        command_success `mkdir /home/fabqr`
-        command_success `chown fabqr /home/fabqr -R`
-        command_success `chgrp fabqr /home/fabqr -R`
-        command_success `chmod 770 /home/fabqr -R`
+        command_success mkdir /home/fabqr
+        command_success chown fabqr /home/fabqr -R
+        command_success chgrp fabqr /home/fabqr -R
+        command_success chmod 770 /home/fabqr -R
     fi
 
     # Check owner
@@ -373,7 +373,7 @@ then
     then
         if user_confirm "[INFO] Owner of /home/fabqr needs to be reset recursively"
         then
-            command_success `chown fabqr /home/fabqr -R`
+            command_success chown fabqr /home/fabqr -R
         fi
     fi
 
@@ -382,7 +382,7 @@ then
     then
         if user_confirm "[INFO] Group of /home/fabqr needs to be reset recursively"
         then
-            command_success `chgrp fabqr /home/fabqr -R`
+            command_success chgrp fabqr /home/fabqr -R
         fi
     fi
 
@@ -391,7 +391,7 @@ then
     then
         if user_confirm "[INFO] Permissions of /home/fabqr need to be reset to 770 recursively"
         then
-            command_success `chmod 770 /home/fabqr -R`
+            command_success chmod 770 /home/fabqr -R
         fi
     fi
 
@@ -401,11 +401,11 @@ else
 
     # Create fabqr user and set password
     output_text "[INFO] Adding user fabqr with home /home/fabqr and shell /bin/bash"
-    command_success `useradd --home /home/fabqr --create-home --shell /bin/bash --user-group fabqr`
+    command_success useradd --home /home/fabqr --create-home --shell /bin/bash --user-group fabqr
     file_properties "/home/fabqr/fabqr_install.sh" "fabqr" "fabqr" "-rwxrwx---" "770"
     output_text "[INFO] Remember the password for your fabqr user!"
     output_text "[INFO] For security reasons, you might want to manually allow SSH key login only!"
-    command_success `passwd fabqr`
+    command_success passwd fabqr
 fi
 
 # Existance of user www-data was already checked before
@@ -413,7 +413,7 @@ fi
 if ! ( ( ( groups www-data | awk -F ' : ' '{print $2}' ) | grep fabqr ) > /dev/null )
 then
     output_text "[INFO] Adding user www-data to additional group fabqr"
-    command_success `usermod -G fabqr www-data`
+    command_success usermod -G fabqr www-data
 fi
 
 # Existance of group www-data was already checked before
@@ -421,7 +421,7 @@ fi
 if ! ( ( ( groups fabqr | awk -F ' : ' '{print $2}' ) | grep www-data ) > /dev/null )
 then
     output_text "[INFO] Adding user fabqr to additional group www-data"
-    command_success `usermod -G www-data fabqr`
+    command_success usermod -G www-data fabqr
 fi
 
 output_text "[INFO] User settings checked successfully"
@@ -436,7 +436,7 @@ output_text "[INFO] Checking FabQR files and settings"
 if ! [ -e "/home/fabqr/fabqr.log" ]
 then
     output_text "[INFO] Moving log to fabqr home directory"
-    command_success `mv fabqr.log /home/fabqr/fabqr.log`
+    command_success mv fabqr.log /home/fabqr/fabqr.log
     file_properties "/home/fabqr/fabqr.log" "fabqr" "fabqr" "-rwxrwx---" "770"
 fi
 
@@ -444,7 +444,7 @@ fi
 if ! [ -e "/home/fabqr/fabqr_install.sh" ]
 then
     output_text "[INFO] Copying install script to fabqr home directory"
-    command_success `cp $( dirname "$0" )/$( basename "$0" ) /home/fabqr/fabqr_install.sh`
+    command_success cp $( dirname "$0" )/$( basename "$0" ) /home/fabqr/fabqr_install.sh
     file_properties "/home/fabqr/fabqr_install.sh" "fabqr" "fabqr" "-rwxrwx---" "770"
 fi
 
@@ -467,24 +467,24 @@ then
     # crontab : If user already has crontab, need to save it
     if ( crontab -u fabqr -l &> /dev/null )
     then
-       command_success `crontab -u fabqr -l > /home/fabqr/fabqr_crontab.tmp`
+       command_success crontab -u fabqr -l "> /home/fabqr/fabqr_crontab.tmp"
 
         if ! [ -e "/home/fabqr/fabqr_crontab.bak" ]
         then
-            command_success `crontab -u fabqr -l > /home/fabqr/fabqr_crontab.bak`
+            command_success crontab -u fabqr -l "> /home/fabqr/fabqr_crontab.bak"
             file_properties "/home/fabqr/fabqr_crontab.bak" "fabqr" "fabqr" "-rwxrwx---" "770"
         fi
     fi
 
     # crontab: Write new command to crontab file
-    command_success `echo >> /home/fabqr/fabqr_crontab`
-    command_success `echo "# FabQR log script every 5 minutes" >> /home/fabqr/fabqr_crontab.tmp`
-    command_success `echo "*/5 * * * * /home/fabqr/fabqr_cron_log.sh" >> /home/fabqr/fabqr_crontab.tmp`
+    command_success echo ">> /home/fabqr/fabqr_crontab"
+    command_success echo "# FabQR log script every 5 minutes" ">> /home/fabqr/fabqr_crontab.tmp"
+    command_success echo "*/5 * * * * /home/fabqr/fabqr_cron_log.sh" ">> /home/fabqr/fabqr_crontab.tmp"
 
     # crontab: Load crontab file for user fabqr and remove temporary file
-    command_success `chmod 777 /home/fabqr/fabqr_crontab.tmp`
-    command_success `crontab -u fabqr /home/fabqr/fabqr_crontab.tmp`
-    command_success `rm /home/fabqr/fabqr_crontab.tmp`
+    command_success chmod 777 /home/fabqr/fabqr_crontab.tmp
+    command_success crontab -u fabqr /home/fabqr/fabqr_crontab.tmp
+    command_success rm /home/fabqr/fabqr_crontab.tmp
     output_text "[INFO] Crontab entry for command fabqr_cron_log.sh created"
 fi
 
@@ -494,23 +494,23 @@ fi
 if ! [ -e "/etc/usbmount/usbmount.conf.bak" ]
 then
     output_text "[INFO] Backup original config file for usbmount /etc/usbmount/usbmount.conf"
-    command_success `cp /etc/usbmount/usbmount.conf /etc/usbmount/usbmount.conf.bak`
+    command_success cp /etc/usbmount/usbmount.conf /etc/usbmount/usbmount.conf.bak
     file_properties "/etc/usbmount/usbmount.conf.bak" "root" "root" "-rw-r--r--" "644"
 fi
 
 # usbmount : Place hash in front of all MOUNTOPTIONS= lines
-command_success `sed -r -i 's/^(MOUNTOPTIONS=.*?)$/# \1/g' /etc/usbmount/usbmount.conf`
+command_success sed -r -i 's/^(MOUNTOPTIONS=.*?)$/# \1/g' /etc/usbmount/usbmount.conf
 
 # usbmount : Remove hash in front of MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007"
-command_success `sed -r -i 's/^# (MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007")$/\1/g' /etc/usbmount/usbmount.conf`
+command_success sed -r -i 's/^# (MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007")$/\1/g' /etc/usbmount/usbmount.conf
 
 # usbmount : If file does not contain line MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007", then add it
 if ! ( ( cat /etc/usbmount/usbmount.conf | grep ^MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"$ ) > /dev/null )
 then
     output_text "[INFO] Adding line MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" to file /etc/usbmount/usbmount.conf"
-    command_success `echo >> /etc/usbmount/usbmount.conf`
-    command_success `echo "# FabQR allow access for all users in group fabqr" >> /etc/usbmount/usbmount.conf`
-    command_success `echo MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" >> /etc/usbmount/usbmount.conf`
+    command_success echo ">> /etc/usbmount/usbmount.conf"
+    command_success echo "# FabQR allow access for all users in group fabqr" ">> /etc/usbmount/usbmount.conf"
+    command_success echo 'MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007"' ">> /etc/usbmount/usbmount.conf"
 fi
 
 # TODO symlink data folder
