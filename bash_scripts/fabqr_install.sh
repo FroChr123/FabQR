@@ -265,6 +265,8 @@ output_text "[INFO] Updating package lists"
 command_success `apt-get update`
 
 # Tools for script and system
+check_package_install "grep"
+check_package_install "sed"
 check_package_install "wget"
 check_package_install "mawk"
 check_package_install "cron"
@@ -276,13 +278,6 @@ then
     output_text "[ERROR] usbmount is installed, but file /etc/usbmount/usbmount.conf does not exist!"
     quit_error
 fi
-
-# TODO usbmount config
-# File: /etc/usbmount/usbmount.conf
-# FS_MOUNTOPTIONS=""
-# =>
-# FS_MOUNTOPTIONS="gid=users,umask=0000"
-# Reload config
 
 # Software for FabQR
 check_package_install "apache2"
@@ -298,6 +293,13 @@ fi
 if ! ( getent passwd www-data > /dev/null )
 then
     output_text "[ERROR] apache2 is installed, but user www-data does not exist!"
+    quit_error
+fi
+
+# Check if group www-data exists
+if ! ( getent group www-data > /dev/null )
+then
+    output_text "[ERROR] apache2 is installed, but group www-data does not exist!"
     quit_error
 fi
 
@@ -402,6 +404,14 @@ then
     command_success `usermod -G fabqr www-data`
 fi
 
+# Existance of group www-data was already checked before
+# Add user fabqr to group www-data, if fabqr is not in that group yet
+if ! ( ( ( groups fabqr | awk -F ' : ' '{print $2}' ) | grep www-data ) > /dev/null )
+then
+    output_text "[INFO] Adding user fabqr to additional group www-data"
+    command_success `usermod -G www-data fabqr`
+fi
+
 output_text "[INFO] User settings checked successfully"
 
 # ##################################################################
@@ -434,13 +444,13 @@ get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh"
 # File: /etc/init.d/fabqr
 # Autostart: update-rc.d fabqr enable
 
-# Crontab : Get file
+# crontab : Get file
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh"
 
-# Crontab : User does not have crontab or fabqr_cron_log.sh is not in crontab yet
+# crontab : User does not have crontab or fabqr_cron_log.sh is not in crontab yet
 if ! ( ( crontab -u fabqr -l | grep fabqr_cron_log.sh ) &> /dev/null )
 then
-    # Crontab : If user already has crontab, need to save it
+    # crontab : If user already has crontab, need to save it
     if ( crontab -u fabqr -l &> /dev/null )
     then
        command_success `crontab -u fabqr -l > /home/fabqr/fabqr_crontab.tmp`
@@ -452,12 +462,12 @@ then
         fi
     fi
 
-    # Crontab: Write new command to crontab file
+    # crontab: Write new command to crontab file
     command_success `echo >> /home/fabqr/fabqr_crontab`
     command_success `echo "# FabQR log script every 5 minutes" >> /home/fabqr/fabqr_crontab.tmp`
     command_success `echo "*/5 * * * * /home/fabqr/fabqr_cron_log.sh" >> /home/fabqr/fabqr_crontab.tmp`
 
-    # Crontab: Load crontab file for user fabqr and remove temporary file
+    # crontab: Load crontab file for user fabqr and remove temporary file
     command_success `chmod 777 /home/fabqr/fabqr_crontab.tmp`
     command_success `crontab -u fabqr /home/fabqr/fabqr_crontab.tmp`
     command_success `rm /home/fabqr/fabqr_crontab.tmp`
@@ -466,16 +476,47 @@ else
     output_text "[INFO] Crontab entry for command fabqr_cron_log.sh is already correct"
 fi
 
+# usbmount : Set option MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007" in usbmount config
+# usbmount : Every user is allowed to access new mounted devices
+# usbmount : Create backup of config file
+if ! [ -e "/etc/usbmount/usbmount.conf.bak" ]
+then
+    output_text "[INFO] Backup original config file for usbmount /etc/usbmount/usbmount.conf"
+    command_success `cp /etc/usbmount/usbmount.conf /etc/usbmount/usbmount.conf.bak`
+    file_properties "/etc/usbmount/usbmount.conf.bak" "root" "root" "-rw-r--r--" "644"
+fi
+
+# usbmount : Place hash in front of all MOUNTOPTIONS= lines
+command_success `sed -r -i 's/^(MOUNTOPTIONS=.*?)$/# \1/g' /etc/usbmount/usbmount.conf`
+
+# usbmount : Remove hash in front of MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007"
+command_success `sed -r -i 's/^# (MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007")$/\1/g' /etc/usbmount/usbmount.conf`
+
+# usbmount : If file does not contain line MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007", then add it
+if ! ( ( cat /etc/usbmount/usbmount.conf | grep ^MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007"$ ) > /dev/null )
+then
+    output_text "[INFO] Adding line MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" to file /etc/usbmount/usbmount.conf"
+    command_success `echo >> /etc/usbmount/usbmount.conf`
+    command_success `echo "# FabQR allow access for all users" >> /etc/usbmount/usbmount.conf`
+    command_success `echo MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" >> /etc/usbmount/usbmount.conf`
+fi
+
 # TODO symlink data folder
 # Enter / Check / Move path of data dir
 
-# Apache FabQR public config : Get file
+# apache2 : FabQR public config, get file
 get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr-apache-public"
 file_properties "/etc/apache2/sites-available/fabqr-apache-public" "root" "root" "-rw-r--r--" "644"
 
-# Apache FabQR private config : Get file
+# apache2 : FabQR private config, get file
 get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr-apache-private"
 file_properties "/etc/apache2/sites-available/fabqr-apache-private" "root" "root" "-rw-r--r--" "644"
+
+# apache2 : Warning default site enabled
+if [ -e "/etc/apache2/sites-enabled/000-default" ]
+then
+    output_text "[INFO] Default site of apache is enabled, you might want to disable it: sudo a2dissite default && sudo service apache2 reload"
+fi
 
 # TODO apache port conf
 # File: /etc/apache2/ports.conf
@@ -490,6 +531,9 @@ file_properties "/etc/apache2/sites-available/fabqr-apache-private" "root" "root
 # BLANK_TIME=30 => BLANK_TIME=0
 # POWERDOWN_TIME=30 => POWERDOWN_TIME=0
 
+# TODO iptables
+# Add to packages, need to config to prevent attacks
+
 # ##################################################################
 # FABQR GRAPHICS
 # ##################################################################
@@ -498,12 +542,10 @@ file_properties "/etc/apache2/sites-available/fabqr-apache-private" "root" "root
 # Download graphics c file, compile program
 
 # ##################################################################
-# START FABQR
+# EXIT AND START FABQR
 # ##################################################################
-
-output_text "[INFO] Starting FabQR services"
-/home/fabqr/fabqr_start
 
 # Exit correctly without errors
 output_text "[INFO] QUIT FABQR INSTALLER SUCCESSFULLY"
+/home/fabqr/fabqr_start
 exit 0
