@@ -648,8 +648,9 @@ do
     fi
 done
 
-# Data directory: Set symlink
-output_text "[INFO] Symlink /home/fabqr/fabqr_data now points to $newdir"
+# Data directory: Set symbolic link
+output_text "[INFO] Update symbolic link /home/fabqr/fabqr_data to $newdir"
+command_success "rm /home/fabqr/fabqr_data"
 command_success "ln -s $newdir /home/fabqr/fabqr_data"
 
 # apache2 : FabQR public config, get file
