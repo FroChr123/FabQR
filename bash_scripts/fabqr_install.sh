@@ -116,7 +116,7 @@ function user_confirm
                 output_text "[ERROR] Action aborted by confirmation dialog, quit"
                 quit_error
             else
-                output_text "[ERROR] Action aborted by confirmation dialog, continue"
+                output_text "[INFO] Action aborted by confirmation dialog, continue"
                 return 1
             fi
             ;;
