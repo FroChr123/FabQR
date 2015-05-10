@@ -17,6 +17,10 @@
 
         DocumentRoot /home/fabqr/fabqr_data/www/private
 
+        # Custom access logging, needed for fail2ban network protection rules
+        LogFormat "%h --- \"%r\"" fabqraccesslog
+        CustomLog ${APACHE_LOG_DIR}/fabqr_private_access.log fabqraccesslog
+
         <Directory /home/fabqr/fabqr_data/www/private/>
                 # Options only allow to follow symlinks
                 Options +FollowSymLinks -Indexes -Includes -ExecCGI

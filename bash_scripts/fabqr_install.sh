@@ -306,6 +306,14 @@ then
 fi
 
 # ##################################################################
+# SECURITY INFORMATION
+# ##################################################################
+
+output_text "[INFO] SECURITY: fail2ban and iptables provide a basic security"
+output_text "[INFO] SECURITY: You should MANUALLY setup a good networking and authentication:"
+output_text "[INFO] SECURITY: E.g.: Disable remote root login and only allow logins with SSH keys"
+
+# ##################################################################
 # REDOWNLOAD
 # ##################################################################
 
@@ -337,6 +345,26 @@ check_package_install "sed"
 check_package_install "wget"
 check_package_install "mawk"
 check_package_install "cron"
+
+# Network security
+check_package_install "iptables"
+check_package_install "fail2ban"
+
+# Check if jail.conf is in correct directory
+if ! [ -e "/etc/fail2ban/jail.conf" ]
+then
+    output_text "[ERROR] fail2ban is installed, but file /etc/fail2ban/jail.conf does not exist!"
+    quit_error
+fi
+
+# Check if fail2ban directories are correct
+if ! [ -d "/etc/fail2ban/filter.d" ]
+then
+    output_text "[ERROR] fail2ban is installed, but directory /etc/fail2ban/filter.d does not exist!"
+    quit_error
+fi
+
+# Auto mount usb devices
 check_package_install "usbmount"
 
 # Check if usbmount.conf is in correct directory
@@ -354,6 +382,12 @@ check_package_install "apache2-utils"
 if ! [ -d "/etc/apache2/sites-available" ]
 then
     output_text "[ERROR] apache2 is installed, but directory /etc/apache2/sites-available does not exist!"
+    quit_error
+fi
+
+if ! [ -d "/etc/apache2/sites-enabled" ]
+then
+    output_text "[ERROR] apache2 is installed, but directory /etc/apache2/sites-enabled does not exist!"
     quit_error
 fi
 
@@ -800,6 +834,19 @@ then
     command_success "echo 'Listen 8090' >> /etc/apache2/ports.conf"
 fi
 
+# apache2 : Reload config
+if ! [ -e "/etc/apache2/sites-enabled/fabqr_apache_public" ]
+then
+    command_success "a2ensite fabqr_apache_public"
+fi
+
+if ! [ -e "/etc/apache2/sites-enabled/fabqr_apache_private" ]
+then
+    command_success "a2ensite fabqr_apache_private"
+fi
+
+command_success "service apache2 reload"
+
 # USB power settings: enable maximum power on usb
 if [ -e "/boot/config.txt" ]
 then
@@ -829,8 +876,16 @@ then
     fi
 fi
 
-# TODO iptables
-# Add to packages, need to config to prevent attacks
+# fail2ban : FabQR jail config, get file
+get_fabqr_file "fail2ban_configs" "/etc/fail2ban" "jail.local" "false" "$redownload"
+file_properties "/etc/fail2ban/jail.local" "root" "root" "-rw-r--r--" "644" "false"
+
+# fail2ban : FabQR filter config, get file
+get_fabqr_file "fail2ban_configs" "/etc/fail2ban/filter.d" "fabqr-http.conf" "false" "$redownload"
+file_properties "/etc/fail2ban/filter.d/fabqr-http.conf" "root" "root" "-rw-r--r--" "644" "false"
+
+# fail2ban : Reload config
+command_success "service fail2ban reload"
 
 output_text "[INFO] FabQR files and settings checked successfully"
 

@@ -1,0 +1,65 @@
+#    This file is part of FabQR. (https://github.com/FroChr123/FabQR)
+#
+#    FabQR is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    FabQR is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with FabQR.  If not, see <http://www.gnu.org/licenses/>.
+
+# ##################################################################
+# DEFAULT SETTINGS
+# ##################################################################
+
+[DEFAULT]
+ignoreip = 127.0.0.1
+bantime  = 600
+backend = auto
+banaction = iptables-multiport
+protocol = tcp
+chain = INPUT
+
+# ##################################################################
+# SSH PORT PROTECTION
+# ##################################################################
+
+[ssh]
+enabled  = true
+port     = ssh
+filter   = sshd
+logpath  = /var/log/auth.log
+bantime  = 600
+maxretry = 10
+findtime = 60
+
+# ##################################################################
+# FABQR PORT 8081 PROTECTION
+# ##################################################################
+
+[fabqr-private]
+enabled  = true
+port     = 8081
+filter   = fabqr-http
+logpath  = /var/log/apache2/fabqr_private_access.log
+bantime  = 600
+maxretry = 450
+findtime = 30
+
+# ##################################################################
+# FABQR PORT 8090 PROTECTION
+# ##################################################################
+
+[fabqr-public]
+enabled  = true
+port     = 8090
+filter   = fabqr-http
+logpath  = /var/log/apache2/fabqr_public_access.log
+bantime  = 600
+maxretry = 450
+findtime = 30
