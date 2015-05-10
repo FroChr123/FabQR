@@ -1,0 +1,40 @@
+#    This file is part of FabQR. (https://github.com/FroChr123/FabQR)
+#
+#    FabQR is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    FabQR is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with FabQR.  If not, see <http://www.gnu.org/licenses/>.
+
+# NOTE: Files in folder /etc/apache2/conf.d/ are loaded in ALPHABETICAL ORDER!
+# Since there might be a file called security, this file here with name security-fabqr
+# will still be loaded after that, which is the reason why these settings here are activated instead
+
+# Only send minimal information about apache version, defaults to greater amount of information
+ServerTokens Prod
+ServerSignature Off
+
+# Do not allow access to higher levels of file system, just allow specified directories
+# This setting might break some other services / packages, hopefully not in our case
+<Directory />
+       AllowOverride None
+       Order Deny,Allow
+       Deny from all
+</Directory>
+
+# Quicker timeout for connections, defaults to 300 on some systems
+Timeout 60
+
+# Reduce amount of KeepAlive requests, defaults to 100 on some systems
+MaxKeepAliveRequests 30
+
+# Do not allow requests larger than 11MB (files will be limited to 10MB in FabQR)
+# Value represents amount of bytes in request
+LimitRequestBody 11000000

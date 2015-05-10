@@ -349,10 +349,16 @@ fi
 # Software for FabQR
 check_package_install "apache2"
 
-# Check if apache directory is correct
+# Check if apache directories are correct
 if ! [ -d "/etc/apache2/sites-available" ]
 then
     output_text "[ERROR] apache2 is installed, but directory /etc/apache2/sites-available does not exist!"
+    quit_error
+fi
+
+if ! [ -d "/etc/apache2/conf.d" ]
+then
+    output_text "[ERROR] apache2 is installed, but directory /etc/apache2/conf.d does not exist!"
     quit_error
 fi
 
@@ -723,6 +729,10 @@ file_properties "/etc/apache2/sites-available/fabqr_apache_public" "root" "root"
 # apache2 : FabQR private config, get file
 get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_private" "false" "$redownload"
 file_properties "/etc/apache2/sites-available/fabqr_apache_private" "root" "root" "-rw-r--r--" "644" "false"
+
+# apache2 : FabQR security config, get file
+get_fabqr_file "apache_configs" "/etc/apache2/conf.d" "security_fabqr_apache" "false" "$redownload"
+file_properties "/etc/apache2/conf.d/security_fabqr_apache" "root" "root" "-rw-r--r--" "644" "false"
 
 # apache2 : Warning default site enabled
 if [ -e "/etc/apache2/sites-enabled/000-default" ]

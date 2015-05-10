@@ -18,8 +18,13 @@
         DocumentRoot /home/fabqr/fabqr_data/www/public
 
         <Directory /home/fabqr/fabqr_data/www/public/>
-                Options FollowSymLinks
+                # Options only allow to follow symlinks
+                Options +FollowSymLinks -Indexes -Includes -ExecCGI
+
+                # Allowed access from all
                 AllowOverride All
+                Order Allow,Deny
+                Allow from all
         </Directory>
 
 </VirtualHost>

@@ -18,8 +18,20 @@
         DocumentRoot /home/fabqr/fabqr_data/www/private
 
         <Directory /home/fabqr/fabqr_data/www/private/>
-                Options FollowSymLinks
+                # Options only allow to follow symlinks
+                Options +FollowSymLinks -Indexes -Includes -ExecCGI
+
+                # Authentication for private directory
+                AuthName "FabQR private access"
+                AuthType Basic
+                AuthUserFile /home/fabqr/fabqr_data/www/private/.htpasswd
+                require valid-user
+
+                # You could limit allowed connections here by
+                # using IP addresses, e.g. local area network
                 AllowOverride All
+                Order Allow,Deny
+                Allow from all
         </Directory>
 
 </VirtualHost>
