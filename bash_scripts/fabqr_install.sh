@@ -599,9 +599,10 @@ do
             if [ -n "$prevdir" ] && [ "$newdir" != "$prevdir" ]
             then
                 # Data directory: Copy data from previous directory, if user accepts
+                # Copying might fail for empty folder, thus unchecked
                 if user_confirm "[INFO] Optional: Copy contents from old directory $prevdir to new directory $newdir" "false"
                 then
-                    command_success "cp -R ${prevdir}* $newdir"
+                    cp -R "${prevdir}*" "$newdir"
                 fi
             fi
 
