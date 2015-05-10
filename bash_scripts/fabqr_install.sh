@@ -635,10 +635,10 @@ do
             output_text "[INFO] Checking $newdir group and permissions"
 
             # Check group
-            if [ $( stat -c %G "$newdir" ) == "fabqr" ]
+            if [ "$( stat -c %G "$newdir" )" == "fabqr" ]
             then
                 # Check permission
-                if [ $( stat -c %A "$newdir" ) == "-rwxrwx---" ]
+                if [ "$( stat -c %A "$newdir" )" == "-rwxrwx---" ]
                 then
                     output_text "[INFO] Checking of $newdir was successful"
                     newdirvalid=true
