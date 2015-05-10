@@ -772,7 +772,34 @@ then
     command_success "echo 'Listen 8090' >> /etc/apache2/ports.conf"
 fi
 
-# TODO boot settings max power
+# USB power settings: enable maximum power on usb
+if [ -e "/boot/config.txt" ]
+then
+    # USB power settings: Create backup
+    if ! [ -e "/boot/config.txt.bak" ]
+    then
+        output_text "[INFO] Backup original boot settings config file /boot/config.txt"
+        command_success "cp /boot/config.txt /boot/config.txt.bak"
+        file_properties "/boot/config.txt.bak" "root" "root" "-rwxr-xr-x" "755" "false"
+    fi
+
+    # USB power settings : Place hash in front of all max_usb_current= lines
+    command_success "sed -r -i 's/^(max_usb_current=.*)$/# \1/g' /boot/config.txt"
+
+    # USB power settings : Remove hash in front of BLANK_TIME=1
+    command_success "sed -r -i 's/^# (max_usb_current=1)$/\1/g' /boot/config.txt"
+
+    # USB power settings : If file does not contain line max_usb_current=1, then add it
+    if ! ( ( cat /boot/config.txt | grep ^max_usb_current=1$ ) > /dev/null )
+    then
+        output_text "[INFO] Adding line max_usb_current=1 to file /boot/config.txt"
+        output_text "[INFO] You need to reboot to activate changes!"
+        reboot=true
+        command_success "echo >> /boot/config.txt"
+        command_success "echo '# FabQR USB power setting' >> /boot/config.txt"
+        command_success "echo 'max_usb_current=1' >> /boot/config.txt"
+    fi
+fi
 
 # TODO iptables
 # Add to packages, need to config to prevent attacks
