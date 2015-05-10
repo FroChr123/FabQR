@@ -615,12 +615,12 @@ do
 
             # Data directory: Set properties for directory
             # For /media/usb* devices setting the properties from before might fail, thus unchecked
-            if user_confirm "[INFO] Owner of $newdir needs to be reset to www-data recursively" "true"
+            if user_confirm "[INFO] Owner of $newdir needs to be reset to fabqr recursively" "true"
             then
                 chown "fabqr" "$newdir" -R
             fi
 
-            if user_confirm "[INFO] Group of $newdir needs to be reset to www-data recursively" "true"
+            if user_confirm "[INFO] Group of $newdir needs to be reset to fabqr recursively" "true"
             then
                 chgrp "fabqr" "$newdir" -R
             fi
