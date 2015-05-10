@@ -550,6 +550,13 @@ then
     output_text "[INFO] Crontab entry for command fabqr_cron_log.sh created"
 fi
 
+# Shared memory: Check if shared memory folder exists
+if ! [ -d "/dev/shm" ]
+then
+    output_text "[ERROR] There is no shared memory at /dev/shm"
+    quit_error
+fi
+
 # usbmount : Set option MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007" in usbmount config
 # usbmount : Every user is allowed to access new mounted devices
 # usbmount : Create backup of config file
