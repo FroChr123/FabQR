@@ -159,76 +159,71 @@ function check_package_install
 # Argument 2: Target directory
 # Argument 3: File name
 # Argument 4: true = Set default file properties, false = Do not set default file properties
+# Argument 5: true = Ensure redownload of file, false = Default procedure
 function get_fabqr_file
 {
-    # Check if target directory exists
-    if ! [ -d "$2" ]
+    # Check if redownload enabled
+    if ! ( $5 )
     then
-        output_text "[INFO] Target directory $2 for FabQR file $1/$3 does not exist"
-        output_text "[INFO] Create directory $2"
-        command_success "mkdir $2"
-
-        if ( $4 )
+        # Check if file already exists and is not empty (which could happen because of error in wget)
+        if [ -e "$2/$3" ] && [ -s "$2/$3" ]
         then
-            output_text "[INFO] Set default properties for directory $2"
-            command_success "chown fabqr $2 -R"
-            command_success "chgrp fabqr $2 -R"
-            command_success "chmod 770 $2 -R"
-        fi
-    fi
+            # Set default file properties if argument 4 is true
+            if ( $4 )
+            then
+                file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
+            fi
 
-    # Check if file already exists and is not empty (which could happen because of error in wget)
-    if [ -e "$2/$3" ] && [ -s "$2/$3" ]
-    then
-        # Set default file properties if argument 4 is true
-        if ( $4 )
-        then
-            file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770"
+            return 1
         fi
 
-        return 1
-    fi
+        # Local folder
+        if [ -e "$3" ]
+        then
+            output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
+            command_success "mv $3 $2/$3"
+            return 0
+        fi
 
-    # Local folder
-    if [ -e "$3" ]
-    then
-        output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success "mv $3 $2/$3"
-        return 0
-    fi
+        # Local folder, subfolder
+        if [ -e "$1/$3" ]
+        then
+            output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
+            command_success "mv $1/$3 $2/$3"
+            return 0
+        fi
 
-    # Local folder, subfolder
-    if [ -e "$1/$3" ]
-    then
-        output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success "mv $1/$3 $2/$3"
-        return 0
-    fi
+        # Parent folder
+        if [ -e "../$3" ]
+        then
+            output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
+            command_success "mv ../$3 $2/$3"
+            return 0
+        fi
 
-    # Parent folder
-    if [ -e "../$3" ]
-    then
-        output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success "mv ../$3 $2/$3"
-        return 0
-    fi
-
-    # Parent folder, subfolder
-    if [ -e "../$1/$3" ]
-    then
-        output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-        command_success "mv ../$1/$3 $2/$3"
-        return 0
+        # Parent folder, subfolder
+        if [ -e "../$1/$3" ]
+        then
+            output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
+            command_success "mv ../$1/$3 $2/$3"
+            return 0
+        fi
+    else
+        # Check if file already exists, in that case for redownload needs to be removed
+        if [ -e "$2/$3" ]
+        then
+            command_success "rm $2/$3"
+        fi
     fi
 
     # Download from github
-    output_text "[INFO] FabQR file $1/$3 not found in local file system, downloading to target $2/$3"
+    output_text "[INFO] Downloading FabQR file $1/$3 to target $2/$3"
     command_success "wget -q -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3"
 
     # Set default file properties if argument 4 is true
     if ( $4 )
     then
-        file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770"
+        file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
     fi
 
     return 0
@@ -240,27 +235,43 @@ function get_fabqr_file
 # Argument 3: Group name
 # Argument 4: Permission string
 # Argument 5: Permission bitmask
+# Argument 6: true = Ignore setting of owner and do not force check, false = default behavior
 function file_properties
 {
     # Check owner
-    if [ $( stat -c %U $1 ) != "$2" ]
+    if ! ( $6 )
     then
-        output_text "[INFO] Owner of file $1 was incorrect, set to $2"
-        command_success "chown $2 $1"
+        if [ $( stat -c %U $1 ) != "$2" ]
+        then
+            output_text "[INFO] Owner of file $1 was incorrect, set to $2"
+            command_success "chown $2 $1"
+        fi
     fi
 
     # Check group
     if [ $( stat -c %G $1 ) != "$3" ]
     then
         output_text "[INFO] Group of file $1 was incorrect, set to $3"
-        command_success "chgrp $3 $1"
+
+        if ! ( $6 )
+        then
+            command_success "chgrp $3 $1"
+        else
+            chgrp "$3" "$1"
+        fi
     fi
 
     # Check permission
     if [ $( stat -c %A $1 ) != "$4" ]
     then
         output_text "[INFO] Permissions of file $1 were incorrect, set to $5"
-        command_success "chmod $5 $1"
+
+        if ! ( $6 )
+        then
+            command_success "chmod $5 $1"
+        else
+            chgrp "chmod $5 $1"
+        fi
     fi
 
     return 0
@@ -292,6 +303,17 @@ fi
 if [ -e "/etc/init.d/fabqr_service" ] && [ -e "/home/fabqr/fabqr_stop.sh" ]
 then
     command_success "service fabqr_service stop"
+fi
+
+# ##################################################################
+# REDOWNLOAD
+# ##################################################################
+
+redownload=false
+
+if user_confirm "[INFO] Optional: Force redownload of all FabQR files" "false"
+then
+    redownload=true
 fi
 
 # ##################################################################
@@ -475,26 +497,21 @@ if ! [ -e "/home/fabqr/fabqr.log" ]
 then
     output_text "[INFO] Moving log to fabqr home directory"
     command_success "mv fabqr.log /home/fabqr/fabqr.log"
-    file_properties "/home/fabqr/fabqr.log" "fabqr" "fabqr" "-rwxrwx---" "770"
+    file_properties "/home/fabqr/fabqr.log" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
 fi
 
-# Copy current script to user location, if it does not exist yet
-if ! [ -e "/home/fabqr/fabqr_install.sh" ]
-then
-    output_text "[INFO] Copying install script to fabqr home directory"
-    command_success "cp $( dirname "$0" )/$( basename "$0" ) /home/fabqr/fabqr_install.sh"
-    file_properties "/home/fabqr/fabqr_install.sh" "fabqr" "fabqr" "-rwxrwx---" "770"
-fi
+# FabQR install: Get file
+get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_install.sh" "true" "$redownload"
 
 # FabQR start : Get file
-get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_start.sh" "true"
+get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_start.sh" "true" "$redownload"
 
 # FabQR stop : Get file
-get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh" "true"
+get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh" "true" "$redownload"
 
 # FabQR service : Get file
-get_fabqr_file "bash_scripts" "/etc/init.d" "fabqr_service" "false"
-file_properties "/etc/init.d/fabqr_service" "root" "root" "-rwxr-xr-x" "755"
+get_fabqr_file "bash_scripts" "/etc/init.d" "fabqr_service" "false" "$redownload"
+file_properties "/etc/init.d/fabqr_service" "root" "root" "-rwxr-xr-x" "755" "false"
 
 # FabQR service : Auto start entry for system boot, if it does not exist yet
 if ! ( ( ls -l /etc/rc2.d | grep fabqr_service ) > /dev/null )
@@ -504,7 +521,7 @@ then
 fi
 
 # crontab : Get file
-get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh" "true"
+get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh" "true" "$redownload"
 
 # crontab : User does not have crontab or fabqr_cron_log.sh is not in crontab yet
 if ! ( ( crontab -u fabqr -l | grep fabqr_cron_log.sh ) &> /dev/null )
@@ -517,7 +534,7 @@ then
         if ! [ -e "/home/fabqr/fabqr_crontab.bak" ]
         then
             command_success "crontab -u fabqr -l > /home/fabqr/fabqr_crontab.bak"
-            file_properties "/home/fabqr/fabqr_crontab.bak" "fabqr" "fabqr" "-rwxrwx---" "770"
+            file_properties "/home/fabqr/fabqr_crontab.bak" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
         fi
     fi
 
@@ -540,7 +557,7 @@ if ! [ -e "/etc/usbmount/usbmount.conf.bak" ]
 then
     output_text "[INFO] Backup original config file for usbmount /etc/usbmount/usbmount.conf"
     command_success "cp /etc/usbmount/usbmount.conf /etc/usbmount/usbmount.conf.bak"
-    file_properties "/etc/usbmount/usbmount.conf.bak" "root" "root" "-rw-r--r--" "644"
+    file_properties "/etc/usbmount/usbmount.conf.bak" "root" "root" "-rw-r--r--" "644" "false"
 fi
 
 # usbmount : Place hash in front of all MOUNTOPTIONS= lines
@@ -595,7 +612,7 @@ do
         if ! [ -e "$newdir" ]
         then
             output_text "[INFO] Create directory $newdir"
-            command_success "mkdir $newdir"
+            command_success "mkdir -p $newdir"
         fi
 
         # Data directory: Path needs to be directory
@@ -611,6 +628,27 @@ do
                 then
                     cp -R "${prevdir}." "$newdir"
                 fi
+            fi
+
+            # Data directory: Create directories
+            if ! [ -d "${newdir}www" ]
+            then
+                command_success "mkdir ${newdir}www"
+            fi
+
+            if ! [ -d "${newdir}data" ]
+            then
+                command_success "mkdir ${newdir}data"
+            fi
+
+            if ! [ -d "${newdir}www/public" ]
+            then
+                command_success "mkdir ${newdir}www/public"
+            fi
+
+            if ! [ -d "${newdir}www/private" ]
+            then
+                command_success "mkdir ${newdir}www/private"
             fi
 
             # Data directory: Set properties for directory
@@ -665,12 +703,12 @@ command_success "ln -s $newdir /home/fabqr/fabqr_data"
 # TODO download web php files to /home/fabqr/fabqr_data directory
 
 # apache2 : FabQR public config, get file
-get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_public" "false"
-file_properties "/etc/apache2/sites-available/fabqr_apache_public" "root" "root" "-rw-r--r--" "644"
+get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_public" "false" "$redownload"
+file_properties "/etc/apache2/sites-available/fabqr_apache_public" "root" "root" "-rw-r--r--" "644" "false"
 
 # apache2 : FabQR private config, get file
-get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_private" "false"
-file_properties "/etc/apache2/sites-available/fabqr_apache_private" "root" "root" "-rw-r--r--" "644"
+get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_private" "false" "$redownload"
+file_properties "/etc/apache2/sites-available/fabqr_apache_private" "root" "root" "-rw-r--r--" "644" "false"
 
 # apache2 : Warning default site enabled
 if [ -e "/etc/apache2/sites-enabled/000-default" ]
@@ -683,7 +721,7 @@ if ! [ -e "/etc/apache2/ports.conf.bak" ]
 then
     output_text "[INFO] Backup original port config file for apache2 /etc/apache2/ports.conf"
     command_success "cp /etc/apache2/ports.conf /etc/apache2/ports.conf.bak"
-    file_properties "/etc/apache2/ports.conf.bak" "root" "root" "-rw-r--r--" "644"
+    file_properties "/etc/apache2/ports.conf.bak" "root" "root" "-rw-r--r--" "644" "false"
 fi
 
 # apache2 : Add port configs for ports 8081 and 8090 to file /etc/apache2/ports.conf
