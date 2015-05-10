@@ -566,7 +566,7 @@ then
 
     # Data directory: Check if old data directory path begins with / and is absolute path
     # Otherwise clear prevdir and set to invalid again
-    if ! ( ( echo $tmp | grep ^/ ) > /dev/null )
+    if ! ( ( echo $prevdir | grep ^/ ) > /dev/null )
     then
         prevdir=""
     fi
@@ -657,6 +657,7 @@ do
 done
 
 # Data directory: Set symlink
+output_text "[INFO] Symlink /home/fabqr/fabqr_data now points to $newdir"
 command_success "ln -s $newdir /home/fabqr/fabqr_data"
 
 # apache2 : FabQR public config, get file
