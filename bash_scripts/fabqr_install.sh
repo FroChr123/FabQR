@@ -602,7 +602,7 @@ do
                 # Copying might fail for empty folder, thus unchecked
                 if user_confirm "[INFO] Optional: Copy contents from old directory $prevdir to new directory $newdir" "false"
                 then
-                    cp -R "${prevdir}*" "$newdir"
+                    cp -R "${prevdir}." "$newdir"
                 fi
             fi
 
