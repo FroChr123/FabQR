@@ -566,7 +566,7 @@ then
 
     # Data directory: Check if old data directory path begins with / and is absolute path
     # Otherwise clear prevdir and set to invalid again
-    if ! ( ( echo $prevdir | grep ^/ ) > /dev/null )
+    if ! ( ( echo $prevdir | grep ^/.*?/$ ) > /dev/null )
     then
         prevdir=""
     fi
@@ -581,7 +581,7 @@ do
     read -e -p "FabQR absolute data path: " -i "$newdir" newdir
 
     # Data directory: Check for absolute path input
-    if ( ( echo $newdir | grep ^/ ) > /dev/null )
+    if ( ( echo $newdir | grep ^/.*?/$ ) > /dev/null )
     then
 
         # Data directory: If no file OR directory does exist at this path, create new directory
@@ -596,20 +596,12 @@ do
         then
 
             # Data directory: Copy data from previous directory, if exists
-            if [ -n "$prevdir" ]
+            if [ -n "$prevdir" ] && [ "$newdir" != "$prevdir" ]
             then
-
                 # Data directory: Copy data from previous directory, if user accepts
                 if user_confirm "[INFO] Optional: Copy contents from old directory $prevdir to new directory $newdir" "false"
                 then
-                    # Data directory: prevdir might have ending slash or not
-                    # Need to have /* at end to copy contents of the directory, not directory itself
-                    if ( ( echo $prevdir | grep /$ ) > /dev/null )
-                    then
-                        command_success "cp -R ${prevdir}* $newdir"
-                    else
-                        command_success "cp -R ${prevdir}/* $newdir"
-                    fi
+                    command_success "cp -R ${prevdir}* $newdir"
                 fi
             fi
 
@@ -652,7 +644,7 @@ do
             output_text "[INFO] Path $newdir is no directory"
         fi
     else
-        output_text "[INFO] Path $newdir does not begin with / and is no absolute path"
+        output_text "[INFO] Path $newdir does not begin or end with / and is wrong absolute path"
     fi
 done
 
