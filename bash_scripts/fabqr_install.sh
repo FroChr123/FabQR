@@ -537,7 +537,7 @@ then
 fi
 
 # usbmount : Place hash in front of all MOUNTOPTIONS= lines
-command_success "sed -r -i 's/^(MOUNTOPTIONS=.*?)$/# \1/g' /etc/usbmount/usbmount.conf"
+command_success "sed -r -i 's/^(MOUNTOPTIONS=.*)$/# \1/g' /etc/usbmount/usbmount.conf"
 
 # usbmount : Remove hash in front of MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007"
 command_success "sed -r -i 's/^# (MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\")$/\1/g' /etc/usbmount/usbmount.conf"
@@ -566,7 +566,7 @@ then
 
     # Data directory: Check if old data directory path begins with / and is absolute path
     # Otherwise clear prevdir and set to invalid again
-    if ! ( ( echo $prevdir | grep ^/.*?/$ ) > /dev/null )
+    if ! ( ( echo $prevdir | grep ^/.*/$ ) > /dev/null )
     then
         prevdir=""
     fi
@@ -581,7 +581,7 @@ do
     read -e -p "FabQR absolute data path: " -i "$newdir" newdir
 
     # Data directory: Check for absolute path input
-    if ( ( echo $newdir | grep ^/.*?/$ ) > /dev/null )
+    if ( ( echo $newdir | grep ^/.*/$ ) > /dev/null )
     then
 
         # Data directory: If no file OR directory does exist at this path, create new directory
