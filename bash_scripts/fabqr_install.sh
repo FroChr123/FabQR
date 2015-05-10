@@ -328,6 +328,13 @@ then
     quit_error
 fi
 
+# Check if apache port config is correct
+if ! [ -e "/etc/apache2/ports.conf" ]
+then
+    output_text "[ERROR] apache2 is installed, but file /etc/apache2/ports.conf does not exist!"
+    quit_error
+fi
+
 # Check if user www-data exists
 if ! ( getent passwd www-data > /dev/null )
 then
@@ -655,6 +662,8 @@ output_text "[INFO] Update symbolic link /home/fabqr/fabqr_data to $newdir"
 command_success "rm /home/fabqr/fabqr_data"
 command_success "ln -s $newdir /home/fabqr/fabqr_data"
 
+# TODO download web php files to /home/fabqr/fabqr_data directory
+
 # apache2 : FabQR public config, get file
 get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_public" "false"
 file_properties "/etc/apache2/sites-available/fabqr_apache_public" "root" "root" "-rw-r--r--" "644"
@@ -669,14 +678,49 @@ then
     output_text "[INFO] Default site of apache is enabled, you might want to disable it and remove port 80 from port config"
 fi
 
-# TODO apache port conf
-# File: /etc/apache2/ports.conf
-# NameVirtualHost *:8081
-# Listen 8081
-# NameVirtualHost *:8090
-# Listen 8090
-# Reload config
+# apache2 : Create backup of file /etc/apache2/ports.conf
+if ! [ -e "/etc/apache2/ports.conf.bak" ]
+then
+    output_text "[INFO] Backup original port config file for apache2 /etc/apache2/ports.conf"
+    command_success "cp /etc/apache2/ports.conf /etc/apache2/ports.conf.bak"
+    file_properties "/etc/apache2/ports.conf.bak" "root" "root" "-rw-r--r--" "644"
+fi
 
+# apache2 : Add port configs for ports 8081 and 8090 to file /etc/apache2/ports.conf
+if ! ( ( cat /etc/apache2/ports.conf | grep '^NameVirtualHost \*\:8081$' ) > /dev/null )
+then
+    output_text "[INFO] Adding line NameVirtualHost *:8081 to file /etc/apache2/ports.conf"
+    command_success "echo >> /etc/apache2/ports.conf"
+    command_success "echo '# FabQR port 8081' >> /etc/apache2/ports.conf"
+    command_success "echo 'NameVirtualHost *:8081' >> /etc/apache2/ports.conf"
+fi
+
+if ! ( ( cat /etc/apache2/ports.conf | grep '^Listen 8081$' ) > /dev/null )
+then
+    output_text "[INFO] Adding line Listen 8081 to file /etc/apache2/ports.conf"
+    command_success "echo >> /etc/apache2/ports.conf"
+    command_success "echo '# FabQR port 8081' >> /etc/apache2/ports.conf"
+    command_success "echo 'Listen 8081' >> /etc/apache2/ports.conf"
+fi
+
+if ! ( ( cat /etc/apache2/ports.conf | grep '^NameVirtualHost \*\:8090$' ) > /dev/null )
+then
+    output_text "[INFO] Adding line NameVirtualHost *:8090 to file /etc/apache2/ports.conf"
+    command_success "echo >> /etc/apache2/ports.conf"
+    command_success "echo '# FabQR port 8090' >> /etc/apache2/ports.conf"
+    command_success "echo 'NameVirtualHost *:8090' >> /etc/apache2/ports.conf"
+fi
+
+if ! ( ( cat /etc/apache2/ports.conf | grep '^Listen 8090$' ) > /dev/null )
+then
+    output_text "[INFO] Adding line Listen 8090 to file /etc/apache2/ports.conf"
+    command_success "echo >> /etc/apache2/ports.conf"
+    command_success "echo '# FabQR port 8090' >> /etc/apache2/ports.conf"
+    command_success "echo 'Listen 8090' >> /etc/apache2/ports.conf"
+fi
+
+# Reload config
+command_success "service apache2 reload"
 
 # TODO display power down time
 # File: /etc/kbd/config
