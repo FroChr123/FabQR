@@ -772,6 +772,8 @@ then
     command_success "echo 'Listen 8090' >> /etc/apache2/ports.conf"
 fi
 
+# TODO boot settings max power
+
 # TODO iptables
 # Add to packages, need to config to prevent attacks
 
