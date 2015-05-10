@@ -635,29 +635,6 @@ do
             # newdir might have ending slash or not
             if ( ( echo $newdir | grep /$ ) > /dev/null )
             then
-                output_text "[INFO] Create ${newdir}/write_test.tmp file for checking group and permissions"
-                command_success "echo 'write_test' >> ${newdir}/write_test.tmp"
-
-                # Check group
-                if [ $( stat -c %G "${newdir}/write_test.tmp" ) == "fabqr" ]
-                then
-                    # Check permission
-                    if [ $( stat -c %A "${newdir}/write_test.tmp" ) == "-rwxrwx---" ]
-                    then
-                        output_text "[INFO] Remove ${newdir}/write_test.tmp file, checking was correct"
-                        newdirvalid=true
-                        command_success "rm ${newdir}/write_test.tmp"
-                    else
-                        output_text "[INFO] Permission on ${newdir}/write_test.tmp file was incorrect"
-                        output_text "[INFO] Remove ${newdir}/write_test.tmp file"
-                        command_success "rm ${newdir}/write_test.tmp"
-                    fi
-                else
-                    output_text "[INFO] Group on ${newdir}/write_test.tmp file was incorrect"
-                    output_text "[INFO] Remove ${newdir}/write_test.tmp file"
-                    command_success "rm ${newdir}/write_test.tmp"
-                fi
-            else
                 output_text "[INFO] Create ${newdir}write_test.tmp file for checking group and permissions"
                 command_success "echo 'write_test' >> ${newdir}write_test.tmp"
 
@@ -679,6 +656,29 @@ do
                     output_text "[INFO] Group on ${newdir}write_test.tmp file was incorrect"
                     output_text "[INFO] Remove ${newdir}write_test.tmp file"
                     command_success "rm ${newdir}write_test.tmp"
+                fi
+            else
+                output_text "[INFO] Create ${newdir}/write_test.tmp file for checking group and permissions"
+                command_success "echo 'write_test' >> ${newdir}/write_test.tmp"
+
+                # Check group
+                if [ $( stat -c %G "${newdir}/write_test.tmp" ) == "fabqr" ]
+                then
+                    # Check permission
+                    if [ $( stat -c %A "${newdir}/write_test.tmp" ) == "-rwxrwx---" ]
+                    then
+                        output_text "[INFO] Remove ${newdir}/write_test.tmp file, checking was correct"
+                        newdirvalid=true
+                        command_success "rm ${newdir}/write_test.tmp"
+                    else
+                        output_text "[INFO] Permission on ${newdir}/write_test.tmp file was incorrect"
+                        output_text "[INFO] Remove ${newdir}/write_test.tmp file"
+                        command_success "rm ${newdir}/write_test.tmp"
+                    fi
+                else
+                    output_text "[INFO] Group on ${newdir}/write_test.tmp file was incorrect"
+                    output_text "[INFO] Remove ${newdir}/write_test.tmp file"
+                    command_success "rm ${newdir}/write_test.tmp"
                 fi
             fi
         else
