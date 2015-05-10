@@ -317,6 +317,12 @@ then
 fi
 
 # ##################################################################
+# REBOOT VARIABLE
+# ##################################################################
+
+reboot=false
+
+# ##################################################################
 # PACKAGES
 # ##################################################################
 
@@ -578,6 +584,7 @@ if ! ( ( cat /etc/usbmount/usbmount.conf | grep ^MOUNTOPTIONS=\"sync,noexec,node
 then
     output_text "[INFO] Adding line MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" to file /etc/usbmount/usbmount.conf"
     output_text "[INFO] You need to reconnect USB storage devices or reboot!"
+    reboot=true
     command_success "echo >> /etc/usbmount/usbmount.conf"
     command_success "echo '# FabQR allow access for all users in group fabqr' >> /etc/usbmount/usbmount.conf"
     command_success "echo 'MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"' >> /etc/usbmount/usbmount.conf"
@@ -765,11 +772,6 @@ then
     command_success "echo 'Listen 8090' >> /etc/apache2/ports.conf"
 fi
 
-# TODO display power down time
-# File: /etc/kbd/config
-# BLANK_TIME=30 => BLANK_TIME=0
-# POWERDOWN_TIME=30 => POWERDOWN_TIME=0
-
 # TODO iptables
 # Add to packages, need to config to prevent attacks
 
@@ -781,10 +783,65 @@ output_text "[INFO] FabQR files and settings checked successfully"
 
 output_text "[INFO] Checking FabQR graphics"
 
+# Display settings: disable standby of display
+if [ -e "/etc/kbd/config" ]
+then
+    # Display settings: Create backup
+    if ! [ -e "/etc/kbd/config.bak" ]
+    then
+        output_text "[INFO] Backup original display settings config file for kbd /etc/kbd/config"
+        command_success "cp /etc/kbd/config /etc/kbd/config.bak"
+        file_properties "/etc/kbd/config.bak" "root" "root" "-rw-r--r--" "644" "false"
+    fi
+
+    # Display settings : Place hash in front of all BLANK_TIME= and POWERDOWN_TIME= lines
+    command_success "sed -r -i 's/^(BLANK_TIME=.*)$/# \1/g' /etc/kbd/config"
+    command_success "sed -r -i 's/^(POWERDOWN_TIME=.*)$/# \1/g' /etc/kbd/config"
+
+    # Display settings : Remove hash in front of BLANK_TIME=0 or POWERDOWN_TIME=0
+    command_success "sed -r -i 's/^# (BLANK_TIME=0)$/\1/g' /etc/kbd/config"
+    command_success "sed -r -i 's/^# (POWERDOWN_TIME=0)$/\1/g' /etc/kbd/config"
+
+    # Display settings : If file does not contain line BLANK_TIME=0, then add it
+    if ! ( ( cat /etc/kbd/config | grep ^BLANK_TIME=0$ ) > /dev/null )
+    then
+        output_text "[INFO] Adding line BLANK_TIME=0 to file /etc/kbd/config"
+        output_text "[INFO] You need to reboot to activate changes!"
+        reboot=true
+        command_success "echo >> /etc/kbd/config"
+        command_success "echo '# FabQR display setting' >> /etc/kbd/config"
+        command_success "echo 'BLANK_TIME=0' >> /etc/kbd/config"
+    fi
+
+    # Display settings : If file does not contain line POWERDOWN_TIME=0, then add it
+    if ! ( ( cat /etc/kbd/config | grep ^POWERDOWN_TIME=0$ ) > /dev/null )
+    then
+        output_text "[INFO] Adding line POWERDOWN_TIME=0 to file /etc/kbd/config"
+        output_text "[INFO] You need to reboot to activate changes!"
+        reboot=true
+        command_success "echo >> /etc/kbd/config"
+        command_success "echo '# FabQR display setting' >> /etc/kbd/config"
+        command_success "echo 'POWERDOWN_TIME=0' >> /etc/kbd/config"
+    fi
+fi
+
 # TODO
 # Download graphics c file, compile program
 
 output_text "[INFO] FabQR graphics checked successfully"
+
+# ##################################################################
+# CHECK REBOOT VARIABLE
+# ##################################################################
+
+if ( $reboot )
+then
+    if user_confirm "[INFO] Optional: Reboot to activate all changes" "false"
+    then
+        reboot
+        exit 0
+    fi
+fi
 
 # ##################################################################
 # EXIT AND START FABQR
