@@ -687,6 +687,7 @@ then
 fi
 
 # apache2 : Add port configs for ports 8081 and 8090 to file /etc/apache2/ports.conf
+# apache2 : Config is reloaded in FabQR start script
 if ! ( ( cat /etc/apache2/ports.conf | grep '^NameVirtualHost \*\:8081$' ) > /dev/null )
 then
     output_text "[INFO] Adding line NameVirtualHost *:8081 to file /etc/apache2/ports.conf"
@@ -718,9 +719,6 @@ then
     command_success "echo '# FabQR port 8090' >> /etc/apache2/ports.conf"
     command_success "echo 'Listen 8090' >> /etc/apache2/ports.conf"
 fi
-
-# Reload config
-command_success "service apache2 reload"
 
 # TODO display power down time
 # File: /etc/kbd/config
