@@ -82,7 +82,7 @@ function remove_existing_folder_confirm
 {
     if [ -d "$1" ]
     then
-        if user_confirm "[INFO] Folder $1 exists, it will be deleted"
+        if user_confirm "[INFO] Folder $1 exists, it will be deleted" "true"
         then
             if rm -R "$1"
             then
@@ -98,15 +98,30 @@ function remove_existing_folder_confirm
 
 # Function to prompt for user input yes or no
 # Argument 1: Text
+# Argument 2: true = Quit if not confirmed, false = Continue if not confirmed
 function user_confirm
 {
     TIMESTRING=$( date "+%Y-%m-%d %H:%M:%S" )
     output_text_log "$1. Confirm (y/n)? "
     read -p "[$TIMESTRING] $1. Confirm (y/n)? " userinput
+
     case "$userinput" in
-        y|Y ) output_text "[INFO] Action confirmed"; return 0;;
-        * ) output_text "[ERROR] Action aborted by confirmation dialog"; quit_error;;
+        y|Y )
+            output_text "[INFO] Action confirmed"
+            return 0
+            ;;
+        * )
+            if ( $2 )
+            then
+                output_text "[ERROR] Action aborted by confirmation dialog, quit"
+                quit_error
+            else
+                output_text "[ERROR] Action aborted by confirmation dialog, continue"
+                return 1
+            fi
+            ;;
     esac
+
     return 0
 }
 
@@ -129,7 +144,7 @@ function check_package_install
 {
     if ! ( is_package_installed "$1" )
     then
-        if user_confirm "[INFO] Package $1 needs to be installed"
+        if user_confirm "[INFO] Package $1 needs to be installed" "true"
         then
             command_success "apt-get install $1"
         fi
@@ -146,6 +161,22 @@ function check_package_install
 # Argument 4: true = Set default file properties, false = Do not set default file properties
 function get_fabqr_file
 {
+    # Check if target directory exists
+    if ! [ -d "$2" ]
+    then
+        output_text "[INFO] Target directory $2 for FabQR file $1/$3 does not exist"
+        output_text "[INFO] Create directory $2"
+        command_success "mkdir $2"
+
+        if ( $4 )
+        then
+            output_text "[INFO] Set default properties for directory $2"
+            command_success "chown fabqr $2 -R"
+            command_success "chgrp fabqr $2 -R"
+            command_success "chmod 770 $2 -R"
+        fi
+    fi
+
     # Check if file already exists and is not empty (which could happen because of error in wget)
     if [ -e "$2/$3" ] && [ -s "$2/$3" ]
     then
@@ -336,7 +367,7 @@ then
     then
         remove_existing_folder_confirm "/home/fabqr"
 
-        if user_confirm "[INFO] User fabqr home path needs to be changed, contents of old home path are moved"
+        if user_confirm "[INFO] User fabqr home path needs to be changed, contents of old home path are moved" "true"
         then
             command_success "usermod --home /home/fabqr --move-home --shell /bin/bash fabqr"
         fi
@@ -369,7 +400,7 @@ then
     # Check owner
     if [ $( stat -c %U /home/fabqr ) != "fabqr" ]
     then
-        if user_confirm "[INFO] Owner of /home/fabqr needs to be reset recursively"
+        if user_confirm "[INFO] Owner of /home/fabqr needs to be reset recursively" "true"
         then
             command_success "chown fabqr /home/fabqr -R"
         fi
@@ -378,7 +409,7 @@ then
     # Check group
     if [ $( stat -c %G /home/fabqr ) != "fabqr" ]
     then
-        if user_confirm "[INFO] Group of /home/fabqr needs to be reset recursively"
+        if user_confirm "[INFO] Group of /home/fabqr needs to be reset recursively" "true"
         then
             command_success "chgrp fabqr /home/fabqr -R"
         fi
@@ -387,7 +418,7 @@ then
     # Check permissions
     if [ $( stat -c %A /home/fabqr ) != "drwxrwx---" ]
     then
-        if user_confirm "[INFO] Permissions of /home/fabqr need to be reset to 770 recursively"
+        if user_confirm "[INFO] Permissions of /home/fabqr need to be reset to 770 recursively" "true"
         then
             command_success "chmod 770 /home/fabqr -R"
         fi
@@ -515,13 +546,151 @@ command_success "sed -r -i 's/^# (MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodir
 if ! ( ( cat /etc/usbmount/usbmount.conf | grep ^MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"$ ) > /dev/null )
 then
     output_text "[INFO] Adding line MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" to file /etc/usbmount/usbmount.conf"
+    output_text "[INFO] You need to reconnect USB storage devices or reboot!"
     command_success "echo >> /etc/usbmount/usbmount.conf"
     command_success "echo '# FabQR allow access for all users in group fabqr' >> /etc/usbmount/usbmount.conf"
     command_success "echo 'MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"' >> /etc/usbmount/usbmount.conf"
 fi
 
-# TODO symlink data folder
-# Enter / Check / Move path of data dir
+# Data directory: Enter / Check / Copy path of data dir
+output_text "[INFO] Configuring FabQR data directory"
+output_text "[INFO] It is advised to use /media/usb* devices"
+prevdir=""
+newdir=""
+newdirvalid=false
+
+# Data directory: If link exists AND points to existing location, then store old path
+if [ -s /home/fabqr/fabqr_data ]
+then
+    prevdir=$( ls -l /home/fabqr/fabqr_data | awk '{print $11}' )
+
+    # Data directory: Check if old data directory path begins with / and is absolute path
+    # Otherwise clear prevdir and set to invalid again
+    if ! ( ( echo $tmp | grep ^/ ) > /dev/null )
+    then
+        prevdir=""
+    fi
+fi
+
+# Data directory: Set new directory value to previous
+newdir="$prevdir"
+
+# Data directory: While loop to ask user for valid new absolute path
+while ! ( $newdirvalid )
+do
+    read -e -p "FabQR absolute data path: " -i "$newdir" newdir
+
+    # Data directory: Check for absolute path input
+    if ( ( echo $newdir | grep ^/ ) > /dev/null )
+    then
+
+        # Data directory: If no file OR directory does exist at this path, create new directory
+        if ! [ -e "$newdir" ]
+        then
+            output_text "[INFO] Create directory $newdir"
+            command_success "mkdir $newdir"
+        fi
+
+        # Data directory: Path needs to be directory
+        if [ -d "$newdir" ]
+        then
+
+            # Data directory: Copy data from previous directory, if exists
+            if [ -n "$prevdir" ]
+            then
+
+                # Data directory: Copy data from previous directory, if user accepts
+                if user_confirm "[INFO] Optional: Copy contents from old directory $prevdir to new directory $newdir" "false"
+                then
+                    # Data directory: prevdir might have ending slash or not
+                    # Need to have /* at end to copy contents of the directory, not directory itself
+                    if ( ( echo $prevdir | grep /$ ) > /dev/null )
+                    then
+                        command_success "cp -R ${prevdir}* $newdir"
+                    else
+                        command_success "cp -R ${prevdir}/* $newdir"
+                    fi
+                fi
+            fi
+
+            # Data directory: Set properties for directory
+            # For /media/usb* devices setting the properties from before might fail, thus unchecked
+            if user_confirm "[INFO] Owner of $newdir needs to be reset to www-data recursively" "true"
+            then
+                chown "fabqr" "$newdir" -R
+            fi
+
+            if user_confirm "[INFO] Group of $newdir needs to be reset to www-data recursively" "true"
+            then
+                chgrp "fabqr" "$newdir" -R
+            fi
+
+            if user_confirm "[INFO] Permissions of $newdir need to be reset to 770 recursively" "true"
+            then
+                chmod "770" "$newdir" -R
+            fi
+
+            # Data directory: Check if file in that folder matches expected group and permissions
+            # For /media/usb* devices setting the properties from before might have no effect at all
+            # newdir might have ending slash or not
+            if ( ( echo $newdir | grep /$ ) > /dev/null )
+            then
+                output_text "[INFO] Create ${newdir}/write_test.tmp file for checking group and permissions"
+                command_success "echo 'write_test' >> ${newdir}/write_test.tmp"
+
+                # Check group
+                if [ $( stat -c %G "${newdir}/write_test.tmp" ) == "fabqr" ]
+                then
+                    # Check permission
+                    if [ $( stat -c %A "${newdir}/write_test.tmp" ) == "-rwxrwx---" ]
+                    then
+                        output_text "[INFO] Remove ${newdir}/write_test.tmp file, checking was correct"
+                        newdirvalid=true
+                        command_success "rm ${newdir}/write_test.tmp"
+                    else
+                        output_text "[INFO] Permission on ${newdir}/write_test.tmp file was incorrect"
+                        output_text "[INFO] Remove ${newdir}/write_test.tmp file"
+                        command_success "rm ${newdir}/write_test.tmp"
+                    fi
+                else
+                    output_text "[INFO] Group on ${newdir}/write_test.tmp file was incorrect"
+                    output_text "[INFO] Remove ${newdir}/write_test.tmp file"
+                    command_success "rm ${newdir}/write_test.tmp"
+                fi
+            else
+                output_text "[INFO] Create ${newdir}write_test.tmp file for checking group and permissions"
+                command_success "echo 'write_test' >> ${newdir}write_test.tmp"
+
+                # Check group
+                if [ $( stat -c %G "${newdir}write_test.tmp" ) == "fabqr" ]
+                then
+                    # Check permission
+                    if [ $( stat -c %A "${newdir}write_test.tmp" ) == "-rwxrwx---" ]
+                    then
+                        output_text "[INFO] Remove ${newdir}write_test.tmp file, checking was correct"
+                        newdirvalid=true
+                        command_success "rm ${newdir}write_test.tmp"
+                    else
+                        output_text "[INFO] Permission on ${newdir}write_test.tmp file was incorrect"
+                        output_text "[INFO] Remove ${newdir}write_test.tmp file"
+                        command_success "rm ${newdir}write_test.tmp"
+                    fi
+                else
+                    output_text "[INFO] Group on ${newdir}write_test.tmp file was incorrect"
+                    output_text "[INFO] Remove ${newdir}write_test.tmp file"
+                    command_success "rm ${newdir}write_test.tmp"
+                fi
+            fi
+        else
+            output_text "[INFO] Path $newdir is no directory"
+        fi
+    else
+        output_text "[INFO] Path $newdir does not begin with / and is no absolute path"
+    fi
+done
+
+# Data directory: Set symlink
+command_success "ln -s $newdir /home/fabqr/fabqr_data"
 
 # apache2 : FabQR public config, get file
 get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_public" "false"
@@ -544,6 +713,7 @@ fi
 # NameVirtualHost *:8090
 # Listen 8090
 # Reload config
+
 
 # TODO display power down time
 # File: /etc/kbd/config
