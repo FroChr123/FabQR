@@ -578,7 +578,7 @@ fi
 
 # Data directory: Enter / Check / Copy path of data dir
 output_text "[INFO] Configuring FabQR data directory"
-output_text "[INFO] It is advised to use /media/usb* devices"
+output_text "[INFO] It is advised to use /media/usb*/ devices"
 prevdir=""
 newdir=""
 newdirvalid=false
@@ -682,10 +682,10 @@ do
                     output_text "[INFO] Checking of $newdir was successful"
                     newdirvalid=true
                 else
-                    output_text "[INFO] Permission on $newdir was incorrect, for /media/usb* maybe need to reconnect USB device?"
+                    output_text "[INFO] Permission on $newdir was incorrect, for /media/usb*/ maybe need to reconnect USB device?"
                 fi
             else
-                output_text "[INFO] Group on $newdir was incorrect, for /media/usb* maybe need to reconnect USB device?"
+                output_text "[INFO] Group on $newdir was incorrect, for /media/usb*/ maybe need to reconnect USB device?"
             fi
         else
             output_text "[INFO] Path $newdir is no directory"
