@@ -630,56 +630,23 @@ do
                 chmod "770" "$newdir" -R
             fi
 
-            # Data directory: Check if file in that folder matches expected group and permissions
+            # Data directory: Check that folder matches expected group and permissions
             # For /media/usb* devices setting the properties from before might have no effect at all
-            # newdir might have ending slash or not
-            if ( ( echo $newdir | grep /$ ) > /dev/null )
-            then
-                output_text "[INFO] Create ${newdir}write_test.tmp file for checking group and permissions"
-                command_success "echo 'write_test' >> ${newdir}write_test.tmp"
+            output_text "[INFO] Checking $newdir group and permissions"
 
-                # Check group
-                if [ $( stat -c %G "${newdir}write_test.tmp" ) == "fabqr" ]
+            # Check group
+            if [ $( stat -c %G "$newdir" ) == "fabqr" ]
+            then
+                # Check permission
+                if [ $( stat -c %A "$newdir" ) == "-rwxrwx---" ]
                 then
-                    # Check permission
-                    if [ $( stat -c %A "${newdir}write_test.tmp" ) == "-rwxrwx---" ]
-                    then
-                        output_text "[INFO] Remove ${newdir}write_test.tmp file, checking was correct"
-                        newdirvalid=true
-                        command_success "rm ${newdir}write_test.tmp"
-                    else
-                        output_text "[INFO] Permission on ${newdir}write_test.tmp file was incorrect"
-                        output_text "[INFO] Remove ${newdir}write_test.tmp file"
-                        command_success "rm ${newdir}write_test.tmp"
-                    fi
+                    output_text "[INFO] Checking of $newdir was successful"
+                    newdirvalid=true
                 else
-                    output_text "[INFO] Group on ${newdir}write_test.tmp file was incorrect"
-                    output_text "[INFO] Remove ${newdir}write_test.tmp file"
-                    command_success "rm ${newdir}write_test.tmp"
+                    output_text "[INFO] Permission on $newdir was incorrect, for /media/usb* maybe need to reconnect USB device?"
                 fi
             else
-                output_text "[INFO] Create ${newdir}/write_test.tmp file for checking group and permissions"
-                command_success "echo 'write_test' >> ${newdir}/write_test.tmp"
-
-                # Check group
-                if [ $( stat -c %G "${newdir}/write_test.tmp" ) == "fabqr" ]
-                then
-                    # Check permission
-                    if [ $( stat -c %A "${newdir}/write_test.tmp" ) == "-rwxrwx---" ]
-                    then
-                        output_text "[INFO] Remove ${newdir}/write_test.tmp file, checking was correct"
-                        newdirvalid=true
-                        command_success "rm ${newdir}/write_test.tmp"
-                    else
-                        output_text "[INFO] Permission on ${newdir}/write_test.tmp file was incorrect"
-                        output_text "[INFO] Remove ${newdir}/write_test.tmp file"
-                        command_success "rm ${newdir}/write_test.tmp"
-                    fi
-                else
-                    output_text "[INFO] Group on ${newdir}/write_test.tmp file was incorrect"
-                    output_text "[INFO] Remove ${newdir}/write_test.tmp file"
-                    command_success "rm ${newdir}/write_test.tmp"
-                fi
+                output_text "[INFO] Group on $newdir was incorrect, for /media/usb* maybe need to reconnect USB device?"
             fi
         else
             output_text "[INFO] Path $newdir is no directory"
