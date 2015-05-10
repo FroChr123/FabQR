@@ -348,6 +348,7 @@ fi
 
 # Software for FabQR
 check_package_install "apache2"
+check_package_install "apache2-utils"
 
 # Check if apache directories are correct
 if ! [ -d "/etc/apache2/sites-available" ]
@@ -729,6 +730,23 @@ file_properties "/etc/apache2/sites-available/fabqr_apache_public" "root" "root"
 # apache2 : FabQR private config, get file
 get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_private" "false" "$redownload"
 file_properties "/etc/apache2/sites-available/fabqr_apache_private" "root" "root" "-rw-r--r--" "644" "false"
+
+# apache2 : Password for private section
+if ! [ -e "/home/fabqr/fabqr_data/www/private/.htpasswd" ]
+then
+    output_text "[INFO] File /home/fabqr/fabqr_data/www/private/.htpasswd does not exist"
+    output_text "[INFO] Create fabqr user and set password for private www section"
+    output_text "[INFO] Remember the www password for your fabqr user!"
+    command_success "htpasswd -c /home/fabqr/fabqr_data/www/private/.htpasswd fabqr"
+else
+    if user_confirm "[INFO] Optional: Reset password for fabqr user in private www section" "false"
+    then
+        output_text "[INFO] File /home/fabqr/fabqr_data/www/private/.htpasswd does exists"
+        output_text "[INFO] Overwrite password for fabqr user private www section"
+        output_text "[INFO] Remember the www password for your fabqr user!"
+        command_success "htpasswd -c /home/fabqr/fabqr_data/www/private/.htpasswd fabqr"
+    fi
+fi
 
 # apache2 : FabQR security config, get file
 get_fabqr_file "apache_configs" "/etc/apache2/conf.d" "security_fabqr_apache" "false" "$redownload"
