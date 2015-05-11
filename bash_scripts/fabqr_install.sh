@@ -604,7 +604,7 @@ then
     quit_error
 fi
 
-# usbmount : Set option MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007" in usbmount config
+# usbmount : Set option MOUNTOPTIONS="noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007" in usbmount config
 # usbmount : Every user is allowed to access new mounted devices
 # usbmount : Create backup of config file
 if ! [ -e "/etc/usbmount/usbmount.conf.bak" ]
@@ -617,18 +617,18 @@ fi
 # usbmount : Place hash in front of all MOUNTOPTIONS= lines
 command_success "sed -r -i 's/^(MOUNTOPTIONS=.*)$/# \1/g' /etc/usbmount/usbmount.conf"
 
-# usbmount : Remove hash in front of MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007"
-command_success "sed -r -i 's/^# (MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\")$/\1/g' /etc/usbmount/usbmount.conf"
+# usbmount : Remove hash in front of MOUNTOPTIONS="noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007"
+command_success "sed -r -i 's/^# (MOUNTOPTIONS=\"noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\")$/\1/g' /etc/usbmount/usbmount.conf"
 
-# usbmount : If file does not contain line MOUNTOPTIONS="sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007", then add it
-if ! ( ( cat /etc/usbmount/usbmount.conf | grep ^MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"$ ) > /dev/null )
+# usbmount : If file does not contain line MOUNTOPTIONS="noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007", then add it
+if ! ( ( cat /etc/usbmount/usbmount.conf | grep ^MOUNTOPTIONS=\"noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"$ ) > /dev/null )
 then
-    output_text "[INFO] Adding line MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" to file /etc/usbmount/usbmount.conf"
+    output_text "[INFO] Adding line MOUNTOPTIONS=\"noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" to file /etc/usbmount/usbmount.conf"
     output_text "[INFO] You need to reconnect USB storage devices or reboot!"
     reboot=true
     command_success "echo >> /etc/usbmount/usbmount.conf"
     command_success "echo '# FabQR allow access for all users in group fabqr' >> /etc/usbmount/usbmount.conf"
-    command_success "echo 'MOUNTOPTIONS=\"sync,noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"' >> /etc/usbmount/usbmount.conf"
+    command_success "echo 'MOUNTOPTIONS=\"noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"' >> /etc/usbmount/usbmount.conf"
 fi
 
 # Data directory: Enter / Check / Copy path of data dir
