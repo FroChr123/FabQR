@@ -1002,8 +1002,9 @@ get_fabqr_file "graphics_source/pngwriter-0.5.4/src" "/home/fabqr/graphics_sourc
 command_success "cat /home/fabqr/graphics_source/pngwriter-0.5.4/make.include.linux > /home/fabqr/graphics_source/pngwriter-0.5.4/make.include"
 command_success "sed -r -i 's/^# (P_FREETYPE = 1)$/\1/g' /home/fabqr/graphics_source/pngwriter-0.5.4/make.include"
 
-# Compile library
+# Compile and install library
 command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 clean"
+command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 libpngwriter"
 command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 install"
 
 
