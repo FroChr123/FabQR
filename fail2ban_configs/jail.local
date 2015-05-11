@@ -18,12 +18,12 @@
 # ##################################################################
 
 [DEFAULT]
-ignoreip = 127.0.0.1
-bantime  = 600
-backend = auto
+ignoreip  = 127.0.0.1
+bantime   = 600
+backend   = polling
 banaction = iptables-multiport
-protocol = tcp
-chain = INPUT
+protocol  = tcp
+chain     = INPUT
 
 # ##################################################################
 # SSH PORT PROTECTION

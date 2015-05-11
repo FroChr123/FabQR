@@ -18,7 +18,7 @@
         DocumentRoot /home/fabqr/fabqr_data/www/public
 
         # Custom access logging, needed for fail2ban network protection rules
-        LogFormat "%h --- \"%r\"" fabqraccesslog
+        LogFormat "%h -- [%t] -- \"%r\"" fabqraccesslog
         CustomLog ${APACHE_LOG_DIR}/fabqr_public_access.log fabqraccesslog
 
         <Directory /home/fabqr/fabqr_data/www/public/>
