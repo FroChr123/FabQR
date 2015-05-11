@@ -424,6 +424,7 @@ check_package_install "php5-common"
 check_package_install "libapache2-mod-php5"
 check_package_install "php5-gd"
 check_package_install "g++"
+check_package_install "make"
 check_package_install "libpng12-dev"
 
 output_text "[INFO] Required packges checked successfully"
@@ -476,28 +477,19 @@ then
     # Check owner
     if [ $( stat -c %U /home/fabqr ) != "fabqr" ]
     then
-        if user_confirm "[INFO] Owner of /home/fabqr needs to be reset recursively" "true"
-        then
-            command_success "chown fabqr /home/fabqr -R"
-        fi
+        command_success "chown fabqr /home/fabqr -R"
     fi
 
     # Check group
     if [ $( stat -c %G /home/fabqr ) != "fabqr" ]
     then
-        if user_confirm "[INFO] Group of /home/fabqr needs to be reset recursively" "true"
-        then
-            command_success "chgrp fabqr /home/fabqr -R"
-        fi
+        command_success "chgrp fabqr /home/fabqr -R"
     fi
 
     # Check permissions
     if [ $( stat -c %A /home/fabqr ) != "drwxrwx---" ]
     then
-        if user_confirm "[INFO] Permissions of /home/fabqr need to be reset to 770 recursively" "true"
-        then
-            command_success "chmod 770 /home/fabqr -R"
-        fi
+        command_success "chmod 770 /home/fabqr -R"
     fi
 
 else
@@ -708,21 +700,10 @@ do
 
             # Data directory: Set properties for directory
             # For /media/usb* devices setting the properties from before might fail, thus unchecked
-            if user_confirm "[INFO] Owner of $newdir needs to be reset to fabqr recursively" "true"
-            then
-                # Silent output, is intended to output errors for /media/usb* devices
-                chown "fabqr" "$newdir" -R &> /dev/null
-            fi
-
-            if user_confirm "[INFO] Group of $newdir needs to be reset to fabqr recursively" "true"
-            then
-                chgrp "fabqr" "$newdir" -R
-            fi
-
-            if user_confirm "[INFO] Permissions of $newdir need to be reset to 770 recursively" "true"
-            then
-                chmod "770" "$newdir" -R
-            fi
+            # Silent output for owner, is intended to output errors for /media/usb* devices
+            chown "fabqr" "$newdir" -R &> /dev/null
+            chgrp "fabqr" "$newdir" -R
+            chmod "770" "$newdir" -R
 
             # Data directory: Check that folder matches expected group and permissions
             # For /media/usb* devices setting the properties from before might have no effect at all
@@ -941,8 +922,81 @@ then
     fi
 fi
 
-# TODO
-# Download graphics c file, compile program
+# FabQR graphics: Directories
+if ! [ -d "/home/fabqr/graphics_source" ]
+then
+    command_success "mkdir /home/fabqr/graphics_source"
+fi
+
+if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4" ]
+then
+    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4"
+fi
+
+if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/doc" ]
+then
+    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/doc"
+fi
+
+if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" ]
+then
+    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/examples"
+fi
+
+if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/fonts" ]
+then
+    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/fonts"
+fi
+
+if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/src" ]
+then
+    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/src"
+fi
+
+command_success "chown fabqr /home/fabqr/graphics_source -R"
+command_success "chgrp fabqr /home/fabqr/graphics_source -R"
+command_success "chmod 770 /home/fabqr/graphics_source -R"
+
+# FabQR graphics: Files
+get_fabqr_file "graphics_source" "/home/fabqr/graphics_source" "fabqr-graphics.c" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "Makefile" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "README" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "configure" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "make.include" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "make.include.linux" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "make.include.linux.oldcpp" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "make.include.osx" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/english" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" "CHANGES" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/english" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" "EXAMPLES" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/english" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" "LICENSE" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/english" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" "PNGwriterQuickReference_EN.pdf" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/english" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" "README" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/espaniol" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" "CAMBIOS" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/espaniol" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" "EJEMPLOS" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/espaniol" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" "LEAME" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/espaniol" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" "LICENCIA" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/espaniol" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" "PNGwriterQuickReference_ES.pdf" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "Makefile" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "burro.png" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "lyapunov.cc" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "lyapunov.espaniol.cc" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "pngtest.cc" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "pngtest.espaniol.cc" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/fonts" "/home/fabqr/graphics_source/pngwriter-0.5.4/fonts" "FreeMonoBold.ttf" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/fonts" "/home/fabqr/graphics_source/pngwriter-0.5.4/fonts" "FreeSansBold.ttf" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/src" "/home/fabqr/graphics_source/pngwriter-0.5.4/src" "Makefile" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/src" "/home/fabqr/graphics_source/pngwriter-0.5.4/src" "pngwriter.cc" "true" "$redownload"
+get_fabqr_file "graphics_source/pngwriter-0.5.4/src" "/home/fabqr/graphics_source/pngwriter-0.5.4/src" "pngwriter.h" "true" "$redownload"
+
+# FabQR graphics: Makefile settings, disable font support
+command_success "cat /home/fabqr/graphics_source/pngwriter-0.5.4/make.include.linux > /home/fabqr/graphics_source/pngwriter-0.5.4/make.include"
+command_success "sed -r -i 's/^# (P_FREETYPE = 1)$/\1/g' /home/fabqr/graphics_source/pngwriter-0.5.4/make.include"
+
+# Compile library
+command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 clean"
+command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 install"
+
+
 
 output_text "[INFO] FabQR graphics checked successfully"
 
