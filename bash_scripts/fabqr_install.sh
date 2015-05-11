@@ -880,9 +880,13 @@ fi
 get_fabqr_file "fail2ban_configs" "/etc/fail2ban" "jail.local" "false" "$redownload"
 file_properties "/etc/fail2ban/jail.local" "root" "root" "-rw-r--r--" "644" "false"
 
-# fail2ban : FabQR filter config, get file
+# fail2ban : FabQR http filter config, get file
 get_fabqr_file "fail2ban_configs" "/etc/fail2ban/filter.d" "fabqr-http.conf" "false" "$redownload"
 file_properties "/etc/fail2ban/filter.d/fabqr-http.conf" "root" "root" "-rw-r--r--" "644" "false"
+
+# fail2ban : FabQR auth filter config, get file
+get_fabqr_file "fail2ban_configs" "/etc/fail2ban/filter.d" "fabqr-auth.conf" "false" "$redownload"
+file_properties "/etc/fail2ban/filter.d/fabqr-auth.conf" "root" "root" "-rw-r--r--" "644" "false"
 
 # fail2ban : Reload config
 command_success "service fail2ban reload"

@@ -54,7 +54,7 @@ findtime = 60
 [fabqr-private-auth]
 enabled  = true
 port     = 8081
-filter   = apache-auth
+filter   = fabqr-auth
 logpath  = /var/log/apache2/fabqr_private_error.log
 bantime  = 600
 maxretry = 5
