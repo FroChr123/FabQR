@@ -938,6 +938,16 @@ then
     command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/doc"
 fi
 
+if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" ]
+then
+    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/doc/english"
+fi
+
+if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" ]
+then
+    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol"
+fi
+
 if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" ]
 then
     command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/examples"
