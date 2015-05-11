@@ -23,6 +23,9 @@
         LogFormat "%h -- [%t] -- \"%r\"" fabqraccesslog
         CustomLog ${APACHE_LOG_DIR}/fabqr_private_access.log fabqraccesslog
 
+        # Error logging, needed for fail2ban network protection rules
+        ErrorLog ${APACHE_LOG_DIR}/fabqr_private_error.log
+
         <Directory /home/fabqr/fabqr_data/www/private/>
                 # Options only allow to follow symlinks
                 Options +FollowSymLinks -Indexes -Includes -ExecCGI

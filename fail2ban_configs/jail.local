@@ -35,7 +35,7 @@ port     = ssh
 filter   = sshd
 logpath  = /var/log/auth.log
 bantime  = 600
-maxretry = 10
+maxretry = 5
 findtime = 60
 
 # ##################################################################
@@ -48,8 +48,17 @@ port     = 8081
 filter   = fabqr-http
 logpath  = /var/log/apache2/fabqr_private_access.log
 bantime  = 600
-maxretry = 600
-findtime = 30
+maxretry = 1500
+findtime = 60
+
+[fabqr-private-auth]
+enabled  = true
+port     = 8081
+filter   = apache-auth
+logpath  = /var/log/apache2/fabqr_private_error.log
+bantime  = 600
+maxretry = 5
+findtime = 600
 
 # ##################################################################
 # FABQR PORT 8090 PROTECTION
@@ -61,5 +70,5 @@ port     = 8090
 filter   = fabqr-http
 logpath  = /var/log/apache2/fabqr_public_access.log
 bantime  = 600
-maxretry = 600
-findtime = 30
+maxretry = 1000
+findtime = 60
