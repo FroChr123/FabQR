@@ -48,7 +48,7 @@ port     = 8081
 filter   = fabqr-http
 logpath  = /var/log/apache2/fabqr_private_access.log
 bantime  = 600
-maxretry = 450
+maxretry = 600
 findtime = 30
 
 # ##################################################################
@@ -61,5 +61,5 @@ port     = 8090
 filter   = fabqr-http
 logpath  = /var/log/apache2/fabqr_public_access.log
 bantime  = 600
-maxretry = 450
+maxretry = 600
 findtime = 30
