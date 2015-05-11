@@ -18,6 +18,8 @@
         DocumentRoot /home/fabqr/fabqr_data/www/private
 
         # Custom access logging, needed for fail2ban network protection rules
+        # fail2ban expects a time information string in matched strings!
+        # Otherwise regex will not work! fail2ban-regex command helps debugging!
         LogFormat "%h -- [%t] -- \"%r\"" fabqraccesslog
         CustomLog ${APACHE_LOG_DIR}/fabqr_private_access.log fabqraccesslog
 
