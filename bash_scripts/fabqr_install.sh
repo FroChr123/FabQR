@@ -346,6 +346,19 @@ check_package_install "wget"
 check_package_install "mawk"
 check_package_install "cron"
 
+# Check system paths
+if ! [ -d "/usr/local/include" ]
+then
+    output_text "[ERROR] System directory /usr/local/include does not exist!"
+    quit_error
+fi
+
+if ! [ -d "/usr/local/lib" ]
+then
+    output_text "[ERROR] System directory /usr/local/include does not exist!"
+    quit_error
+fi
+
 # Network security
 check_package_install "iptables"
 check_package_install "fail2ban"
@@ -426,6 +439,7 @@ check_package_install "php5-gd"
 check_package_install "g++"
 check_package_install "make"
 check_package_install "libpng12-dev"
+check_package_install "zlib1g-dev"
 
 output_text "[INFO] Required packges checked successfully"
 
@@ -440,7 +454,7 @@ output_text "[INFO] Checking user settings"
 if ( getent passwd fabqr > /dev/null )
 then
     # User exists, correct home path?
-    if ! ( ( getent passwd fabqr | grep /home/fabqr ) > /dev/null )
+    if ! ( ( getent passwd fabqr | grep :/home/fabqr: ) > /dev/null )
     then
         remove_existing_folder_confirm "/home/fabqr"
 
@@ -733,7 +747,12 @@ done
 
 # Data directory: Set symbolic link
 output_text "[INFO] Update symbolic link /home/fabqr/fabqr_data to $newdir"
-command_success "rm /home/fabqr/fabqr_data"
+
+if [ -e "/home/fabqr/fabqr_data" ]
+then
+    command_success "rm /home/fabqr/fabqr_data"
+fi
+
 command_success "ln -s $newdir /home/fabqr/fabqr_data"
 
 # TODO download web php files to /home/fabqr/fabqr_data directory
@@ -1006,7 +1025,7 @@ command_success "sed -r -i 's/^# (P_FREETYPE = 1)$/\1/g' /home/fabqr/graphics_so
 command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 clean"
 command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 libpngwriter"
 command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 install"
-
+# g++ fabqr-graphics.c -o fabqr-graphics -DNO_FREETYPE -I/usr/local/include  -L/usr/local/lib -lpng -lpngwriter -lz
 
 
 output_text "[INFO] FabQR graphics checked successfully"
