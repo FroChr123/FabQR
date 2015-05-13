@@ -438,8 +438,6 @@ check_package_install "libapache2-mod-php5"
 check_package_install "php5-gd"
 check_package_install "g++"
 check_package_install "make"
-check_package_install "libpng12-dev"
-check_package_install "zlib1g-dev"
 
 output_text "[INFO] Required packges checked successfully"
 
