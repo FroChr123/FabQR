@@ -955,7 +955,9 @@ get_fabqr_file "framebuffer_png_source" "/home/fabqr/framebuffer_png_source" "lo
 get_fabqr_file "framebuffer_png_source" "/home/fabqr/framebuffer_png_source" "lodepng.h" "true" "$redownload"
 
 # Compile program
+output_text "[INFO] Compile FabQR framebuffer PNG graphics"
 command_success "g++ /home/fabqr/framebuffer_png_source/lodepng.cpp /home/fabqr/framebuffer_png_source/fabqr_framebuffer_png.cpp -o /home/fabqr/fabqr_framebuffer_png -ansi -pedantic -Wall -Wextra -O3"
+
 output_text "[INFO] FabQR graphics checked successfully"
 
 # ##################################################################
