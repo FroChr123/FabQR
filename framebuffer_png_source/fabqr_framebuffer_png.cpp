@@ -13,26 +13,21 @@
 //    You should have received a copy of the GNU Lesser General Public License
 //    along with FabQR.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <sys/file.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
-#include <fcntl.h>
 #include <linux/fb.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <time.h>
-#include <string>
-#include <sys/file.h>
 #include <stdlib.h>
+#include <time.h>
 #include "lodepng.h"
 
 // Argument 1: Debug output text message
-void debugmsg(const char *msg)
-{
-    printf(msg);
-}
+// void debugmsg(const char *msg)
+// {
+//     printf(msg);
+// }
 
 // Argument 0: Execution command for this program
 // Argument 1: Output framebuffer device (e.g.: /dev/fb0)
@@ -40,15 +35,15 @@ void debugmsg(const char *msg)
 int main(int argc, char *argv[])
 {
     // Debug messages
-    debugmsg("Program start\n");
-    debugmsg("Check argument count\n");
+    // debugmsg("Program start\n");
+    // debugmsg("Check argument count\n");
 
     // Quit if argument count does not match
     if (argc != 3)
         return 1;
 
     // Debug message
-    debugmsg("Argument count correct, initialize variables\n");
+    // debugmsg("Argument count correct, initialize variables\n");
 
     // Framebuffer variables
     unsigned int fb_width_real = 0;
@@ -81,7 +76,7 @@ int main(int argc, char *argv[])
     waittime.tv_nsec = 0L;
 
     // Debug message
-    debugmsg("Variables initialized, open framebuffer\n");
+    // debugmsg("Variables initialized, open framebuffer\n");
 
     // Open framebuffer
     fb_file = open(fb_path.c_str(), O_RDWR);
@@ -90,12 +85,12 @@ int main(int argc, char *argv[])
     if (fb_file == -1)
     {
         // Debug message
-        debugmsg("ERROR: Can not open framebuffer, quit\n");
+        // debugmsg("ERROR: Can not open framebuffer, quit\n");
         return 1;
     }
 
     // Debug message
-    debugmsg("Opened framebuffer, read framebuffer information\n");
+    // debugmsg("Opened framebuffer, read framebuffer information\n");
 
     // Get current information of framebuffer, quit on error
     struct fb_var_screeninfo fb_var_screeninfo;
@@ -104,14 +99,14 @@ int main(int argc, char *argv[])
     if (ioctl(fb_file, FBIOGET_VSCREENINFO, &fb_var_screeninfo) == -1)
     {
         // Debug message
-        debugmsg("ERROR: Can not get framebuffer var info, quit\n");
+        // debugmsg("ERROR: Can not get framebuffer var info, quit\n");
         return 1;
     }
 
     if (ioctl(fb_file, FBIOGET_FSCREENINFO, &fb_fix_screeninfo) == -1)
     {
         // Debug message
-        debugmsg("ERROR: Can not get framebuffer fix info, quit\n");
+        // debugmsg("ERROR: Can not get framebuffer fix info, quit\n");
         return 1;
     }
 
@@ -123,7 +118,7 @@ int main(int argc, char *argv[])
     if (fb_pixel_bits != 16)
     {
         // Debug message
-        debugmsg("ERROR: Bits per pixel is not 16, quit\n");
+        // debugmsg("ERROR: Bits per pixel is not 16, quit\n");
         return 1;
     }
 
@@ -143,7 +138,7 @@ int main(int argc, char *argv[])
     }
 
     // Debug message
-    debugmsg("Framebuffer information read, read framebuffer data pointer\n");
+    // debugmsg("Framebuffer information read, read framebuffer data pointer\n");
 
     // Get pointer to framebuffer data
     fb_data = (uint16_t*)(mmap(0, fb_memory_size, PROT_READ | PROT_WRITE, MAP_SHARED, fb_file, 0));
@@ -152,12 +147,12 @@ int main(int argc, char *argv[])
     if (fb_data == NULL || fb_data == MAP_FAILED)
     {
         // Debug message
-        debugmsg("ERROR: Framebuffer pointer invalid, quit\n");
+        // debugmsg("ERROR: Framebuffer pointer invalid, quit\n");
         return 1;
     }
 
     // Debug message
-    debugmsg("Framebuffer data pointer read, write initial black image\n");
+    // debugmsg("Framebuffer data pointer read, write initial black image\n");
 
     // Write initial black image to framebuffer
     for (unsigned int fb_row = 0; fb_row < fb_height_real; ++fb_row)
@@ -165,7 +160,7 @@ int main(int argc, char *argv[])
             fb_data[fb_row * fb_width_virtual + fb_column] = 0;
 
     // Debug message
-    debugmsg("Initial black image written, start infinite loop\n");
+    // debugmsg("Initial black image written, start infinite loop\n");
 
     // Infinite loop to update displayed picture
     while (true)
@@ -272,20 +267,30 @@ int main(int argc, char *argv[])
     // This application is usually closed by external commands (pkill)
 
     // Debug message
-    debugmsg("Infinite loop quit, release data pointers\n");
+    // debugmsg("Infinite loop quit, release data pointer\n");
 
-    // Release data pointers
-    munmap(fb_data, fb_memory_size);
+    // Release data pointer
+    if (fb_data != NULL && fb_data != MAP_FAILED)
+    {
+        munmap(fb_data, fb_memory_size);
+    }
 
     // Debug message
-    debugmsg("Data pointer released, close file pointers\n");
+    // debugmsg("Data pointer released, close file pointers\n");
 
     // Close file pointers
-    close(png_file);
-    close(fb_file);
+    if (png_file != -1)
+    {
+        close(png_file);
+    }
+
+    if (fb_file != -1)
+    {
+        close(fb_file);
+    }
 
     // Debug message
-    debugmsg("File pointers closed, quit program correctly\n");
+    // debugmsg("File pointers closed, quit program correctly\n");
 
     // Quit correctly
     return 0;
