@@ -942,22 +942,22 @@ then
 fi
 
 # FabQR graphics: Directory
-if ! [ -d "/home/fabqr/framebuffer_graphics_source" ]
+if ! [ -d "/home/fabqr/framebuffer_png_source" ]
 then
-    command_success "mkdir /home/fabqr/framebuffer_graphics_source"
+    command_success "mkdir /home/fabqr/framebuffer_png_source"
 fi
 
-command_success "chown fabqr /home/fabqr/framebuffer_graphics_source -R"
-command_success "chgrp fabqr /home/fabqr/framebuffer_graphics_source -R"
-command_success "chmod 770 /home/fabqr/framebuffer_graphics_source -R"
+command_success "chown fabqr /home/fabqr/framebuffer_png_source -R"
+command_success "chgrp fabqr /home/fabqr/framebuffer_png_source -R"
+command_success "chmod 770 /home/fabqr/framebuffer_png_source -R"
 
 # FabQR graphics: Files
-get_fabqr_file "framebuffer_graphics_source" "/home/fabqr/framebuffer_graphics_source" "fabqr_framebuffer_graphics.cpp" "true" "$redownload"
-get_fabqr_file "framebuffer_graphics_source" "/home/fabqr/framebuffer_graphics_source" "lodepng.cpp" "true" "$redownload"
-get_fabqr_file "framebuffer_graphics_source" "/home/fabqr/framebuffer_graphics_source" "lodepng.h" "true" "$redownload"
+get_fabqr_file "framebuffer_png_source" "/home/fabqr/framebuffer_png_source" "fabqr_framebuffer_png.cpp" "true" "$redownload"
+get_fabqr_file "framebuffer_png_source" "/home/fabqr/framebuffer_png_source" "lodepng.cpp" "true" "$redownload"
+get_fabqr_file "framebuffer_png_source" "/home/fabqr/framebuffer_png_source" "lodepng.h" "true" "$redownload"
 
 # Compile program
-command_success "g++ /home/fabqr/framebuffer_graphics_source/lodepng.cpp /home/fabqr/framebuffer_graphics_source/fabqr_framebuffer_graphics.cpp -o /home/fabqr/fabqr_framebuffer_graphics -ansi -pedantic -Wall -Wextra -O3"
+command_success "g++ /home/fabqr/framebuffer_png_source/lodepng.cpp /home/fabqr/framebuffer_png_source/fabqr_framebuffer_png.cpp -o /home/fabqr/fabqr_framebuffer_png -ansi -pedantic -Wall -Wextra -O3"
 output_text "[INFO] FabQR graphics checked successfully"
 
 # ##################################################################
