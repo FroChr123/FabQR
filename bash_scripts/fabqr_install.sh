@@ -941,93 +941,23 @@ then
     fi
 fi
 
-# FabQR graphics: Directories
-if ! [ -d "/home/fabqr/graphics_source" ]
+# FabQR graphics: Directory
+if ! [ -d "/home/fabqr/framebuffer_graphics_source" ]
 then
-    command_success "mkdir /home/fabqr/graphics_source"
+    command_success "mkdir /home/fabqr/framebuffer_graphics_source"
 fi
 
-if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4" ]
-then
-    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4"
-fi
-
-if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/doc" ]
-then
-    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/doc"
-fi
-
-if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" ]
-then
-    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/doc/english"
-fi
-
-if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" ]
-then
-    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol"
-fi
-
-if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" ]
-then
-    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/examples"
-fi
-
-if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/fonts" ]
-then
-    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/fonts"
-fi
-
-if ! [ -d "/home/fabqr/graphics_source/pngwriter-0.5.4/src" ]
-then
-    command_success "mkdir /home/fabqr/graphics_source/pngwriter-0.5.4/src"
-fi
-
-command_success "chown fabqr /home/fabqr/graphics_source -R"
-command_success "chgrp fabqr /home/fabqr/graphics_source -R"
-command_success "chmod 770 /home/fabqr/graphics_source -R"
+command_success "chown fabqr /home/fabqr/framebuffer_graphics_source -R"
+command_success "chgrp fabqr /home/fabqr/framebuffer_graphics_source -R"
+command_success "chmod 770 /home/fabqr/framebuffer_graphics_source -R"
 
 # FabQR graphics: Files
-get_fabqr_file "graphics_source" "/home/fabqr/graphics_source" "fabqr-graphics.c" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "Makefile" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "README" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "configure" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "make.include" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "make.include.linux" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "make.include.linux.oldcpp" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4" "/home/fabqr/graphics_source/pngwriter-0.5.4" "make.include.osx" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/english" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" "CHANGES" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/english" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" "EXAMPLES" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/english" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" "LICENSE" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/english" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" "PNGwriterQuickReference_EN.pdf" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/english" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/english" "README" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/espaniol" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" "CAMBIOS" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/espaniol" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" "EJEMPLOS" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/espaniol" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" "LEAME" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/espaniol" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" "LICENCIA" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/doc/espaniol" "/home/fabqr/graphics_source/pngwriter-0.5.4/doc/espaniol" "PNGwriterQuickReference_ES.pdf" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "Makefile" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "burro.png" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "lyapunov.cc" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "lyapunov.espaniol.cc" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "pngtest.cc" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/examples" "/home/fabqr/graphics_source/pngwriter-0.5.4/examples" "pngtest.espaniol.cc" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/fonts" "/home/fabqr/graphics_source/pngwriter-0.5.4/fonts" "FreeMonoBold.ttf" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/fonts" "/home/fabqr/graphics_source/pngwriter-0.5.4/fonts" "FreeSansBold.ttf" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/src" "/home/fabqr/graphics_source/pngwriter-0.5.4/src" "Makefile" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/src" "/home/fabqr/graphics_source/pngwriter-0.5.4/src" "pngwriter.cc" "true" "$redownload"
-get_fabqr_file "graphics_source/pngwriter-0.5.4/src" "/home/fabqr/graphics_source/pngwriter-0.5.4/src" "pngwriter.h" "true" "$redownload"
+get_fabqr_file "framebuffer_graphics_source" "/home/fabqr/framebuffer_graphics_source" "fabqr_framebuffer_graphics.cpp" "true" "$redownload"
+get_fabqr_file "framebuffer_graphics_source" "/home/fabqr/framebuffer_graphics_source" "lodepng.cpp" "true" "$redownload"
+get_fabqr_file "framebuffer_graphics_source" "/home/fabqr/framebuffer_graphics_source" "lodepng.h" "true" "$redownload"
 
-# FabQR graphics: Makefile settings, disable font support
-command_success "cat /home/fabqr/graphics_source/pngwriter-0.5.4/make.include.linux > /home/fabqr/graphics_source/pngwriter-0.5.4/make.include"
-command_success "sed -r -i 's/^# (P_FREETYPE = 1)$/\1/g' /home/fabqr/graphics_source/pngwriter-0.5.4/make.include"
-
-# Compile and install library
-command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 clean"
-command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 libpngwriter"
-command_success "make -C /home/fabqr/graphics_source/pngwriter-0.5.4 install"
-# g++ fabqr-graphics.c -o fabqr-graphics -DNO_FREETYPE -I/usr/local/include  -L/usr/local/lib -lpng -lpngwriter -lz
-
-
+# Compile program
+command_success "g++ /home/fabqr/framebuffer_graphics_source/lodepng.cpp /home/fabqr/framebuffer_graphics_source/fabqr_framebuffer_graphics.cpp -o /home/fabqr/fabqr_framebuffer_graphics -ansi -pedantic -Wall -Wextra -O3"
 output_text "[INFO] FabQR graphics checked successfully"
 
 # ##################################################################

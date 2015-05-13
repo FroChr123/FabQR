@@ -111,5 +111,8 @@ fi
 # File: System startup
 # echo 0 > /sys/class/graphics/fbcon/cursor_blink
 
+# 
+fbset -g 854 480 854 480 16
+
 output_text "[INFO] QUIT FABQR START SCRIPT SUCCESSFULLY"
 exit 0
