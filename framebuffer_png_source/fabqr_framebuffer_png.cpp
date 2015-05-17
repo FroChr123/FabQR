@@ -40,7 +40,9 @@ int main(int argc, char *argv[])
 
     // Quit if argument count does not match
     if (argc != 3)
+    {
         return 1;
+    }
 
     // Debug message
     // debugmsg("Argument count correct, initialize variables\n");
