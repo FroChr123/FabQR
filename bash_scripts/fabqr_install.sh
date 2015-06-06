@@ -129,7 +129,7 @@ function user_confirm
 # Argument 1: Package name
 function is_package_installed
 {
-    if ! ( dpkg -s "$1" &> /dev/null )
+    if ! ( dpkg -s "$1" &> "/dev/null" )
     then
         output_text "[INFO] Package $1 is not installed"
         return 1
@@ -300,9 +300,9 @@ fi
 # STOP FABQR
 # ##################################################################
 
-if [ -e "/etc/init.d/fabqr_service" ] && [ -e "/home/fabqr/fabqr_stop.sh" ]
+if [ -e "/etc/init.d/fabqr" ] && [ -e "/home/fabqr/fabqr_stop.sh" ]
 then
-    command_success "service fabqr_service stop"
+    command_success "service fabqr stop"
 fi
 
 # ##################################################################
@@ -418,14 +418,14 @@ then
 fi
 
 # Check if user www-data exists
-if ! ( getent passwd www-data > /dev/null )
+if ! ( getent passwd www-data > "/dev/null" )
 then
     output_text "[ERROR] apache2 is installed, but user www-data does not exist!"
     quit_error
 fi
 
 # Check if group www-data exists
-if ! ( getent group www-data > /dev/null )
+if ! ( getent group www-data > "/dev/null" )
 then
     output_text "[ERROR] apache2 is installed, but group www-data does not exist!"
     quit_error
@@ -436,8 +436,7 @@ check_package_install "php5-cli"
 check_package_install "php5-common"
 check_package_install "libapache2-mod-php5"
 check_package_install "php5-gd"
-check_package_install "g++"
-check_package_install "make"
+check_package_install "build-essential"
 
 output_text "[INFO] Required packges checked successfully"
 
@@ -449,10 +448,10 @@ output_text "[INFO] Required packges checked successfully"
 output_text "[INFO] Checking user settings"
 
 # Does user fabqr exist?
-if ( getent passwd fabqr > /dev/null )
+if ( getent passwd fabqr > "/dev/null" )
 then
     # User exists, correct home path?
-    if ! ( ( getent passwd fabqr | grep :/home/fabqr: ) > /dev/null )
+    if ! ( ( getent passwd fabqr | grep :/home/fabqr: ) > "/dev/null" )
     then
         remove_existing_folder_confirm "/home/fabqr"
 
@@ -463,14 +462,14 @@ then
     fi
 
     # Check if group exists
-    if ! ( getent group fabqr > /dev/null )
+    if ! ( getent group fabqr > "/dev/null" )
     then
         output_text "[INFO] Creating missing group fabqr"
         command_success "groupadd fabqr"
     fi
 
     # Check if user fabqr is in group fabqr
-    if ! ( ( ( groups fabqr | awk -F ' : ' '{print $2}' ) | grep fabqr ) > /dev/null )
+    if ! ( ( ( groups fabqr | awk -F ' : ' '{print $2}' ) | grep fabqr ) > "/dev/null" )
     then
         output_text "[INFO] Setting primary group of user fabqr to group fabqr"
         command_success "usermod -g fabqr fabqr"
@@ -521,7 +520,7 @@ fi
 
 # Existance of user www-data was already checked before
 # Add user www-data to group fabqr, if www-data is not in that group yet
-if ! ( ( ( groups www-data | awk -F ' : ' '{print $2}' ) | grep fabqr ) > /dev/null )
+if ! ( ( ( groups www-data | awk -F ' : ' '{print $2}' ) | grep fabqr ) > "/dev/null" )
 then
     output_text "[INFO] Adding user www-data to additional group fabqr"
     command_success "usermod -G fabqr www-data"
@@ -529,7 +528,7 @@ fi
 
 # Existance of group www-data was already checked before
 # Add user fabqr to group www-data, if fabqr is not in that group yet
-if ! ( ( ( groups fabqr | awk -F ' : ' '{print $2}' ) | grep www-data ) > /dev/null )
+if ! ( ( ( groups fabqr | awk -F ' : ' '{print $2}' ) | grep www-data ) > "/dev/null" )
 then
     output_text "[INFO] Adding user fabqr to additional group www-data"
     command_success "usermod -G www-data fabqr"
@@ -561,24 +560,24 @@ get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_start.sh" "true" "$redownload
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh" "true" "$redownload"
 
 # FabQR service : Get file
-get_fabqr_file "bash_scripts" "/etc/init.d" "fabqr_service" "false" "$redownload"
-file_properties "/etc/init.d/fabqr_service" "root" "root" "-rwxr-xr-x" "755" "false"
+get_fabqr_file "bash_scripts" "/etc/init.d" "fabqr" "false" "$redownload"
+file_properties "/etc/init.d/fabqr" "root" "root" "-rwxr-xr-x" "755" "false"
 
 # FabQR service : Auto start entry for system boot, if it does not exist yet
-if ! ( ( ls -l /etc/rc2.d | grep fabqr_service ) > /dev/null )
+if ! ( ( ls -l "/etc/rc2.d" | grep fabqr ) > "/dev/null" )
 then
-    output_text "[INFO] Creating auto start entry for fabqr_service"
-    command_success "update-rc.d fabqr_service defaults > /dev/null"
+    output_text "[INFO] Creating auto start entry for fabqr"
+    command_success "update-rc.d fabqr defaults > /dev/null"
 fi
 
 # crontab : Get file
 get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh" "true" "$redownload"
 
 # crontab : User does not have crontab or fabqr_cron_log.sh is not in crontab yet
-if ! ( ( crontab -u fabqr -l | grep fabqr_cron_log.sh ) &> /dev/null )
+if ! ( ( crontab -u fabqr -l | grep fabqr_cron_log.sh ) &> "/dev/null" )
 then
     # crontab : If user already has crontab, need to save it
-    if ( crontab -u fabqr -l &> /dev/null )
+    if ( crontab -u fabqr -l &> "/dev/null" )
     then
        command_success "crontab -u fabqr -l > /home/fabqr/fabqr_crontab.tmp"
 
@@ -625,7 +624,7 @@ command_success "sed -r -i 's/^(MOUNTOPTIONS=.*)$/# \1/g' /etc/usbmount/usbmount
 command_success "sed -r -i 's/^# (MOUNTOPTIONS=\"noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\")$/\1/g' /etc/usbmount/usbmount.conf"
 
 # usbmount : If file does not contain line MOUNTOPTIONS="noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007", then add it
-if ! ( ( cat /etc/usbmount/usbmount.conf | grep ^MOUNTOPTIONS=\"noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"$ ) > /dev/null )
+if ! ( ( cat "/etc/usbmount/usbmount.conf" | grep ^MOUNTOPTIONS=\"noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\"$ ) > "/dev/null" )
 then
     output_text "[INFO] Adding line MOUNTOPTIONS=\"noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007\" to file /etc/usbmount/usbmount.conf"
     output_text "[INFO] You need to reconnect USB storage devices or reboot!"
@@ -649,7 +648,7 @@ then
 
     # Data directory: Check if old data directory path begins with / and is absolute path
     # Otherwise clear prevdir and set to invalid again
-    if ! ( ( echo $prevdir | grep ^/.*/$ ) > /dev/null )
+    if ! ( ( echo $prevdir | grep ^/.*/$ ) > "/dev/null" )
     then
         prevdir=""
     fi
@@ -664,7 +663,7 @@ do
     read -e -p "FabQR absolute data path: " -i "$newdir" newdir
 
     # Data directory: Check for absolute path input
-    if ( ( echo $newdir | grep ^/.*/$ ) > /dev/null )
+    if ( ( echo $newdir | grep ^/.*/$ ) > "/dev/null" )
     then
 
         # Data directory: If no file OR directory does exist at this path, create new directory
@@ -713,7 +712,7 @@ do
             # Data directory: Set properties for directory
             # For /media/usb* devices setting the properties from before might fail, thus unchecked
             # Silent output for owner, is intended to output errors for /media/usb* devices
-            chown "fabqr" "$newdir" -R &> /dev/null
+            chown "fabqr" "$newdir" -R &> "/dev/null"
             chgrp "fabqr" "$newdir" -R
             chmod "770" "$newdir" -R
 
@@ -800,7 +799,7 @@ fi
 
 # apache2 : Add port configs for ports 8081 and 8090 to file /etc/apache2/ports.conf
 # apache2 : Config is reloaded in FabQR start script
-if ! ( ( cat /etc/apache2/ports.conf | grep '^NameVirtualHost \*\:8081$' ) > /dev/null )
+if ! ( ( cat "/etc/apache2/ports.conf" | grep '^NameVirtualHost \*\:8081$' ) > "/dev/null" )
 then
     output_text "[INFO] Adding line NameVirtualHost *:8081 to file /etc/apache2/ports.conf"
     command_success "echo >> /etc/apache2/ports.conf"
@@ -808,7 +807,7 @@ then
     command_success "echo 'NameVirtualHost *:8081' >> /etc/apache2/ports.conf"
 fi
 
-if ! ( ( cat /etc/apache2/ports.conf | grep '^Listen 8081$' ) > /dev/null )
+if ! ( ( cat "/etc/apache2/ports.conf" | grep '^Listen 8081$' ) > "/dev/null" )
 then
     output_text "[INFO] Adding line Listen 8081 to file /etc/apache2/ports.conf"
     command_success "echo >> /etc/apache2/ports.conf"
@@ -816,7 +815,7 @@ then
     command_success "echo 'Listen 8081' >> /etc/apache2/ports.conf"
 fi
 
-if ! ( ( cat /etc/apache2/ports.conf | grep '^NameVirtualHost \*\:8090$' ) > /dev/null )
+if ! ( ( cat "/etc/apache2/ports.conf" | grep '^NameVirtualHost \*\:8090$' ) > "/dev/null" )
 then
     output_text "[INFO] Adding line NameVirtualHost *:8090 to file /etc/apache2/ports.conf"
     command_success "echo >> /etc/apache2/ports.conf"
@@ -824,7 +823,7 @@ then
     command_success "echo 'NameVirtualHost *:8090' >> /etc/apache2/ports.conf"
 fi
 
-if ! ( ( cat /etc/apache2/ports.conf | grep '^Listen 8090$' ) > /dev/null )
+if ! ( ( cat "/etc/apache2/ports.conf" | grep '^Listen 8090$' ) > "/dev/null" )
 then
     output_text "[INFO] Adding line Listen 8090 to file /etc/apache2/ports.conf"
     command_success "echo >> /etc/apache2/ports.conf"
@@ -863,7 +862,7 @@ then
     command_success "sed -r -i 's/^# (max_usb_current=1)$/\1/g' /boot/config.txt"
 
     # USB power settings : If file does not contain line max_usb_current=1, then add it
-    if ! ( ( cat /boot/config.txt | grep ^max_usb_current=1$ ) > /dev/null )
+    if ! ( ( cat "/boot/config.txt" | grep ^max_usb_current=1$ ) > "/dev/null" )
     then
         output_text "[INFO] Adding line max_usb_current=1 to file /boot/config.txt"
         output_text "[INFO] You need to reboot to activate changes!"
@@ -917,7 +916,7 @@ then
     command_success "sed -r -i 's/^# (POWERDOWN_TIME=0)$/\1/g' /etc/kbd/config"
 
     # Display settings : If file does not contain line BLANK_TIME=0, then add it
-    if ! ( ( cat /etc/kbd/config | grep ^BLANK_TIME=0$ ) > /dev/null )
+    if ! ( ( cat "/etc/kbd/config" | grep ^BLANK_TIME=0$ ) > "/dev/null" )
     then
         output_text "[INFO] Adding line BLANK_TIME=0 to file /etc/kbd/config"
         output_text "[INFO] You need to reboot to activate changes!"
@@ -928,7 +927,7 @@ then
     fi
 
     # Display settings : If file does not contain line POWERDOWN_TIME=0, then add it
-    if ! ( ( cat /etc/kbd/config | grep ^POWERDOWN_TIME=0$ ) > /dev/null )
+    if ! ( ( cat "/etc/kbd/config" | grep ^POWERDOWN_TIME=0$ ) > "/dev/null" )
     then
         output_text "[INFO] Adding line POWERDOWN_TIME=0 to file /etc/kbd/config"
         output_text "[INFO] You need to reboot to activate changes!"
@@ -979,5 +978,5 @@ fi
 
 # Exit correctly without errors
 output_text "[INFO] QUIT FABQR INSTALLER SUCCESSFULLY"
-command_success "service fabqr_service start"
+command_success "service fabqr start"
 exit 0
