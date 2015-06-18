@@ -504,10 +504,13 @@ then
 fi
 
 # Handle download of repository folder
-if ( [ -d "/home/fabqr/fabqr-repository" ] && $redownload )
+if ( $redownload )
 then
-    output_text "[INFO] Redownload active, remove existing repository folder"
-    remove_existing_folder_confirm "/home/fabqr/fabqr_repository"
+    if [ -d "/home/fabqr/fabqr_repository" ]
+    then
+        output_text "[INFO] Redownload active, remove existing repository folder"
+        remove_existing_folder_confirm "/home/fabqr/fabqr_repository"
+    fi
 fi
 
 if ! [ -d "/home/fabqr/fabqr_repository" ]
@@ -534,7 +537,7 @@ then
 fi
 
 # FabQR cron script : Copy file
-get_fabqr_file "bash_scripts/fabqr_cron.sh" "/home/fabqr/fabqr_cron.sh"
+copy_fabqr_file "bash_scripts/fabqr_cron.sh" "/home/fabqr/fabqr_cron.sh"
 
 # crontab : User does not have crontab or fabqr_cron.sh is not in crontab yet
 if ! ( ( crontab -u fabqr -l | grep fabqr_cron.sh ) &> "/dev/null" )
