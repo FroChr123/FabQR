@@ -153,78 +153,23 @@ function check_package_install
     return 0
 }
 
-# Function to check if a package is installed and install if it is missing
-# Search for file in different directories, if nothing found, direct download from github
-# Argument 1: Directory name
-# Argument 2: Target directory
-# Argument 3: File name
-# Argument 4: true = Set default file properties, false = Do not set default file properties
-# Argument 5: true = Ensure redownload of file, false = Default procedure
-function get_fabqr_file
+# Function to copy files to correct directories
+# Argument 1: Path relative to repository root
+# Argument 2: Target file path
+function copy_fabqr_file
 {
-    # Check if redownload enabled
-    if ! ( $5 )
+    # File must be in local folder, subfolder
+    if [ -e "/home/fabqr/fabqr_repository/$1" ]
     then
-        # Check if file already exists and is not empty (which could happen because of error in wget)
-        if [ -e "$2/$3" ] && [ -s "$2/$3" ]
-        then
-            # Set default file properties if argument 4 is true
-            if ( $4 )
-            then
-                file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
-            fi
-
-            return 1
-        fi
-
-        # Local folder
-        if [ -e "$3" ]
-        then
-            output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-            command_success "mv $3 $2/$3"
-            return 0
-        fi
-
-        # Local folder, subfolder
-        if [ -e "$1/$3" ]
-        then
-            output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-            command_success "mv $1/$3 $2/$3"
-            return 0
-        fi
-
-        # Parent folder
-        if [ -e "../$3" ]
-        then
-            output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-            command_success "mv ../$3 $2/$3"
-            return 0
-        fi
-
-        # Parent folder, subfolder
-        if [ -e "../$1/$3" ]
-        then
-            output_text "[INFO] Moving FabQR file $1/$3 to target $2/$3"
-            command_success "mv ../$1/$3 $2/$3"
-            return 0
-        fi
+        output_text "[INFO] Copying FabQR file $1 to target $2"
+        command_success "cp /home/fabqr/fabqr_repository/$1 $2"
+        return 0
     else
-        # Check if file already exists, in that case for redownload needs to be removed
-        if [ -e "$2/$3" ]
-        then
-            command_success "rm $2/$3"
-        fi
+        output_text "[ERROR] File /home/fabqr/fabqr_repository/$1 not found, quit"
+        quit_error
     fi
 
-    # Download from github
-    output_text "[INFO] Downloading FabQR file $1/$3 to target $2/$3"
-    command_success "wget -q -O $2/$3 https://raw.githubusercontent.com/FroChr123/FabQR/master/$1/$3"
-
-    # Set default file properties if argument 4 is true
-    if ( $4 )
-    then
-        file_properties "$2/$3" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
-    fi
+    file_properties "$2" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
 
     return 0
 }
@@ -345,6 +290,7 @@ check_package_install "sed"
 check_package_install "wget"
 check_package_install "mawk"
 check_package_install "cron"
+check_package_install "git"
 
 # Check system paths
 if ! [ -d "/usr/local/include" ]
@@ -355,7 +301,14 @@ fi
 
 if ! [ -d "/usr/local/lib" ]
 then
-    output_text "[ERROR] System directory /usr/local/include does not exist!"
+    output_text "[ERROR] System directory /usr/local/lib does not exist!"
+    quit_error
+fi
+
+# Shared memory: Check if shared memory folder exists
+if ! [ -d "/run/shm" ]
+then
+    output_text "[ERROR] There is no shared memory at /run/shm"
     quit_error
 fi
 
@@ -550,17 +503,27 @@ then
     file_properties "/home/fabqr/fabqr.log" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
 fi
 
-# FabQR install: Get file
-get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_install.sh" "true" "$redownload"
+# Handle download of repository folder
+if ( [ -d "/home/fabqr/fabqr-repository" ] && $redownload )
+then
+    output_text "[INFO] Redownload active, remove existing repository folder"
+    remove_existing_folder_confirm "/home/fabqr/fabqr_repository"
+fi
 
-# FabQR start : Get file
-get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_start.sh" "true" "$redownload"
+if ! [ -d "/home/fabqr/fabqr_repository" ]
+then
+    output_text "[INFO] Download FabQR repository"
+    command_success "git clone https://github.com/FroChr123/FabQR.git /home/fabqr/fabqr_repository"
+fi
 
-# FabQR stop : Get file
-get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_stop.sh" "true" "$redownload"
+# FabQR start : Copy file
+copy_fabqr_file "bash_scripts/fabqr_start.sh" "/home/fabqr/fabqr_start.sh"
 
-# FabQR service : Get file
-get_fabqr_file "bash_scripts" "/etc/init.d" "fabqr" "false" "$redownload"
+# FabQR stop : Copy file
+copy_fabqr_file "bash_scripts/fabqr_stop.sh" "/home/fabqr/fabqr_stop.sh"
+
+# FabQR service : Copy file
+copy_fabqr_file "bash_scripts/fabqr" "/etc/init.d/fabqr"
 file_properties "/etc/init.d/fabqr" "root" "root" "-rwxr-xr-x" "755" "false"
 
 # FabQR service : Auto start entry for system boot, if it does not exist yet
@@ -570,11 +533,11 @@ then
     command_success "update-rc.d fabqr defaults > /dev/null"
 fi
 
-# crontab : Get file
-get_fabqr_file "bash_scripts" "/home/fabqr" "fabqr_cron_log.sh" "true" "$redownload"
+# FabQR cron script : Copy file
+get_fabqr_file "bash_scripts/fabqr_cron.sh" "/home/fabqr/fabqr_cron.sh"
 
-# crontab : User does not have crontab or fabqr_cron_log.sh is not in crontab yet
-if ! ( ( crontab -u fabqr -l | grep fabqr_cron_log.sh ) &> "/dev/null" )
+# crontab : User does not have crontab or fabqr_cron.sh is not in crontab yet
+if ! ( ( crontab -u fabqr -l | grep fabqr_cron.sh ) &> "/dev/null" )
 then
     # crontab : If user already has crontab, need to save it
     if ( crontab -u fabqr -l &> "/dev/null" )
@@ -589,22 +552,15 @@ then
     fi
 
     # crontab: Write new command to crontab file
-    command_success "echo >> /home/fabqr/fabqr_crontab"
-    command_success "echo '# FabQR log script every 5 minutes' >> /home/fabqr/fabqr_crontab.tmp"
-    command_success "echo '*/5 * * * * /home/fabqr/fabqr_cron_log.sh' >> /home/fabqr/fabqr_crontab.tmp"
+    command_success "echo >> /home/fabqr/fabqr_crontab.tmp"
+    command_success "echo '# FabQR log script every minute' >> /home/fabqr/fabqr_crontab.tmp"
+    command_success "echo '*/1 * * * * /home/fabqr/fabqr_cron.sh' >> /home/fabqr/fabqr_crontab.tmp"
 
     # crontab: Load crontab file for user fabqr and remove temporary file
     command_success "chmod 777 /home/fabqr/fabqr_crontab.tmp"
     command_success "crontab -u fabqr /home/fabqr/fabqr_crontab.tmp"
     command_success "rm /home/fabqr/fabqr_crontab.tmp"
-    output_text "[INFO] Crontab entry for command fabqr_cron_log.sh created"
-fi
-
-# Shared memory: Check if shared memory folder exists
-if ! [ -d "/dev/shm" ]
-then
-    output_text "[ERROR] There is no shared memory at /dev/shm"
-    quit_error
+    output_text "[INFO] Crontab entry for command fabqr_cron.sh created"
 fi
 
 # usbmount : Set option MOUNTOPTIONS="noexec,nodev,noatime,nodiratime,uid=0,gid=fabqr,umask=007" in usbmount config
@@ -642,7 +598,7 @@ newdir=""
 newdirvalid=false
 
 # Data directory: If link exists AND points to existing location, then store old path
-if [ -s /home/fabqr/fabqr_data ]
+if [ -s "/home/fabqr/fabqr_data" ]
 then
     prevdir=$( ls -l /home/fabqr/fabqr_data | awk '{print $11}' )
 
@@ -709,6 +665,11 @@ do
                 command_success "mkdir ${newdir}www/private"
             fi
 
+            if ! [ -d "${newdir}apache_logs" ]
+            then
+                command_success "mkdir ${newdir}apache_logs"
+            fi
+
             # Data directory: Set properties for directory
             # For /media/usb* devices setting the properties from before might fail, thus unchecked
             # Silent output for owner, is intended to output errors for /media/usb* devices
@@ -755,11 +716,11 @@ command_success "ln -s $newdir /home/fabqr/fabqr_data"
 # TODO download web php files to /home/fabqr/fabqr_data directory
 
 # apache2 : FabQR public config, get file
-get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_public" "false" "$redownload"
+copy_fabqr_file "apache_configs/fabqr_apache_public" "/etc/apache2/sites-available/fabqr_apache_public"
 file_properties "/etc/apache2/sites-available/fabqr_apache_public" "root" "root" "-rw-r--r--" "644" "false"
 
 # apache2 : FabQR private config, get file
-get_fabqr_file "apache_configs" "/etc/apache2/sites-available" "fabqr_apache_private" "false" "$redownload"
+copy_fabqr_file "apache_configs/fabqr_apache_private" "/etc/apache2/sites-available/fabqr_apache_private"
 file_properties "/etc/apache2/sites-available/fabqr_apache_private" "root" "root" "-rw-r--r--" "644" "false"
 
 # apache2 : Password for private section
@@ -780,7 +741,7 @@ else
 fi
 
 # apache2 : FabQR security config, get file
-get_fabqr_file "apache_configs" "/etc/apache2/conf.d" "security_fabqr_apache" "false" "$redownload"
+copy_fabqr_file "apache_configs/security_fabqr_apache" "/etc/apache2/conf.d/security_fabqr_apache"
 file_properties "/etc/apache2/conf.d/security_fabqr_apache" "root" "root" "-rw-r--r--" "644" "false"
 
 # apache2 : Warning default site enabled
@@ -874,15 +835,15 @@ then
 fi
 
 # fail2ban : FabQR jail config, get file
-get_fabqr_file "fail2ban_configs" "/etc/fail2ban" "jail.local" "false" "$redownload"
+copy_fabqr_file "fail2ban_configs/jail.local" "/etc/fail2ban/jail.local"
 file_properties "/etc/fail2ban/jail.local" "root" "root" "-rw-r--r--" "644" "false"
 
 # fail2ban : FabQR http filter config, get file
-get_fabqr_file "fail2ban_configs" "/etc/fail2ban/filter.d" "fabqr-http.conf" "false" "$redownload"
+copy_fabqr_file "fail2ban_configs/fabqr-http.conf" "/etc/fail2ban/filter.d/fabqr-http.conf"
 file_properties "/etc/fail2ban/filter.d/fabqr-http.conf" "root" "root" "-rw-r--r--" "644" "false"
 
 # fail2ban : FabQR auth filter config, get file
-get_fabqr_file "fail2ban_configs" "/etc/fail2ban/filter.d" "fabqr-auth.conf" "false" "$redownload"
+copy_fabqr_file "fail2ban_configs/fabqr-auth.conf" "/etc/fail2ban/filter.d/fabqr-auth.conf"
 file_properties "/etc/fail2ban/filter.d/fabqr-auth.conf" "root" "root" "-rw-r--r--" "644" "false"
 
 # fail2ban : Reload config
@@ -949,9 +910,9 @@ command_success "chgrp fabqr /home/fabqr/framebuffer_png_source -R"
 command_success "chmod 770 /home/fabqr/framebuffer_png_source -R"
 
 # FabQR graphics: Files
-get_fabqr_file "framebuffer_png_source" "/home/fabqr/framebuffer_png_source" "fabqr_framebuffer_png.cpp" "true" "$redownload"
-get_fabqr_file "framebuffer_png_source" "/home/fabqr/framebuffer_png_source" "lodepng.cpp" "true" "$redownload"
-get_fabqr_file "framebuffer_png_source" "/home/fabqr/framebuffer_png_source" "lodepng.h" "true" "$redownload"
+copy_fabqr_file "framebuffer_png_source/fabqr_framebuffer_png.cpp" "/home/fabqr/framebuffer_png_source/fabqr_framebuffer_png.cpp"
+copy_fabqr_file "framebuffer_png_source/lodepng.cpp" "/home/fabqr/framebuffer_png_source/lodepng.cpp"
+copy_fabqr_file "framebuffer_png_source/lodepng.h" "/home/fabqr/framebuffer_png_source/lodepng.h"
 
 # Compile program
 output_text "[INFO] Compile FabQR framebuffer PNG graphics"

@@ -57,9 +57,9 @@ function output_text_log
 # Argument 1: Command
 function command_success
 {
-    if ! ( $1 )
+    if ! ( eval "$1" )
     then
-        output_text_log "[ERROR] Error in command '$1'"
+        output_text "[ERROR] Error in command '$1'"
         quit_error
     fi
 
