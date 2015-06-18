@@ -653,11 +653,6 @@ do
                 command_success "mkdir ${newdir}www"
             fi
 
-            if ! [ -d "${newdir}data" ]
-            then
-                command_success "mkdir ${newdir}data"
-            fi
-
             if ! [ -d "${newdir}www/public" ]
             then
                 command_success "mkdir ${newdir}www/public"
@@ -671,6 +666,11 @@ do
             if ! [ -d "${newdir}apache_logs" ]
             then
                 command_success "mkdir ${newdir}apache_logs"
+            fi
+
+            if ! [ -d "${newdir}www/private/pngdisplay" ]
+            then
+                command_success "mkdir ${newdir}www/private/pngdisplay"
             fi
 
             # Data directory: Set properties for directory
@@ -716,7 +716,9 @@ fi
 
 command_success "ln -s $newdir /home/fabqr/fabqr_data"
 
-# TODO download web php files to /home/fabqr/fabqr_data directory
+# PHP files : PNG display
+copy_fabqr_file "webservices/private/pngdisplay/config.php" "/home/fabqr/fabqr_data/www/private/pngdisplay/config.php"
+copy_fabqr_file "webservices/private/pngdisplay/pngdisplay.php" "/home/fabqr/fabqr_data/www/private/pngdisplay/pngdisplay.php"
 
 # apache2 : FabQR public config, get file
 copy_fabqr_file "apache_configs/fabqr_apache_public" "/etc/apache2/sites-available/fabqr_apache_public"
