@@ -389,6 +389,14 @@ check_package_install "php5-cli"
 check_package_install "php5-common"
 check_package_install "libapache2-mod-php5"
 check_package_install "php5-gd"
+
+# Check PHP config directory
+if ! [ -d "/etc/php5/conf.d" ]
+then
+    output_text "[ERROR] PHP5 is installed, but directory /etc/php5/conf.d does not exist!"
+    quit_error
+fi
+
 check_package_install "build-essential"
 
 output_text "[INFO] Required packges checked successfully"
@@ -663,14 +671,14 @@ do
                 command_success "mkdir ${newdir}www/private"
             fi
 
+            if ! [ -d "${newdir}www/includes" ]
+            then
+                command_success "mkdir ${newdir}www/includes"
+            fi
+
             if ! [ -d "${newdir}apache_logs" ]
             then
                 command_success "mkdir ${newdir}apache_logs"
-            fi
-
-            if ! [ -d "${newdir}www/private/pngdisplay" ]
-            then
-                command_success "mkdir ${newdir}www/private/pngdisplay"
             fi
 
             # Data directory: Set properties for directory
@@ -716,9 +724,17 @@ fi
 
 command_success "ln -s $newdir /home/fabqr/fabqr_data"
 
-# PHP files : PNG display
-copy_fabqr_file "webservices/private/pngdisplay/config.php" "/home/fabqr/fabqr_data/www/private/pngdisplay/config.php"
-copy_fabqr_file "webservices/private/pngdisplay/pngdisplay.php" "/home/fabqr/fabqr_data/www/private/pngdisplay/pngdisplay.php"
+# webservices : Includes
+copy_fabqr_file "webservices/includes/config.php" "/home/fabqr/fabqr_data/www/includes/config.php"
+copy_fabqr_file "webservices/includes/functions.php" "/home/fabqr/fabqr_data/www/includes/functions.php"
+
+# webservices : Private
+copy_fabqr_file "webservices/private/api_pngdisplay.php" "/home/fabqr/fabqr_data/www/private/api_pngdisplay.php"
+copy_fabqr_file "webservices/private/api_uploadproject.php" "/home/fabqr/fabqr_data/www/private/api_uploadproject.php"
+
+# php5 : Config file for upload file sizes
+copy_fabqr_file "php_configs/fabqr.ini" "/etc/php5/conf.d/fabqr.ini"
+file_properties "/etc/php5/conf.d/fabqr.ini" "root" "root" "-rw-r--r--" "644" "false"
 
 # apache2 : FabQR public config, get file
 copy_fabqr_file "apache_configs/fabqr_apache_public" "/etc/apache2/sites-available/fabqr_apache_public"
