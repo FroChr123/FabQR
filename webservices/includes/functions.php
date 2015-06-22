@@ -150,19 +150,21 @@ function generate_qr_code($text, $filepath)
     $fg_b = 0;
 
     // Start processing
-    $qrFrame = QRcode::text($text, false, $eclevelConfig, $pixelConfig, $frameConfig);
+    $qrFrame = QRcode::text($text, false, $eclevelConfig);
 
     // Render image with GD
-    $imageHeight = count($qrFrame);
-    $imageWidth = strlen($qrFrame[0]);
+    $height = count($qrFrame);
+    $width = strlen($qrFrame[0]);
+    $imageWidth = $width + 2 * $frameConfig;
+    $imageHeight = $height + 2 * $frameConfig;
 
-    // Prepare image
-    $image = imagecreate($imageWidth, $imageHeight);
-    $color_bg = imagecolorallocate($image, $bg_r, $bg_g, $bg_b);
-    $color_fg = imagecolorallocate($image, $fg_r, $fg_g, $fg_b);
+    // Prepare base image
+    $base_image = imagecreate($imageWidth, $imageHeight);
+    $color_bg_base = imagecolorallocate($base_image, $bg_r, $bg_g, $bg_b);
+    $color_fg_base = imagecolorallocate($base_image, $fg_r, $fg_g, $fg_b);
 
-    // Image with background color
-    imagefill($image, 0, 0, $color_bg);
+    // Base image with background color
+    imagefill($base_image, 0, 0, $color_bg_base);
 
     // Iterate each pixel and color it with foreground color if needed by QR code
     for ($y = 0; $y < $height; $y++)
@@ -171,19 +173,28 @@ function generate_qr_code($text, $filepath)
         {
             if ($qrFrame[$y][$x] == '1')
             {
-                imagesetpixel($image, $x, $y, $color_fg);
+                imagesetpixel($base_image, $x + $frameConfig, $y + $frameConfig, $color_fg_base);
             }
         }
     }
 
+    // Resize to final format
+    $target_image = imagecreate($imageWidth * $pixelConfig, $imageHeight * $pixelConfig);
+    imagecopyresized($target_image, $base_image, 0, 0, 0, 0, $imageWidth * $pixelConfig, $imageHeight * $pixelConfig, $imageWidth, $imageHeight);
+
+    // Deallocate base image
+    imagecolordeallocate($color_bg_base);
+    imagecolordeallocate($color_fg_base);
+    imagedestroy($base_image);
+
     // Draw 1 pixel border on QR code, for printing and cutting out the image
-    imagerectangle($image, 0, 0, $imageWidth - 1, $imageHeight - 1, $color_fg);
+    $color_fg_target = imagecolorallocate($base_image, $fg_r, $fg_g, $fg_b);
+    imagerectangle($target_image, 0, 0, ($imageWidth * $pixelConfig) - 1, ($imageHeight * $pixelConfig) - 1, $color_fg_target);
 
     // Save target image to filesystem and deallocate
-    imagepng($image, $filepath);
-    imagecolordeallocate($color_bg);
-    imagecolordeallocate($color_fg);
-    imagedestroy($image);
+    imagepng($target_image, $filepath);
+    imagecolordeallocate($color_fg_target);
+    imagedestroy($target_image);
 
     // Check if file exists now
     if (!file_exists($filepath))
