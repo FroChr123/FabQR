@@ -61,11 +61,11 @@ $pageIcon = PUBLIC_URL . ICON_NAME;
 $imageLinkQrCode = PUBLIC_URL . $projectId . "/" . FILENAME_IMAGE_QR_CODE;
 
 // Header information
-$printTemplate = str_replace("_--TEMPLATE_PAGE_TITLE--_", $pageTitle, $projectTemplate);
-$printTemplate = str_replace("_--TEMPLATE_PAGE_ICON--_", $pageIcon, $projectTemplate);
+$printTemplate = str_replace("_--TEMPLATE_PAGE_TITLE--_", $pageTitle, $printTemplate);
+$printTemplate = str_replace("_--TEMPLATE_PAGE_ICON--_", $pageIcon, $printTemplate);
 
 // Body information
-$printTemplate = str_replace("_--TEMPLATE_IMAGE_QR_CODE_LINK--_", $imageLinkQrCode, $projectTemplate);
+$printTemplate = str_replace("_--TEMPLATE_IMAGE_QR_CODE_LINK--_", $imageLinkQrCode, $printTemplate);
 
 // Output page
 echo $printTemplate;

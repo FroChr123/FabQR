@@ -31,7 +31,7 @@ a:hover, a:active { color: #3774E6; }
 .project-image-qr-code-link { text-decoration: none; }
 .project-image-scheme-image { max-width: 320px; width: 100%; }
 .project-image-real-image { max-width: 320px; width: 100%; }
-.project-image-qr-code-image { max-width: 260px; width: 100%; }
+.project-image-qr-code-image { width: 260px; }
 .project-main-footer { display: table; width: 100%; margin-top: 25px; }
 .project-footer-open-div { display: table-cell; width: 30%; padding-left: 10px; }
 .project-footer-download-file-div { display: table-cell; width: 30%; padding-left: 10px; }
