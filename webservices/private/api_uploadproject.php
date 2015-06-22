@@ -64,35 +64,11 @@ if (isset($_POST["description"]))
     $descriptionTmp = trim($_POST["description"]);
 }
 
-$lasercutterNameTmp = "";
-
-if (isset($_POST["lasercutterName"]))
-{
-    $lasercutterNameTmp = trim($_POST["lasercutterName"]);
-}
-
-$lasercutterMaterialTmp = "";
-
-if (isset($_POST["lasercutterMaterial"]))
-{
-    $lasercutterMaterialTmp = trim($_POST["lasercutterMaterial"]);
-}
-
-$referencesTmp = "";
-
-if (isset($_POST["references"]))
-{
-    $referencesTmp = trim($_POST["references"]);
-}
-
 if (empty($_POST)
     || !isset($_POST["name"]) || !isset($_POST["email"]) || !isset($_POST["licenseIndex"])
     || (intval(trim($_POST["licenseIndex"])) != LICENSE_CC0_INDEX && (empty($nameTmp) || empty($emailTmp)))
     || empty($projectNameTmp) || strlen(trim($_POST["projectName"])) < PROJECT_NAME_MINIMUM_LENGTH
-    || empty($toolsTmp) || empty($descriptionTmp)
-    || (isset($_POST["lasercutterName"]) && empty($lasercutterNameTmp))
-    || (isset($_POST["lasercutterMaterial"]) && empty($lasercutterMaterialTmp))
-    || (isset($_POST["references"]) && empty($referencesTmp)))
+    || empty($toolsTmp) || empty($descriptionTmp))
 {
     quit_errorcode();
 }
@@ -321,29 +297,33 @@ $referencesHTML = "";
 if (isset($_POST["references"]))
 {
     $references = trim($_POST["references"]);
-    $referencesArray = explode(REFERENCES_SEPERATOR, $references);
-    $referencesIndentation = REFERENCES_MAIN_INDENTATION;
-    $referencesCounter = 0;
 
-    foreach ($referencesArray as $ref)
+    if (!empty($references))
     {
-        $referencesCounter++;
+        $referencesArray = explode(REFERENCES_SEPERATOR, $references);
+        $referencesIndentation = REFERENCES_MAIN_INDENTATION;
+        $referencesCounter = 0;
 
-        if (empty($referencesHTML))
+        foreach ($referencesArray as $ref)
         {
-            $referencesHTML = '<span class="project-references-key">' . escape_and_encode(REFERENCES_TEXT, "xhtml", "") . '</span>\n';
-            $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '<span class="project-references-colon">' . escape_and_encode(COLON_TEXT, "xhtml", "") . '</span>\n';
-            $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '<span class="project-references-value">\n';
-        }
-        else
-        {
-            $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<span class="project-references-seperator">' . escape_and_encode(REFERENCES_HTML_SEPERATOR, "xhtml", "") . '</span>\n';
+            $referencesCounter++;
+
+            if (empty($referencesHTML))
+            {
+                $referencesHTML = '<span class="project-references-key">' . escape_and_encode(REFERENCES_TEXT, "xhtml", "") . '</span>\n';
+                $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '<span class="project-references-colon">' . escape_and_encode(COLON_TEXT, "xhtml", "") . '</span>\n';
+                $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '<span class="project-references-value">\n';
+            }
+            else
+            {
+                $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<span class="project-references-seperator">' . escape_and_encode(REFERENCES_HTML_SEPERATOR, "xhtml", "") . '</span>\n';
+            }
+
+            $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<a href="' . escape_and_encode($ref) . '" class="project-references-link-' . $referencesCounter . '" target="_blank">' . escape_and_encode(REFERENCES_LINK_TEXT, "xhtml", "") . $referencesCounter . '</a>\n';
         }
 
-        $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<a href="' . escape_and_encode($ref) . '" class="project-references-link-' . $referencesCounter . '" target="_blank">' . escape_and_encode(REFERENCES_LINK_TEXT, "xhtml", "") . $referencesCounter . '</a>\n';
+        $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '</span>';
     }
-
-    $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '</span>';
 }
 
 // Date
