@@ -28,15 +28,71 @@ if (empty($_FILES)
     quit_errorcode();
 }
 
-// Validate input: Text data
+// Validate input: Text data, need temporary variables for correct empty checks
+$nameTmp = "";
+
+if (isset($_POST["name"]))
+{
+    $nameTmp = trim($_POST["name"]);
+}
+
+$emailTmp = "";
+
+if (isset($_POST["email"]))
+{
+    $emailTmp = trim($_POST["email"]);
+}
+
+$projectNameTmp = "";
+
+if (isset($_POST["projectName"]))
+{
+    $projectNameTmp = trim($_POST["projectName"]);
+}
+
+$toolsTmp = "";
+
+if (isset($_POST["tools"]))
+{
+    $toolsTmp = trim($_POST["tools"]);
+}
+
+$descriptionTmp = "";
+
+if (isset($_POST["description"]))
+{
+    $descriptionTmp = trim($_POST["description"]);
+}
+
+$lasercutterNameTmp = "";
+
+if (isset($_POST["lasercutterName"]))
+{
+    $lasercutterNameTmp = trim($_POST["lasercutterName"]);
+}
+
+$lasercutterMaterialTmp = "";
+
+if (isset($_POST["lasercutterMaterial"]))
+{
+    $lasercutterMaterialTmp = trim($_POST["lasercutterMaterial"]);
+}
+
+$referencesTmp = "";
+
+if (isset($_POST["references"]))
+{
+    $referencesTmp = trim($_POST["references"]);
+}
+
 if (empty($_POST)
     || !isset($_POST["name"]) || !isset($_POST["email"]) || !isset($_POST["licenseIndex"])
-    || (intval(trim($_POST["licenseIndex"])) != LICENSE_CC0_INDEX && (empty(trim($_POST["name"])) || empty(trim($_POST["email"]))))
-    || empty(trim($_POST["projectName"])) || strlen(trim($_POST["projectName"])) < PROJECT_NAME_MINIMUM_LENGTH
-    || empty(trim($_POST["tools"])) || empty(trim($_POST["description"]))
-    || (isset($_POST["lasercutterName"]) && empty(trim($_POST["lasercutterName"])))
-    || (isset($_POST["lasercutterMaterial"]) && empty(trim($_POST["lasercutterMaterial"])))
-    || (isset($_POST["references"]) && empty(trim($_POST["references"]))))
+    || (intval(trim($_POST["licenseIndex"])) != LICENSE_CC0_INDEX && (empty($nameTmp) || empty($emailTmp)))
+    || empty($projectNameTmp) || strlen(trim($_POST["projectName"])) < PROJECT_NAME_MINIMUM_LENGTH
+    || empty($toolsTmp) || empty($descriptionTmp)
+    || (isset($_POST["lasercutterName"]) && empty($lasercutterNameTmp))
+    || (isset($_POST["lasercutterMaterial"]) && empty($lasercutterMaterialTmp))
+    || (isset($_POST["references"]) && empty($referencesTmp)))
 {
     quit_errorcode();
 }
@@ -67,7 +123,7 @@ if (!copy($_FILES["imageScheme"]["tmp_name"], $imageSchemeFilePath))
 }
 
 // Copy image real from temp directory to target file, if it was sent
-if (isset($_FILES["imageReal"])
+if (isset($_FILES["imageReal"]))
 {
     $imageRealFilePath = DIR_PUBLIC_PATH . $projectId . "/" . FILENAME_IMAGE_REAL;
 
@@ -269,7 +325,7 @@ if (isset($_POST["references"]))
     $referencesIndentation = REFERENCES_MAIN_INDENTATION;
     $referencesCounter = 0;
 
-    foreach ($referencesArray : $ref)
+    foreach ($referencesArray as $ref)
     {
         $referencesCounter++;
 
