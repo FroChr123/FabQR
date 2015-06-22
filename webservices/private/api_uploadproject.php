@@ -195,7 +195,7 @@ if (empty($licenseString))
 }
 
 // Description
-$description = escape_and_encode(replace_linebreaks(trim($_POST["description"]), "<br />"), "xhtml", "<br />");
+$description = escape_and_encode(trim($_POST["description"]), "xhtml", "<br />");
 
 // Tools
 $tools = trim($_POST["tools"]);
