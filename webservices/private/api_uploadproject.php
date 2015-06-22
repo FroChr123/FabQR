@@ -394,7 +394,7 @@ $projectTemplate = str_replace("_--TEMPLATE_PROJECTFILELINK--_", $projectFileLin
 // Write content to file
 $projectFilePath = DIR_PUBLIC_PATH . $projectId . "/" . FILENAME_PROJECT_XHTML;
 
-if (file_put_contents($projectFilePath, $projectFilePath) === false)
+if (file_put_contents($projectFilePath, $projectTemplate) === false)
 {
     quit_removeproject_errorcode($projectId, false);
 }
