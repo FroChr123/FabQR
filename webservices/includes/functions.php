@@ -132,4 +132,136 @@ function remove_project($projectId, $isPrivate)
     return false;
 }
 
+// Function to generate QR codes to a specified file path
+function generate_qr_code($text, $filepath)
+{
+    // Generate QR code with modified background color
+    // QR code configs
+    $pixelConfig = 8;
+    $frameConfig = 4;
+    $eclevelConfig = QR_ECLEVEL_H;
+
+    // Color configs
+    $bg_r = 229;
+    $bg_g = 229;
+    $bg_b = 229;
+    $fg_r = 0;
+    $fg_g = 0;
+    $fg_b = 0;
+
+    // Start processing
+    $qrFrame = QRcode::text($text, false, $eclevelConfig);
+    
+    // Render image with GD
+    $height = count($qrFrame);
+    $width = strlen($qrFrame[0]);
+    $imageWidth = $width + 2 * $frameConfig;
+    $imageHeight = $height + 2 * $frameConfig;
+
+    // Prepare base image
+    $base_image = imagecreate($imageWidth, $imageHeight);
+    $color_bg = imagecolorallocate($base_image, $bg_r, $bg_g, $bg_b);
+    $color_fg = imagecolorallocate($base_image, $fg_r, $fg_g, $fg_b);
+
+    // Base image with background color
+    imagefill($base_image, 0, 0, $color_bg);
+
+    // Iterate each pixel and color it with foreground color if needed by QR code
+    for ($y = 0; $y < $height; $y++)
+    {
+        for ($x = 0; $x < $width; $x++)
+        {
+            if ($qrFrame[$y][$x] == '1')
+            {
+                imagesetpixel($base_image, $x + $frameConfig, $y + $frameConfig, $color_fg);
+            }
+        }
+    }
+
+    // Draw 1 pixel border on QR code, for printing and cutting out the image
+    imagerectangle($base_image, 0, 0, $imageWidth - 1, $imageHeight - 1, $color_fg);
+
+    // Resize to final format
+    $target_image = imagecreate($imageWidth * $pixelConfig, $imageHeight * $pixelConfig);
+    imagecopyresized($target_image, $base_image, 0, 0, 0, 0, $imageWidth * $pixelConfig, $imageHeight * $pixelConfig, $imageWidth, $imageHeight);
+
+    // Deallocate base image
+    imagecolordeallocate($color_bg);
+    imagecolordeallocate($color_fg);
+    imagedestroy($base_image);
+
+    // Save target image to filesystem and deallocate
+    imagepng($target_image, $filepath);
+    imagedestroy($target_image);
+
+    // Check if file exists now
+    if (!file_exists($filepath))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+// Function to compute correct indentation hierachies
+function indentation($count)
+{
+    $result = "";
+
+    for ($i = 0; $i < $count; $i++)
+    {
+        $result = $result . GENERAL_INDENTATION;
+    }
+
+    return $result;
+}
+
+// Function to generate correct encoded / escaped values
+function escape_and_encode($text, $mode, $linebreakReplacement)
+{
+    $result = "";
+
+    switch ($mode)
+    {
+        case 'xml':
+            $result = htmlspecialchars(strval($text), ENT_QUOTES | ENT_XML1, 'UTF-8');
+            break;
+        case 'xhtml':
+            $result = htmlspecialchars(strval($text), ENT_QUOTES | ENT_XHTML, 'UTF-8');
+            break;
+        default:
+            break;
+    }
+
+    $result = str_replace("\r\n", strval($linebreakReplacement), $text);
+    $result = str_replace("\n\r", strval($linebreakReplacement), $text);
+    $result = str_replace("\r", strval($linebreakReplacement), $text);
+    $result = str_replace("\n", strval($linebreakReplacement), $text);
+
+    return $result;
+}
+
+// Function to check if given projectId is syntactically correct
+function is_project_id_syntax_valid($projectId)
+{
+    // Valid project ids are 7 characters long
+    if (strlen(strval($projectId)) == 7)
+    {
+        for ($i = 0; $i < 7; $i++)
+        {
+            $asciiVal = ord($projectId[$i]);
+
+            // 48 = 0, 122 = z, 57 = 9, 97 = a
+            if ($asciiVal < 48 || $asciiVal > 122 || ($asciiVal > 57 && $asciiVal < 97))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 ?>
