@@ -201,7 +201,7 @@ $description = escape_and_encode(trim($_POST["description"]), "xhtml", "<br />")
 $tools = trim($_POST["tools"]);
 $toolsArray = explode(TOOLS_SEPERATOR, $tools);
 $toolsIndentation = TOOLS_MAIN_INDENTATION;
-$toolsHTML = '<ul class="project-tools-list">\n';
+$toolsHTML = '<ul class="project-tools-list">' . "\n";
 $toolsIndentation1 = "";
 
 foreach ($toolsArray as $tool)
@@ -209,8 +209,8 @@ foreach ($toolsArray as $tool)
     switch ($tool)
     {
         case TOOL_LASERCUTTER:
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-lasercutter">\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-lasercutter-text">' . escape_and_encode($tool, "xhtml", "") . '</span>\n';
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-lasercutter">' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-lasercutter-text">' . escape_and_encode($tool, "xhtml", "") . '</span>' . "\n";
 
             // Lasercutter name
             $lasercutterName = "";
@@ -231,60 +231,60 @@ foreach ($toolsArray as $tool)
             // If either of them is not empty, create sub list
             if (!empty($lasercutterName) || !empty($lasercutterMaterial))
             {
-                $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<ul class="project-tool-lasercutter-extended-list">\n';
+                $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<ul class="project-tool-lasercutter-extended-list">' . "\n";
 
                 if (!empty($lasercutterName))
                 {
-                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 3) . '<li class="project-tool-lasercutter-extended-model">\n';
-                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-model-key">Model</span>\n';
-                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-model-colon">' . escape_and_encode(COLON_TEXT, "xhtml", "") . '</span>\n';
-                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-model-value">' . escape_and_encode($lasercutterName, "xhtml", "") . '</span>\n';
-                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 3) . '</li>\n';
+                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 3) . '<li class="project-tool-lasercutter-extended-model">' . "\n";
+                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-model-key">Model</span>' . "\n";
+                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-model-colon">' . escape_and_encode(COLON_TEXT, "xhtml", "") . '</span>' . "\n";
+                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-model-value">' . escape_and_encode($lasercutterName, "xhtml", "") . '</span>' . "\n";
+                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 3) . '</li>' . "\n";
                 }
 
                 if (!empty($lasercutterMaterial))
                 {
-                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 3) . '<li class="project-tool-lasercutter-extended-material">\n';
-                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-material-key">Material</span>\n';
-                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-material-colon">' . escape_and_encode(COLON_TEXT, "xhtml", "") . '</span>\n';
-                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-material-value">' . escape_and_encode($lasercutterMaterial, "xhtml", "") . '</span>\n';
-                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 3) . '</li>\n';
+                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 3) . '<li class="project-tool-lasercutter-extended-material">' . "\n";
+                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-material-key">Material</span>' . "\n";
+                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-material-colon">' . escape_and_encode(COLON_TEXT, "xhtml", "") . '</span>' . "\n";
+                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 4) . '<span class="project-tool-lasercutter-extended-material-value">' . escape_and_encode($lasercutterMaterial, "xhtml", "") . '</span>' . "\n";
+                    $toolsHTML = $toolsHTML . indentation($toolsIndentation + 3) . '</li>' . "\n";
                 }
 
-                $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '</ul>\n';
+                $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '</ul>' . "\n";
             }
 
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>\n';
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>' . "\n";
             break;
         case TOOL_PCB_SOLDERING:
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-pcb-soldering">\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-pcb-soldering-text">' . escape_and_encode($tool, "xhtml", "") . '</span>\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>\n';
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-pcb-soldering">' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-pcb-soldering-text">' . escape_and_encode($tool, "xhtml", "") . '</span>' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>' . "\n";
             break;
         case TOOL_3D_PRINTER:
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-3d-printer">\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-3d-printer-text">' . escape_and_encode($tool, "xhtml", "") . '</span>\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>\n';
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-3d-printer">' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-3d-printer-text">' . escape_and_encode($tool, "xhtml", "") . '</span>' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>' . "\n";
             break;
         case TOOL_CNC_ROUTER:
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-cnc-router">\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-cnc-router-text">' . escape_and_encode($tool, "xhtml", "") . '</span>\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>\n';
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-cnc-router">' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-cnc-router-text">' . escape_and_encode($tool, "xhtml", "") . '</span>' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>' . "\n";
             break;
         case TOOL_ARDUINO:
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-arduino">\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-arduino-text">' . escape_and_encode($tool, "xhtml", "") . '</span>\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>\n';
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-arduino">' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-arduino-text">' . escape_and_encode($tool, "xhtml", "") . '</span>' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>' . "\n";
             break;
         case TOOL_RASPBERRY_PI:
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-raspberry-pi">\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-raspberry-pi-text">' . escape_and_encode($tool, "xhtml", "") . '</span>\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>\n';
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-raspberry-pi">' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-raspberry-pi-text">' . escape_and_encode($tool, "xhtml", "") . '</span>' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>' . "\n";
             break;
         default:
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-unknown">\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-unknown-text">' . escape_and_encode($tool, "xhtml", "") . '</span>\n';
-            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>\n';
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '<li class="project-tool-unknown">' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 2) . '<span class="project-tool-unknown-text">' . escape_and_encode($tool, "xhtml", "") . '</span>' . "\n";
+            $toolsHTML = $toolsHTML . indentation($toolsIndentation + 1) . '</li>' . "\n";
             break;
     }
 }
@@ -310,16 +310,16 @@ if (isset($_POST["references"]))
 
             if (empty($referencesHTML))
             {
-                $referencesHTML = '<span class="project-references-key">' . escape_and_encode(REFERENCES_TEXT, "xhtml", "") . '</span>\n';
-                $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '<span class="project-references-colon">' . escape_and_encode(COLON_TEXT, "xhtml", "") . '</span>\n';
-                $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '<span class="project-references-value">\n';
+                $referencesHTML = '<span class="project-references-key">' . escape_and_encode(REFERENCES_TEXT, "xhtml", "") . '</span>' . "\n";
+                $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '<span class="project-references-colon">' . escape_and_encode(COLON_TEXT, "xhtml", "") . '</span>' . "\n";
+                $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '<span class="project-references-value">' . "\n";
             }
             else
             {
-                $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<span class="project-references-seperator">' . escape_and_encode(REFERENCES_HTML_SEPERATOR, "xhtml", "") . '</span>\n';
+                $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<span class="project-references-seperator">' . escape_and_encode(REFERENCES_HTML_SEPERATOR, "xhtml", "") . '</span>' . "\n";
             }
 
-            $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<a href="' . escape_and_encode($ref) . '" class="project-references-link-' . $referencesCounter . '" target="_blank">' . escape_and_encode(REFERENCES_LINK_TEXT, "xhtml", "") . $referencesCounter . '</a>\n';
+            $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<a href="' . escape_and_encode($ref) . '" class="project-references-link-' . $referencesCounter . '" target="_blank">' . escape_and_encode(REFERENCES_LINK_TEXT, "xhtml", "") . $referencesCounter . '</a>' . "\n";
         }
 
         $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '</span>';
