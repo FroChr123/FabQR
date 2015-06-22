@@ -13,29 +13,29 @@ a:hover, a:active { color: #3774E6; }
 .project-main { border: 2px solid #4C78A8; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; }
 .project-main-text { display: table; width: 100%; }
 .project-paragraph { margin: 0px; line-height: 24px; }
-.project-information { display: table-cell; width: 30%; padding-left: 10px; }
+.project-information { display: table-cell; padding-left: 10px; }
 .project-header-information { margin: 0px; padding-bottom: 10px; }
-.project-tools { display: table-cell; width: 30%; padding-left: 10px; }
+.project-tools { display: table-cell; padding-left: 10px; }
 .project-tools-list { list-style-type: disc; }
 .project-tool-lasercutter-extended-list { list-style-type: square; }
 .project-header-tools { margin: 0px; padding-bottom: 10px; }
-.project-description { display: table-cell; width: 40%; padding-left: 10px; padding-right: 10px; }
+.project-description { display: table-cell; padding-left: 10px; padding-right: 10px; }
 .project-header-description { margin: 0px; padding-bottom: 10px; }
 .project-references { padding-top: 10px; }
 .project-main-image { display: table; width: 100%; margin-top: 25px; }
-.project-image-scheme-div { display: table-cell; width: 30%; padding-left: 10px; vertical-align: middle; }
-.project-image-real-div { display: table-cell; width: 30%; padding-left: 10px; vertical-align: middle; }
-.project-image-qr-code-div { display: table-cell; width: 40%; padding-left: 10px; padding-right: 10px; vertical-align: middle; }
+.project-image-scheme-div { display: table-cell; padding-left: 10px; vertical-align: middle; text-align: center; }
+.project-image-real-div { display: table-cell; padding-left: 10px; vertical-align: middle; text-align: center; }
+.project-image-qr-code-div { display: table-cell; padding-left: 10px; padding-right: 10px; vertical-align: middle; text-align: center; }
 .project-image-scheme-link { text-decoration: none; }
 .project-image-real-link { text-decoration: none; }
 .project-image-qr-code-link { text-decoration: none; }
 .project-image-scheme-image { max-width: 320px; width: 100%; }
 .project-image-real-image { max-width: 320px; width: 100%; }
-.project-image-qr-code-image { width: 260px; }
+.project-image-qr-code-image { width: 328px; }
 .project-main-footer { display: table; width: 100%; margin-top: 25px; }
-.project-footer-open-div { display: table-cell; width: 30%; padding-left: 10px; }
-.project-footer-download-file-div { display: table-cell; width: 30%; padding-left: 10px; }
-.project-footer-print-qr-code-div { display: table-cell; width: 40%; padding-left: 10px; padding-right: 10px; }
+.project-footer-open-div { display: table-cell; padding-left: 10px; text-align: center; }
+.project-footer-download-file-div { display: table-cell; padding-left: 10px; text-align: center; }
+.project-footer-print-qr-code-div { display: table-cell; padding-left: 10px; padding-right: 10px; text-align: center; }
 .project-footer-open-link { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; }
 .project-footer-open-link:hover, .project-footer-open-link:active { color: #FFFFFF; background-color: #2E4966; }
 .project-footer-download-file-link { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; }

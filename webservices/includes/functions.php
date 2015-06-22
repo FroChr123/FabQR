@@ -150,21 +150,19 @@ function generate_qr_code($text, $filepath)
     $fg_b = 0;
 
     // Start processing
-    $qrFrame = QRcode::text($text, false, $eclevelConfig);
-    
+    $qrFrame = QRcode::text($text, false, $eclevelConfig, $pixelConfig, $frameConfig);
+
     // Render image with GD
-    $height = count($qrFrame);
-    $width = strlen($qrFrame[0]);
-    $imageWidth = $width + 2 * $frameConfig;
-    $imageHeight = $height + 2 * $frameConfig;
+    $imageHeight = count($qrFrame);
+    $imageWidth = strlen($qrFrame[0]);
 
-    // Prepare base image
-    $base_image = imagecreate($imageWidth, $imageHeight);
-    $color_bg = imagecolorallocate($base_image, $bg_r, $bg_g, $bg_b);
-    $color_fg = imagecolorallocate($base_image, $fg_r, $fg_g, $fg_b);
+    // Prepare image
+    $image = imagecreate($imageWidth, $imageHeight);
+    $color_bg = imagecolorallocate($image, $bg_r, $bg_g, $bg_b);
+    $color_fg = imagecolorallocate($image, $fg_r, $fg_g, $fg_b);
 
-    // Base image with background color
-    imagefill($base_image, 0, 0, $color_bg);
+    // Image with background color
+    imagefill($image, 0, 0, $color_bg);
 
     // Iterate each pixel and color it with foreground color if needed by QR code
     for ($y = 0; $y < $height; $y++)
@@ -173,26 +171,19 @@ function generate_qr_code($text, $filepath)
         {
             if ($qrFrame[$y][$x] == '1')
             {
-                imagesetpixel($base_image, $x + $frameConfig, $y + $frameConfig, $color_fg);
+                imagesetpixel($image, $x, $y, $color_fg);
             }
         }
     }
 
     // Draw 1 pixel border on QR code, for printing and cutting out the image
-    imagerectangle($base_image, 0, 0, $imageWidth - 1, $imageHeight - 1, $color_fg);
-
-    // Resize to final format
-    $target_image = imagecreate($imageWidth * $pixelConfig, $imageHeight * $pixelConfig);
-    imagecopyresized($target_image, $base_image, 0, 0, 0, 0, $imageWidth * $pixelConfig, $imageHeight * $pixelConfig, $imageWidth, $imageHeight);
-
-    // Deallocate base image
-    imagecolordeallocate($color_bg);
-    imagecolordeallocate($color_fg);
-    imagedestroy($base_image);
+    imagerectangle($image, 0, 0, $imageWidth - 1, $imageHeight - 1, $color_fg);
 
     // Save target image to filesystem and deallocate
-    imagepng($target_image, $filepath);
-    imagedestroy($target_image);
+    imagepng($image, $filepath);
+    imagecolordeallocate($color_bg);
+    imagecolordeallocate($color_fg);
+    imagedestroy($image);
 
     // Check if file exists now
     if (!file_exists($filepath))
