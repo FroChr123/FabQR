@@ -47,8 +47,9 @@ define("FILENAME_IMAGE_SCHEME", "image_scheme.png");
 define("FILENAME_IMAGE_QR_CODE", "qr_code.png");
 define("FILENAME_PROJECT_XHTML", "project.xhtml");
 
-// PHP filenames
+// Misc filenames
 define("PHP_SCRIPT_PRINT_QR_CODE", "print_qr_code.php");
+define("FILENAME_PROJECTS_XML", "projects.xml");
 
 // Project name minimum length
 define("PROJECT_NAME_MINIMUM_LENGTH", 3);

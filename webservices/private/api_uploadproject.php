@@ -74,7 +74,7 @@ if (empty($_POST)
 }
 
 // Get a free new identifier
-$projectId = add_new_project(false);
+$projectId = add_new_project(false, $_POST["projectName"]);
 
 if (empty($projectId))
 {

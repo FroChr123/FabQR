@@ -40,14 +40,21 @@ function quit_removeproject_errorcode($projectId, $isPrivate)
 }
 
 // Function which tries to find a new unused project id and adds a new empty project with this id
-function add_new_project($isPrivate)
+function add_new_project($isPrivate, $projectName)
 {
-    // Set correct target path
+    // Variables
+    $resultProjectId = "";
     $path = DIR_PUBLIC_PATH;
+    $projectNameProcessed = "";
 
+    // Process variables
     if (!empty($isPrivate))
     {
         $path = DIR_PRIVATE_PATH;
+    }
+    else
+    {
+        $projectNameProcessed = escape_and_encode(trim($projectName), "xml", "");
     }
 
     // Try multiple times to find a new project id
@@ -81,12 +88,82 @@ function add_new_project($isPrivate)
             // Check if creating new directory is successful
             if (mkdir($path . $newProjectId, 0770))
             {
-                return $newProjectId;
+                $resultProjectId = $newProjectId;
+                break;
             }
         }
     }
 
-    return "";
+    // Deal with index file
+    $domDoc = new DOMDocument("1.0", "UTF-8");
+    $domDoc->preserveWhiteSpace = false;
+    $domDoc->formatOutput = true;
+
+    // Open file descriptor
+    $fileDescriptor = fopen($path . FILENAME_PROJECTS_XML, "a+");
+
+    // Check if file opening is successful
+    if ($fileDescriptor === false)
+    {
+        return "";
+    }
+
+    // Lock file, check if successful
+    if (!flock($fileDescriptor, LOCK_EX))
+    {
+        return "";
+    }
+
+    // Try to load contents with warning suppression, warnings are allowed to happen here (e.g. new empty file)
+    // In error case original contents are not changed anyways, so code can continue without any issues
+    @$domDoc->load($path . FILENAME_PROJECTS_XML);
+
+    // Check main node, if it does not exist, create it
+    $indexNode = $domDoc->firstChild;
+
+    if (empty($indexNode))
+    {
+        $indexNode = $domDoc->createElement("index");
+        $indexNode->setAttribute("fablab-name", escape_and_encode(FABLAB_NAME, "xml", ""));
+        $indexNode->setAttribute("url", escape_and_encode(((!empty($isPrivate)) ? PRIVATE_URL : PUBLIC_URL), "xml", ""));
+        $indexNode->setAttribute("type", ((!empty($isPrivate)) ? "private" : "public"));
+        $domDoc->appendChild($indexNode);
+    }
+
+    // Add project as first new child in index node
+    $projectNode = $domDoc->createElement("project");
+    $projectNode->setAttribute("id", $resultProjectId);
+    $projectNode->setAttribute("name", $projectNameProcessed);
+    $projectNode->setAttribute("create-timestamp", time());
+
+    if (empty($indexNode->firstChild))
+    {
+        $indexNode->appendChild($projectNode);
+    }
+    else
+    {
+        $indexNode->insertBefore($projectNode, $indexNode->firstChild);
+    }
+
+    // Write contents to file
+    if (file_put_contents($path . FILENAME_PROJECTS_XML, $domDoc->saveXML()) === false)
+    {
+        return "";
+    }
+
+    // Unlock file
+    if (!flock($fileDescriptor, LOCK_UN))
+    {
+        return "";
+    }
+
+    // Close file handle
+    if (!fclose($fileDescriptor))
+    {
+        return "";
+    }
+
+    return $resultProjectId;
 }
 
 // Function which tries to remove a project
@@ -100,9 +177,65 @@ function remove_project($projectId, $isPrivate)
         $path = DIR_PRIVATE_PATH;
     }
 
-    // If directory exists, remove all files in it
+    // If directory exists, remove entry in index and remove all files in it
     if (is_dir($path . $projectId))
     {
+        // Deal with index file
+        $domDoc = new DOMDocument("1.0", "UTF-8");
+        $domDoc->preserveWhiteSpace = false;
+        $domDoc->formatOutput = true;
+
+        // Open file descriptor
+        $fileDescriptor = fopen($path . FILENAME_PROJECTS_XML, "a+");
+
+        // Check if file opening is successful
+        if ($fileDescriptor === false)
+        {
+            return false;
+        }
+
+        // Lock file, check if successful
+        if (!flock($fileDescriptor, LOCK_EX))
+        {
+            return false;
+        }
+
+        // Load contents, file must now be valid
+        if (@$domDoc->load($path . FILENAME_PROJECTS_XML) === false)
+        {
+            return false;
+        }
+
+        // Get project node with project id from file, must be valid, use XPath
+        $xpath = new DOMXPath($domDoc);
+        $projectNode = $xpath->query("/index/project[@id='$projectId']")->item(0);
+
+        if (empty($projectNode) || empty($projectNode->parentNode))
+        {
+            return false;
+        }
+
+        // Remove node in parent
+        $projectNode->parentNode->removeChild($projectNode);
+
+        // Write contents to file
+        if (file_put_contents($path . FILENAME_PROJECTS_XML, $domDoc->saveXML()) === false)
+        {
+            return false;
+        }
+
+        // Unlock file
+        if (!flock($fileDescriptor, LOCK_UN))
+        {
+            return false;
+        }
+
+        // Close file handle
+        if (!fclose($fileDescriptor))
+        {
+            return false;
+        }
+
         // Directory has to be empty before it can be deleted, remove seperate files
         $files = scandir($path . $projectId);
 
