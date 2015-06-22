@@ -188,7 +188,7 @@ function generate_qr_code($text, $filepath)
     imagedestroy($base_image);
 
     // Draw 1 pixel border on QR code, for printing and cutting out the image
-    $color_fg_target = imagecolorallocate($base_image, $fg_r, $fg_g, $fg_b);
+    $color_fg_target = imagecolorallocate($target_image, $fg_r, $fg_g, $fg_b);
     imagerectangle($target_image, 0, 0, ($imageWidth * $pixelConfig) - 1, ($imageHeight * $pixelConfig) - 1, $color_fg_target);
 
     // Save target image to filesystem and deallocate
