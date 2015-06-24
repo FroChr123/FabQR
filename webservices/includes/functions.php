@@ -416,7 +416,7 @@ function upload_temporary_private_file($filesArray, $projectId)
         $logFileName = $filesArray["inputFile"]["name"];
     }
 
-    $logEntry = $_SERVER["REMOTE_ADDR"] " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "File Upload: " . $logFileName . "\"";
+    $logEntry = $_SERVER["REMOTE_ADDR"] . " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "File Upload: " . $logFileName . "\"";
     if (file_put_contents(DIR_LOGS . LOGNAME_TEMPORARY_UPLOAD, $logEntry, FILE_APPEND) === false)
     {
         return "";
