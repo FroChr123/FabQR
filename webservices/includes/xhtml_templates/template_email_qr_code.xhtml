@@ -9,7 +9,9 @@
                     </a>
                     <form action="&&&TEMPLATE_LINK_EMAIL_QR_CODE&&&" method="POST" enctype="multipart/form-data">
                         <div id="email-qr-code-footer">
-                            <input id="email-qr-code-input-text" type="text" placeholder="Email address" />
+                            <input id="email-qr-code-input-text" type="text" name="email" placeholder="Email address" />
+                            <input id="email-qr-code-input-hidden-project" type="hidden" name="projectId" value="&&&TEMPLATE_PROJECT_ID_DATA&&&" />
+                            <input id="email-qr-code-input-hidden-type" type="hidden" name="type" value="&&&TEMPLATE_TYPE_DATA&&&" />
                             <input id="email-qr-code-input-submit" type="submit" value="Submit" />
                         </div>
                     </form>

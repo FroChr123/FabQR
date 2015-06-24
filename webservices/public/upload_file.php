@@ -42,7 +42,7 @@ if (!file_exists($templateFooterPath))
     quit_errorcode();
 }
 
-$footerTemplate = file_get_contents($footerTemplate);
+$footerTemplate = file_get_contents($templateFooterPath);
 
 if (empty($footerTemplate))
 {
@@ -87,8 +87,8 @@ if (empty($_FILES))
     $linkUpload = escape_and_encode(PUBLIC_URL . PHP_SCRIPT_UPLOAD_FILE, "xhtml", "");
 
     // Content information
-    $contentTemplate = str_replace("&&&TEMPLATE_PAGE_MAIN_HEADER&&&", $pageMainHeading, $contentTemplate);
-    $contentTemplate = str_replace("&&&TEMPLATE_PAGE_SUB_HEADER&&&", $pageSubHeading, $contentTemplate);
+    $contentTemplate = str_replace("&&&TEMPLATE_PAGE_MAIN_HEADING&&&", $pageMainHeading, $contentTemplate);
+    $contentTemplate = str_replace("&&&TEMPLATE_PAGE_SUB_HEADING&&&", $pageSubHeading, $contentTemplate);
     $contentTemplate = str_replace("&&&TEMPLATE_LINK_MAIN&&&", $linkMain, $contentTemplate);
 
     $contentTemplate = str_replace("&&&TEMPLATE_LINK_UPLOAD&&&", $linkUpload, $contentTemplate);
@@ -144,8 +144,8 @@ else
     $contentTemplate = str_replace("&&&TEMPLATE_LINK_MAIN&&&", $linkMain, $contentTemplate);
 
     $contentTemplate = str_replace("&&&TEMPLATE_IMAGE_QR_CODE_LINK&&&", $imageLinkQrCode, $contentTemplate);
-    $projectTemplate = str_replace("&&&TEMPLATE_PRINTQRCODELINK&&&", $printQrCodeLink, $projectTemplate);
-    $projectTemplate = str_replace("&&&TEMPLATE_EMAILQRCODELINK&&&", $emailQrCodeLink, $projectTemplate);
+    $contentTemplate = str_replace("&&&TEMPLATE_PRINTQRCODELINK&&&", $printQrCodeLink, $contentTemplate);
+    $contentTemplate = str_replace("&&&TEMPLATE_EMAILQRCODELINK&&&", $emailQrCodeLink, $contentTemplate);
 }
 
 echo $headerTemplate . $contentTemplate . $footerTemplate;

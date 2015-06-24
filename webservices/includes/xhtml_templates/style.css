@@ -44,6 +44,7 @@ a:hover, a:active { color: #3774E6; }
 .project-footer-print-qr-code-link:hover, .project-footer-print-qr-code-link:active { color: #FFFFFF; background-color: #2E4966; }
 
 /* Styles for print */
+#print-qr-code-image { margin-top: 10px; }
 #print-qr-code-image-link { text-decoration: none; }
 
 /* Styles for file upload */
@@ -52,10 +53,10 @@ a:hover, a:active { color: #3774E6; }
 #file-upload-main { border: 2px solid #4C78A8; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 10px; text-align: center; }
 #file-upload-input-file-wrapper { display: inline-block; position: relative; overflow: hidden; text-align: center; width: 280px; height: 40px; line-height: 40px; font-size: 16px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; margin-right: 50px; cursor: pointer; }
 #file-upload-input-file-wrapper:hover, #file-upload-input-file-wrapper:active { color: #FFFFFF; background-color: #2E4966; }
-#file-upload-input-file { display: block; text-align: right; position: absolute; top: 0; right: 0; min-height: 100%; min-width: 100%; opacity: 0; filter: alpha(opacity=0); background: none transparent scroll repeat 0 0; cursor: pointer; }
+#file-upload-input-file { display: block; text-align: right; position: absolute; top: 0; right: 0; min-height: 100%; min-width: 100%; opacity: 0; background: none transparent scroll repeat 0 0; cursor: pointer; }
 #file-upload-input-submit-wrapper { display: inline-block; position: relative; overflow: hidden; text-align: center; width: 280px; height: 40px; line-height: 40px; font-size: 16px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; cursor: pointer; }
 #file-upload-input-submit-wrapper:hover, #file-upload-input-submit-wrapper:active { color: #FFFFFF; background-color: #2E4966; }
-#file-upload-input-submit { display: block; text-align: right; position: absolute; top: 0; right: 0; min-height: 100%; min-width: 100%; opacity: 0; filter: alpha(opacity=0); background: none transparent scroll repeat 0 0; cursor: pointer; }
+#file-upload-input-submit { display: block; text-align: right; position: absolute; top: 0; right: 0; min-height: 100%; min-width: 100%; opacity: 0; background: none transparent scroll repeat 0 0; cursor: pointer; }
 #file-upload-footer { margin-top: 25px; }
 #file-upload-footer-email-qr-code-link { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; margin-right: 40px; }
 #file-upload-footer-email-qr-code-link:hover, #file-upload-footer-email-qr-code-link:active { color: #FFFFFF; background-color: #2E4966; }
@@ -72,3 +73,4 @@ a:hover, a:active { color: #3774E6; }
 #email-qr-code-input-text { display: inline-block; width: 200px; height: 25px; margin-right: 10px; border-radius: 5px; border: 1px solid #888888; }
 #email-qr-code-input-submit { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; border: none transparent; cursor: pointer; }
 #email-qr-code-input-submit:hover, #email-qr-code-input-submit:active { color: #FFFFFF; background-color: #2E4966; }
+#email-qr-code-input-hidden-project, #email-qr-code-input-hidden-type { display: none; }

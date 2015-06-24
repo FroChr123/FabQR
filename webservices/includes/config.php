@@ -70,9 +70,10 @@ define("FILENAME_IMAGE_SCHEME", "image_scheme.png");
 define("FILENAME_IMAGE_QR_CODE", "qr_code.png");
 define("FILENAME_PROJECT_XHTML", "project.xhtml");
 
-// Configs for email QR code texts
+// Configs for email
 define("EMAIL_QR_CODE_SUBJECT_PREFIX", "QR Code - ");
 define("EMAIL_QR_CODE_BODY", "This email contains your requested QR Code as an attachment.");
+define("SMTP_TIMEOUT", 30);
 
 // Configs for file upload
 define("FILE_UPLOAD_MAXIMUM_SIZE_BYTES", 10000000);

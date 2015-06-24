@@ -46,7 +46,7 @@ $qrCodeFilePath = DIR_PUBLIC_PATH . $projectId . "/" . FILENAME_IMAGE_QR_CODE;
 
 if ($type == "private")
 {
-    $qrCodeFilePath = DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" $projectId . ".png";
+    $qrCodeFilePath = DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png";
 }
 
 if (!file_exists($qrCodeFilePath))
@@ -85,7 +85,7 @@ $imageLinkQrCode = escape_and_encode(PUBLIC_URL . $projectId . "/" . FILENAME_IM
 
 if ($type == "private")
 {
-    $imageLinkQrCode = escape_and_encode(DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png", "xhtml", "");
+    $imageLinkQrCode = escape_and_encode(PUBLIC_URL . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png", "xhtml", "");
 }
 
 $printTemplate = str_replace("&&&TEMPLATE_IMAGE_QR_CODE_LINK&&&", $imageLinkQrCode, $printTemplate);

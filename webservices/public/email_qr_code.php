@@ -19,23 +19,49 @@
 require_once("../includes/config.php");
 require_once("../includes/functions.php");
 
-// Check GET data
-if (empty($_GET) || empty($_GET["projectId"]) || empty($_GET["type"]))
+// Check GET and POST, only one of them is allowed to be filled
+if ((empty($_GET) && empty($_POST)) || (!empty($_GET) && !empty($_POST)))
 {
     quit_errorcode();
 }
 
-// Check type valid
-$type = $_GET["type"];
+// Prepare input variables
+$projectId = "";
+$type = "";
+$email = "";
 
+// Check GET data
+if (!empty($_GET))
+{
+    if (empty($_GET["projectId"]) || empty($_GET["type"]))
+    {
+        quit_errorcode();
+    }
+
+    $projectId = $_GET["projectId"];
+    $type = $_GET["type"];
+}
+
+// Check POST data
+if (!empty($_POST))
+{
+    if (empty($_POST["projectId"]) || empty($_POST["type"]) || empty($_POST["email"]))
+    {
+        quit_errorcode();
+    }
+
+    $projectId = $_POST["projectId"];
+    $type = $_POST["type"];
+    $email = $_POST["email"];
+}
+
+// Check type valid
 if ($type != "public" && $type != "private")
 {
     quit_errorcode();
 }
 
 // Check projectId syntax valid
-$projectId = $_GET["projectId"];
-
 if (!is_project_id_syntax_valid($projectId))
 {
     quit_errorcode();
@@ -48,8 +74,8 @@ $isPrivate = false;
 
 if ($type == "private")
 {
-    $qrCodeFilePath = DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" $projectId . ".png";
-    $imageLinkQrCode = escape_and_encode(PUBLIC_URL . DIR_NAME_PRIVATE_QR_CODES . "/" $projectId . ".png", "xhtml", "");
+    $qrCodeFilePath = DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png";
+    $imageLinkQrCode = escape_and_encode(PUBLIC_URL . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png", "xhtml", "");
     $isPrivate = true;
 }
 
@@ -81,7 +107,7 @@ if (!file_exists($templateFooterPath))
     quit_errorcode();
 }
 
-$footerTemplate = file_get_contents($footerTemplate);
+$footerTemplate = file_get_contents($templateFooterPath);
 
 if (empty($footerTemplate))
 {
@@ -124,27 +150,23 @@ if (empty($_POST))
     $linkEmail = escape_and_encode(PUBLIC_URL . PHP_SCRIPT_EMAIL_QR_CODE, "xhtml", "");
 
     // Content information
-    $contentTemplate = str_replace("&&&TEMPLATE_PAGE_MAIN_HEADER&&&", $pageMainHeading, $contentTemplate);
-    $contentTemplate = str_replace("&&&TEMPLATE_PAGE_SUB_HEADER&&&", $pageSubHeading, $contentTemplate);
+    $contentTemplate = str_replace("&&&TEMPLATE_PAGE_MAIN_HEADING&&&", $pageMainHeading, $contentTemplate);
+    $contentTemplate = str_replace("&&&TEMPLATE_PAGE_SUB_HEADING&&&", $pageSubHeading, $contentTemplate);
     $contentTemplate = str_replace("&&&TEMPLATE_LINK_MAIN&&&", $linkMain, $contentTemplate);
     $contentTemplate = str_replace("&&&TEMPLATE_IMAGE_QR_CODE_LINK&&&", $imageLinkQrCode, $contentTemplate);
+
+    $contentTemplate = str_replace("&&&TEMPLATE_PROJECT_ID_DATA&&&", $projectId, $contentTemplate);
+    $contentTemplate = str_replace("&&&TEMPLATE_TYPE_DATA&&&", $type, $contentTemplate);
 
     $contentTemplate = str_replace("&&&TEMPLATE_LINK_EMAIL_QR_CODE&&&", $linkEmail, $contentTemplate);
 }
 // Output template with email result
 else
 {
-    // Check POST data
-    if (empty($_POST["email"]))
-    {
-        quit_errorcode();
-    }
-
     // Simple regex email check
-    $email = $_POST["email"];
-    $regex_email = "^.+@.+\..+$";
+    $regex_email = "/^.+@.+\..+$/";
 
-    if (!preg_match($regex, $email))
+    if (!preg_match($regex_email, $email))
     {
         quit_errorcode();
     }
@@ -168,7 +190,6 @@ else
     $subject = EMAIL_QR_CODE_SUBJECT_PREFIX . FABLAB_NAME;
 
     // Send email
-    function send_email($recipientMail, $subject, $htmlBody, $plainBody, $projectId = "", $isPrivate = false)
     if (!send_email($email, $subject, EMAIL_QR_CODE_BODY, EMAIL_QR_CODE_BODY, $projectId, $isPrivate))
     {
         quit_errorcode();

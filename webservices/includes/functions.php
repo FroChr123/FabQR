@@ -26,6 +26,9 @@ function quit_errorcode()
     // Set error header
     http_response_code(500);
 
+    // Send error
+    echo "Critical error!";
+
     // Stop script execution
     exit();
 }
@@ -323,8 +326,8 @@ function generate_qr_code($text, $filepath)
     imagecopyresized($target_image, $base_image, 0, 0, 0, 0, $imageWidth * $pixelConfig, $imageHeight * $pixelConfig, $imageWidth, $imageHeight);
 
     // Deallocate base image
-    imagecolordeallocate($color_bg_base);
-    imagecolordeallocate($color_fg_base);
+    imagecolordeallocate($base_image, $color_bg_base);
+    imagecolordeallocate($base_image, $color_fg_base);
     imagedestroy($base_image);
 
     // Draw 1 pixel border on QR code, for printing and cutting out the image
@@ -333,7 +336,7 @@ function generate_qr_code($text, $filepath)
 
     // Save target image to filesystem and deallocate
     imagepng($target_image, $filepath);
-    imagecolordeallocate($color_fg_target);
+    imagecolordeallocate($target_image, $color_fg_target);
     imagedestroy($target_image);
 
     // Check if file exists now
@@ -417,7 +420,7 @@ function upload_temporary_private_file($filesArray, $projectId)
         $logFileName = $filesArray["inputFile"]["name"];
     }
 
-    $logEntry = $_SERVER["REMOTE_ADDR"] . " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "File Upload: " . $logFileName . "\"";
+    $logEntry = $_SERVER["REMOTE_ADDR"] . " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "File Upload: " . $logFileName . "\"\n";
     if (file_put_contents(DIR_LOGS . LOGNAME_TEMPORARY_UPLOAD, $logEntry, FILE_APPEND) === false)
     {
         return "";
@@ -540,7 +543,7 @@ function send_email($recipientMail, $subject, $htmlBody, $plainBody, $projectId 
         $logPrivate = "false";
     }
 
-    $logEntry = $_SERVER["REMOTE_ADDR"] . " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "Email: Recipient: '" . $logRecipientMail . "', Subject: '" . $logSubject . "', ProjectId: '" . $logProjectId . "', Private: '" . $logPrivate . "'\"";
+    $logEntry = $_SERVER["REMOTE_ADDR"] . " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "Email: Recipient: '" . $logRecipientMail . "', Subject: '" . $logSubject . "', ProjectId: '" . $logProjectId . "', Private: '" . $logPrivate . "'\"\n";
     if (file_put_contents(DIR_LOGS . LOGNAME_EMAIL, $logEntry, FILE_APPEND) === false)
     {
         return "";
@@ -586,6 +589,7 @@ function send_email($recipientMail, $subject, $htmlBody, $plainBody, $projectId 
     $email->Password = SMTP_PASSWORD;
     $email->SMTPSecure = SMTP_SECURE;
     $email->Port = SMTP_PORT;
+    $email->Timeout = SMTP_TIMEOUT;
     $email->From = SMTP_MAIL;
     $email->FromName = FABLAB_NAME;
     $email->addAddress($recipientMail);
@@ -598,8 +602,8 @@ function send_email($recipientMail, $subject, $htmlBody, $plainBody, $projectId 
 
     // Continue setup email
     $email->isHTML(true);
-    $email->Subject = $subject
-    $email->Body    = $htmlBody;
+    $email->Subject = $subject;
+    $email->Body = $htmlBody;
     $email->AltBody = $plainBody;
 
     // Try to send email
