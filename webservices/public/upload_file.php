@@ -50,7 +50,7 @@ if (empty($footerTemplate))
 }
 
 // Header information
-$pageTitle = escape_and_encode(TITLE_PREFIX . FABLAB_NAME . TITLE_SEPERATOR . TITLE_UPLOAD_FILE, "xhtml", "");
+$pageTitle = escape_and_encode(FABQR_PREFIX . FABLAB_NAME . TITLE_SEPERATOR . TITLE_UPLOAD_FILE, "xhtml", "");
 $pageIcon = escape_and_encode(PUBLIC_URL . ICON_NAME, "xhtml", "");
 $pageStyle = escape_and_encode(PUBLIC_URL . STYLE_NAME, "xhtml", "");
 
@@ -60,9 +60,8 @@ $headerTemplate = str_replace("&&&TEMPLATE_PAGE_STYLE&&&", $pageStyle, $headerTe
 
 // Prepare Content information
 $contentTemplate = "";
-$pageMainHeading = escape_and_encode(TITLE_PREFIX . FABLAB_NAME, "xhtml", "");
+$pageMainHeading = escape_and_encode(FABQR_PREFIX . FABLAB_NAME, "xhtml", "");
 $pageSubHeading = escape_and_encode(TITLE_UPLOAD_FILE, "xhtml", "");
-$linkUpload = escape_and_encode(PUBLIC_URL . PHP_SCRIPT_UPLOAD_FILE, "xhtml", "");
 $linkMain = escape_and_encode(PUBLIC_URL, "xhtml", "");
 
 // Output template with form upload
@@ -85,13 +84,14 @@ if (empty($_FILES))
 
     $extensions = escape_and_encode(FILE_UPLOAD_EXTENSIONS, "xhtml", "");
     $fileSize = escape_and_encode(FILE_UPLOAD_MAXIMUM_SIZE_BYTES, "xhtml", "");
+    $linkUpload = escape_and_encode(PUBLIC_URL . PHP_SCRIPT_UPLOAD_FILE, "xhtml", "");
 
     // Content information
     $contentTemplate = str_replace("&&&TEMPLATE_PAGE_MAIN_HEADER&&&", $pageMainHeading, $contentTemplate);
     $contentTemplate = str_replace("&&&TEMPLATE_PAGE_SUB_HEADER&&&", $pageSubHeading, $contentTemplate);
-    $contentTemplate = str_replace("&&&TEMPLATE_LINK_UPLOAD&&&", $linkUpload, $contentTemplate);
     $contentTemplate = str_replace("&&&TEMPLATE_LINK_MAIN&&&", $linkMain, $contentTemplate);
 
+    $contentTemplate = str_replace("&&&TEMPLATE_LINK_UPLOAD&&&", $linkUpload, $contentTemplate);
     $contentTemplate = str_replace("&&&TEMPLATE_UPLOAD_ALLOWED_EXTENSIONS&&&", $extensions, $contentTemplate);
     $contentTemplate = str_replace("&&&TEMPLATE_UPLOAD_MAXIMUM_SIZE_BYTES&&&", $fileSize, $contentTemplate);
 }
@@ -141,7 +141,6 @@ else
     // Content information
     $contentTemplate = str_replace("&&&TEMPLATE_PAGE_MAIN_HEADING&&&", $pageMainHeading, $contentTemplate);
     $contentTemplate = str_replace("&&&TEMPLATE_PAGE_SUB_HEADING&&&", $pageSubHeading, $contentTemplate);
-    $contentTemplate = str_replace("&&&TEMPLATE_LINK_UPLOAD&&&", $linkUpload, $contentTemplate);
     $contentTemplate = str_replace("&&&TEMPLATE_LINK_MAIN&&&", $linkMain, $contentTemplate);
 
     $contentTemplate = str_replace("&&&TEMPLATE_IMAGE_QR_CODE_LINK&&&", $imageLinkQrCode, $contentTemplate);

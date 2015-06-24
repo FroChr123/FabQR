@@ -28,6 +28,15 @@ define("PRIVATE_URL", "http://192.168.178.38:8081/");
 // Name of the FabLab, used in titles
 define("FABLAB_NAME", "FabLab");
 
+// Email config
+define("SMTP_MAIL", "mail@example.com");
+define("SMTP_HOST", "example.com");
+define("SMTP_PORT", 587);
+define("SMTP_SECURE", "tls");
+define("SMTP_USER", "SMTP-USER");
+define("SMTP_PASSWORD", "SMTP-PASSWORD");
+
+
 /* **********************************
  * CONSTANTS
  * ********************************** */
@@ -40,6 +49,9 @@ define("DIR_PRIVATE_PATH", "/home/fabqr/fabqr_data/www/private/");
 
 // Absolute directory path of logs area
 define("DIR_LOGS", "/home/fabqr/fabqr_data/logs/");
+
+// FabQR prefix
+define("FABQR_PREFIX", "FabQR: ");
 
 // Misc file system paths and names
 define("DIR_NAME_PRIVATE_QR_CODES", "private_qr_codes");
@@ -57,6 +69,10 @@ define("FILENAME_IMAGE_REAL", "image_real.png");
 define("FILENAME_IMAGE_SCHEME", "image_scheme.png");
 define("FILENAME_IMAGE_QR_CODE", "qr_code.png");
 define("FILENAME_PROJECT_XHTML", "project.xhtml");
+
+// Configs for email QR code texts
+define("EMAIL_QR_CODE_SUBJECT_PREFIX", "QR Code - ");
+define("EMAIL_QR_CODE_BODY", "This email contains your requested QR Code as an attachment.");
 
 // Configs for file upload
 define("FILE_UPLOAD_MAXIMUM_SIZE_BYTES", 10000000);
@@ -116,9 +132,8 @@ define("REFERENCES_MAIN_INDENTATION", 9);
 
 // Header settings
 define("TITLE_SEPERATOR", " - ");
-define("TITLE_PREFIX", "FabQR: ");
 define("TITLE_PRINT_QR_CODE", "Print QR Code");
-define("TITLE_EMAIL_QR_CODE", "Print QR Code");
+define("TITLE_EMAIL_QR_CODE", "Email QR Code");
 define("TITLE_UPLOAD_FILE", "File Upload");
 
 ?>

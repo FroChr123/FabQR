@@ -18,6 +18,7 @@
 // Includes
 require_once("config.php");
 require_once("phpqrcode/qrlib.php");
+require_once("PHPMailer/PHPMailerAutoload.php");
 
 // Function which sets error header and quits script execution
 function quit_errorcode()
@@ -504,6 +505,110 @@ function upload_temporary_private_file($filesArray, $projectId)
 
     // Valid, return URL to PNG QR code image
     return $qrCodeUrl;
+}
+
+// Function to send emails, if projectId is not empty, the QR code will be attached
+function send_email($recipientMail, $subject, $htmlBody, $plainBody, $projectId = "", $isPrivate = false)
+{
+    // Log attempt for email
+    $logRecipientMail = "Unknown";
+    $logSubject = "Unknown";
+    $logProjectId = "Unknown";
+    $logPrivate = "Unknown";
+
+    if (!empty($recipientMail))
+    {
+        $logRecipientMail = $recipientMail;
+    }
+    
+    if (!empty($subject))
+    {
+        $logSubject = $subject;
+    }
+    
+    if (!empty($projectId))
+    {
+        $logProjectId = $projectId;
+    }
+    
+    if (!empty($isPrivate))
+    {
+        $logPrivate = "true";
+    }
+    else
+    {
+        $logPrivate = "false";
+    }
+
+    $logEntry = $_SERVER["REMOTE_ADDR"] . " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "Email: Recipient: '" . $logRecipientMail . "', Subject: '" . $logSubject . "', ProjectId: '" . $logProjectId . "', Private: '" . $logPrivate . "'\"";
+    if (file_put_contents(DIR_LOGS . LOGNAME_EMAIL, $logEntry, FILE_APPEND) === false)
+    {
+        return "";
+    }
+
+    // Check validity
+    if (empty($recipientMail) || empty($subject) || empty($htmlBody) || empty($plainBody))
+    {
+        return false;
+    }
+
+    // Check attachment
+    $attachmentPath = "";
+
+    if (!empty($projectId))
+    {
+        if (!is_project_id_syntax_valid($projectId))
+        {
+            return false;
+        }
+
+        if (empty($isPrivate))
+        {
+            $attachmentPath = DIR_PUBLIC_PATH . $projectId . "/" . FILENAME_IMAGE_QR_CODE;
+        }
+        else
+        {
+            $attachmentPath = DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png";
+        }
+
+        if (!file_exists($attachmentPath))
+        {
+            return false;
+        }
+    }
+
+    // Setup email
+    $email = new PHPMailer;
+    $email->isSMTP();
+    $email->SMTPAuth = true;
+    $email->Host = SMTP_HOST;
+    $email->Username = SMTP_USER;
+    $email->Password = SMTP_PASSWORD;
+    $email->SMTPSecure = SMTP_SECURE;
+    $email->Port = SMTP_PORT;
+    $email->From = SMTP_MAIL;
+    $email->FromName = FABLAB_NAME;
+    $email->addAddress($recipientMail);
+
+    // Add attachment, if specified and valid
+    if (!empty($attachmentPath))
+    {
+        $email->addAttachment($attachmentPath, FILENAME_IMAGE_QR_CODE);
+    }
+
+    // Continue setup email
+    $email->isHTML(true);
+    $email->Subject = $subject
+    $email->Body    = $htmlBody;
+    $email->AltBody = $plainBody;
+
+    // Try to send email
+    if(!$email->send())
+    {
+        return false;
+    }
+
+    return true;
 }
 
 ?>

@@ -43,6 +43,9 @@ a:hover, a:active { color: #3774E6; }
 .project-footer-print-qr-code-link { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; }
 .project-footer-print-qr-code-link:hover, .project-footer-print-qr-code-link:active { color: #FFFFFF; background-color: #2E4966; }
 
+/* Styles for print */
+#print-qr-code-image-link { text-decoration: none; }
+
 /* Styles for file upload */
 #file-upload { padding-top: 40px; }
 #file-upload-header { background-color: #4C78A8; color: #FFFFFF; font-size: 16px; font-weight: bold; padding: 7px 10px; border-top-right-radius: 10px; border-top-left-radius: 10px; }
@@ -58,3 +61,14 @@ a:hover, a:active { color: #3774E6; }
 #file-upload-footer-email-qr-code-link:hover, #file-upload-footer-email-qr-code-link:active { color: #FFFFFF; background-color: #2E4966; }
 #file-upload-footer-print-qr-code-link { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; }
 #file-upload-footer-print-qr-code-link:hover, #file-upload-footer-print-qr-code-link:active { color: #FFFFFF; background-color: #2E4966; }
+#file-upload-qr-code-image-link { text-decoration: none; }
+
+/* Styles for email */
+#email-qr-code-image-link { text-decoration: none; }
+#email-qr-code { padding-top: 40px; }
+#email-qr-code-header { background-color: #4C78A8; color: #FFFFFF; font-size: 16px; font-weight: bold; padding: 7px 10px; border-top-right-radius: 10px; border-top-left-radius: 10px; }
+#email-qr-code-main { border: 2px solid #4C78A8; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 10px; text-align: center; }
+#email-qr-code-footer { margin-top: 25px; }
+#email-qr-code-input-text { display: inline-block; width: 200px; height: 25px; margin-right: 10px; border-radius: 5px; border: 1px solid #888888; }
+#email-qr-code-input-submit { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; border: none transparent; cursor: pointer; }
+#email-qr-code-input-submit:hover, #email-qr-code-input-submit:active { color: #FFFFFF; background-color: #2E4966; }

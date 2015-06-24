@@ -19,7 +19,7 @@
 require_once("../includes/config.php");
 require_once("../includes/functions.php");
 
-// Get FILES data, PNG bytes
+// Check GET data
 if (empty($_GET) || empty($_GET["projectId"]) || empty($_GET["type"]))
 {
     quit_errorcode();
@@ -72,7 +72,7 @@ if (empty($printTemplate))
 }
 
 // Header information
-$pageTitle = escape_and_encode(TITLE_PREFIX . FABLAB_NAME . TITLE_SEPERATOR . TITLE_PRINT_QR_CODE, "xhtml", "");
+$pageTitle = escape_and_encode(FABQR_PREFIX . FABLAB_NAME . TITLE_SEPERATOR . TITLE_PRINT_QR_CODE, "xhtml", "");
 $pageIcon = escape_and_encode(PUBLIC_URL . ICON_NAME, "xhtml", "");
 $pageStyle = escape_and_encode(PUBLIC_URL . STYLE_NAME, "xhtml", "");
 
