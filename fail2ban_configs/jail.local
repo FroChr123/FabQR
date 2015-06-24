@@ -19,7 +19,7 @@
 
 [DEFAULT]
 ignoreip  = 127.0.0.1
-bantime   = 600
+bantime   = 3600
 backend   = polling
 banaction = iptables-multiport
 protocol  = tcp
@@ -34,7 +34,7 @@ enabled  = true
 port     = ssh
 filter   = sshd
 logpath  = /var/log/auth.log
-bantime  = 600
+bantime  = 3600
 maxretry = 5
 findtime = 60
 
@@ -46,17 +46,17 @@ findtime = 60
 enabled  = true
 port     = 8081
 filter   = fabqr-http
-logpath  = /home/fabqr/fabqr_data/apache_logs/fabqr_private_access.log
-bantime  = 600
-maxretry = 500
+logpath  = /home/fabqr/fabqr_data/logs/fabqr_private_access.log
+bantime  = 3600
+maxretry = 800
 findtime = 20
 
 [fabqr-private-auth]
 enabled  = true
 port     = 8081
 filter   = fabqr-auth
-logpath  = /home/fabqr/fabqr_data/apache_logs/fabqr_private_error.log
-bantime  = 600
+logpath  = /home/fabqr/fabqr_data/logs/fabqr_private_error.log
+bantime  = 3600
 maxretry = 5
 findtime = 600
 
@@ -68,7 +68,25 @@ findtime = 600
 enabled  = true
 port     = 8090
 filter   = fabqr-http
-logpath  = /home/fabqr/fabqr_data/apache_logs/fabqr_public_access.log
-bantime  = 600
-maxretry = 500
+logpath  = /home/fabqr/fabqr_data/logs/fabqr_public_access.log
+bantime  = 3600
+maxretry = 800
 findtime = 20
+
+[fabqr-public-file]
+enabled  = true
+port     = 8090
+filter   = fabqr-http
+logpath  = /home/fabqr/fabqr_data/logs/fabqr_temporary_upload.log
+bantime  = 3600
+maxretry = 6
+findtime = 3600
+
+[fabqr-public-email]
+enabled  = true
+port     = 8090
+filter   = fabqr-http
+logpath  = /home/fabqr/fabqr_data/logs/fabqr_email.log
+bantime  = 3600
+maxretry = 6
+findtime = 3600

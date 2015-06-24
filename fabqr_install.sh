@@ -676,9 +676,9 @@ do
                 command_success "mkdir ${newdir}www/includes"
             fi
 
-            if ! [ -d "${newdir}apache_logs" ]
+            if ! [ -d "${newdir}logs" ]
             then
-                command_success "mkdir ${newdir}apache_logs"
+                command_success "mkdir ${newdir}logs"
             fi
 
             # Data directory: Set properties for directory

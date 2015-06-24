@@ -175,6 +175,12 @@ function remove_project($projectId, $isPrivate)
     if (!empty($isPrivate))
     {
         $path = DIR_PRIVATE_PATH;
+
+        // Remove QR code in public area
+        if (file_exists(DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png"))
+        {
+            unlink(DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png");
+        }
     }
 
     // If directory exists, remove entry in index and remove all files in it
@@ -270,9 +276,9 @@ function generate_qr_code($text, $filepath)
 {
     // Generate QR code with modified background color
     // QR code configs
-    $pixelConfig = 8;
+    $pixelConfig = 10;
     $frameConfig = 4;
-    $eclevelConfig = QR_ECLEVEL_H;
+    $eclevelConfig = QR_ECLEVEL_M;
 
     // Color configs
     $bg_r = 229;
@@ -397,6 +403,107 @@ function is_project_id_syntax_valid($projectId)
     }
 
     return false;
+}
+
+// Function to upload a file 
+function upload_temporary_private_file($filesArray, $projectId)
+{
+    // Log attempt for upload
+    $logFileName = "Unknown filename";
+
+    if (!empty($filesArray["inputFile"]) && !empty($filesArray["inputFile"]["name"]))
+    {
+        $logFileName = $filesArray["inputFile"]["name"];
+    }
+
+    $logEntry = $_SERVER["REMOTE_ADDR"] " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "File Upload: " . $logFileName . "\"";
+    if (file_put_contents(DIR_LOGS . LOGNAME_TEMPORARY_UPLOAD, $logEntry, FILE_APPEND) === false)
+    {
+        return "";
+    }
+
+    // Validate input: Files array
+    if (empty($filesArray)
+        || empty($filesArray["inputFile"]) || empty($filesArray["inputFile"]["tmp_name"]) || empty($filesArray["inputFile"]["size"]) || empty($filesArray["inputFile"]["name"])
+        || !is_project_id_syntax_valid($projectId))
+    {
+        return "";
+    }
+
+    // Check file size
+    if ($filesArray["inputFile"]["size"] > FILE_UPLOAD_MAXIMUM_SIZE_BYTES)
+    {
+        return "";
+    }
+
+    // Remove trailing whitespace
+    $inputFileName = trim($filesArray["inputFile"]["name"]);
+
+    // Seperate at dots in file name and use last part as file extension later on, for now only use first part
+    $inputFileNameArray = explode(".", $inputFileName);
+    $inputFileNameArrayLen = count($inputFileNameArray);
+
+    // Invalid filename, need file name and file extension
+    if ($inputFileNameArrayLen < 2)
+    {
+        return "";
+    }
+
+    $inputFileName = $inputFileNameArray[0];
+    $inputFileExtension = strtolower($inputFileNameArray[$inputFileNameArrayLen - 1]);
+
+    // Check if file extension is in allowed extensions
+    $allowedExtensions = explode(",", FILE_UPLOAD_EXTENSIONS);
+    $extensionAllowed = false;
+
+    foreach ($allowedExtensions as $extension)
+    {
+        $extensionCleanup = str_replace(".", "", strtolower($extension));
+
+        if ($inputFileExtension == $extensionCleanup)
+        {
+            $extensionAllowed = true;
+            break;
+        }
+    }
+
+    if (!$extensionAllowed)
+    {
+        return "";
+    }
+
+    // Replace whitespace with underscore
+    $inputFileName = preg_replace("/\s/", "_", $inputFileName);
+
+    // Special replacements for some characters
+    $inputFileName = str_replace("Ä", "Ae", str_replace("Ö", "Oe", str_replace("Ü", "Ue", str_replace("ä", "ae", str_replace("ö", "oe", str_replace("ü", "ue", str_replace("ß", "ss", $inputFileName)))))));
+
+    // Remove all non alphabetic / numeric or underscore or minus characters
+    $inputFileName = preg_replace("/[^0-9a-zA-Z_\-]/", "", $inputFileName);
+
+    // Append original input file type ending at end
+    $inputFileName = $inputFileName . "." . $inputFileExtension;
+
+    // Copy input file from temp directory to target file
+    $inputFilePath = DIR_PRIVATE_PATH . $projectId . "/" . $inputFileName;
+
+    if (!copy($_FILES["inputFile"]["tmp_name"], $inputFilePath))
+    {
+        return "";
+    }
+
+    // Generate QR code for that project
+    $fileDownloadUrl = PRIVATE_URL . URL_MARKER_TEMPORARY . "/" . $projectId;
+    $qrCodeFilePath = DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png";
+    $qrCodeUrl = PUBLIC_URL . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png";
+
+    if (!generate_qr_code($fileDownloadUrl, $qrCodeFilePath))
+    {
+        return "";
+    }
+
+    // Valid, return URL to PNG QR code image
+    return $qrCodeUrl;
 }
 
 ?>

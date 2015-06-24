@@ -19,43 +19,23 @@
 require_once("../includes/config.php");
 require_once("../includes/functions.php");
 
-// Get FILES data, PNG bytes
-if (empty($_FILES) || empty($_FILES["data"]) || empty($_FILES["data"]["tmp_name"]) || empty($_FILES["data"]["size"]))
+// Get a free new identifier
+$projectId = add_new_project(true, "");
+
+if (empty($projectId))
 {
     quit_errorcode();
 }
 
-// Open file handle, create file if does not exist, do not truncate file (as "w" would do)
-$file = fopen(FILE_PNG_PATH, "c");
+// Process upload
+$imageLinkQrCode = upload_temporary_private_file($_FILES, $projectId);
 
-// Check if file opening is successful
-if ($file === false)
+if (empty($imageLinkQrCode))
 {
-    quit_errorcode();
+    quit_removeproject_errorcode($projectId, true);
 }
 
-// Lock file, check if successful
-if (!flock($file, LOCK_EX))
-{
-    quit_errorcode();
-}
-
-// Copy file from temp directory to real file
-if (!copy($_FILES["data"]["tmp_name"], FILE_PNG_PATH))
-{
-    quit_errorcode();
-}
-
-// Unlock file
-if (!flock($file, LOCK_UN))
-{
-    quit_errorcode();
-}
-
-// Close file handle
-if (!fclose($file))
-{
-    quit_errorcode();
-}
+// Output valid result
+echo $imageLinkQrCode;
 
 ?>

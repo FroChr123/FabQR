@@ -21,7 +21,7 @@
         # fail2ban expects a time information string in matched strings!
         # Otherwise regex will not work! fail2ban-regex command helps debugging!
         LogFormat "%h -- [%t] -- \"%r\"" fabqraccesslog
-        CustomLog /home/fabqr/fabqr_data/apache_logs/fabqr_public_access.log fabqraccesslog
+        CustomLog /home/fabqr/fabqr_data/logs/fabqr_public_access.log fabqraccesslog
 
         <Directory /home/fabqr/fabqr_data/www/public/>
                 # Options only allow to follow symlinks

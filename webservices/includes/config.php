@@ -25,9 +25,6 @@ define("PUBLIC_URL", "http://192.168.178.38:8090/");
 // Private area URL
 define("PRIVATE_URL", "http://192.168.178.38:8081/");
 
-// Absolute file path of the PNG file to write to
-define("FILE_PNG_PATH", "/run/shm/pngdisplay.png");
-
 // Name of the FabLab, used in titles
 define("FABLAB_NAME", "FabLab");
 
@@ -40,16 +37,30 @@ define("DIR_PUBLIC_PATH", "/home/fabqr/fabqr_data/www/public/");
 
 // Absolute directory path of private area
 define("DIR_PRIVATE_PATH", "/home/fabqr/fabqr_data/www/private/");
- 
+
+// Absolute directory path of logs area
+define("DIR_LOGS", "/home/fabqr/fabqr_data/logs/");
+
+// Misc file system paths and names
+define("DIR_NAME_PRIVATE_QR_CODES", "private_qr_codes");
+define("PHP_SCRIPT_UPLOAD_FILE", "upload_file.php");
+define("PHP_SCRIPT_PRINT_QR_CODE", "print_qr_code.php");
+define("PHP_SCRIPT_EMAIL_QR_CODE", "email_qr_code.php");
+define("FILENAME_PROJECTS_XML", "projects.xml");
+define("LOGNAME_EMAIL", "fabqr_email.log");
+define("LOGNAME_TEMPORARY_UPLOAD", "fabqr_temporary_upload.log");
+define("ICON_NAME", "icon.ico");
+define("STYLE_NAME", "style.css");
+
 // Filenames in project directories
 define("FILENAME_IMAGE_REAL", "image_real.png");
 define("FILENAME_IMAGE_SCHEME", "image_scheme.png");
 define("FILENAME_IMAGE_QR_CODE", "qr_code.png");
 define("FILENAME_PROJECT_XHTML", "project.xhtml");
 
-// Misc filenames
-define("PHP_SCRIPT_PRINT_QR_CODE", "print_qr_code.php");
-define("FILENAME_PROJECTS_XML", "projects.xml");
+// Configs for file upload
+define("FILE_UPLOAD_MAXIMUM_SIZE_BYTES", 10000000);
+define("FILE_UPLOAD_EXTENSIONS", ".plf,.svg");
 
 // Project name minimum length
 define("PROJECT_NAME_MINIMUM_LENGTH", 3);
@@ -105,7 +116,9 @@ define("REFERENCES_MAIN_INDENTATION", 9);
 
 // Header settings
 define("TITLE_SEPERATOR", " - ");
+define("TITLE_PREFIX", "FabQR: ");
 define("TITLE_PRINT_QR_CODE", "Print QR Code");
-define("ICON_NAME", "icon.ico");
+define("TITLE_EMAIL_QR_CODE", "Print QR Code");
+define("TITLE_UPLOAD_FILE", "File Upload");
 
 ?>

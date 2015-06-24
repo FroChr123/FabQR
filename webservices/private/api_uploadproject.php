@@ -120,7 +120,7 @@ $inputFileName = preg_replace("/\s/", "_", $inputFileName);
 // Special replacements for some characters
 $inputFileName = str_replace("Ä", "Ae", str_replace("Ö", "Oe", str_replace("Ü", "Ue", str_replace("ä", "ae", str_replace("ö", "oe", str_replace("ü", "ue", str_replace("ß", "ss", $inputFileName)))))));
 
-// Remove all non alphabetic / numeric characters
+// Remove all non alphabetic / numeric or underscore or minus characters
 $inputFileName = preg_replace("/[^0-9a-zA-Z_\-]/", "", $inputFileName);
 
 // Append original input file type ending at end
@@ -330,28 +330,31 @@ if (isset($_POST["references"]))
 $dateString = escape_and_encode(date("j. F Y, H:i"), "xhtml", "");
 
 // Link to project
-$projectLink = PUBLIC_URL . $projectId;
+$projectLink = escape_and_encode(PUBLIC_URL . $projectId, "xhtml", "");
 
 // Link to project file
-$projectFileLink = PUBLIC_URL . $projectId . "/" . $inputFileName;
+$projectFileLink = escape_and_encode(PUBLIC_URL . $projectId . "/" . $inputFileName, "xhtml", "");
 
 // Links to images
-$imageLinkScheme = PUBLIC_URL . $projectId . "/" . FILENAME_IMAGE_SCHEME;
-$imageLinkQrCode = PUBLIC_URL . $projectId . "/" . FILENAME_IMAGE_QR_CODE;
+$imageLinkScheme = escape_and_encode(PUBLIC_URL . $projectId . "/" . FILENAME_IMAGE_SCHEME, "xhtml", "");
+$imageLinkQrCode = escape_and_encode(PUBLIC_URL . $projectId . "/" . FILENAME_IMAGE_QR_CODE, "xhtml", "");
 
 // Link for real image is special, fallback to link scheme if it is not set to avoid errors in apache logs
 // is not visible anyways in that case
 $imageLinkReal = $imageLinkScheme;
-$imageRealVisible = "display: none;";
+$imageRealVisible = escape_and_encode("display: none;", "xhtml", "");
 
 if (isset($_FILES["imageReal"]))
 {
-    $imageLinkReal = PUBLIC_URL . $projectId . "/" . FILENAME_IMAGE_REAL;
-    $imageRealVisible = "display: table-cell;";
+    $imageLinkReal = escape_and_encode(PUBLIC_URL . $projectId . "/" . FILENAME_IMAGE_REAL, "xhtml", "");
+    $imageRealVisible = escape_and_encode("display: table-cell;", "xhtml", "");
 }
 
 // Link to print QR code
-$printQrCodeLink = PUBLIC_URL . PHP_SCRIPT_PRINT_QR_CODE . "?projectId=" . $projectId;
+$printQrCodeLink = escape_and_encode(PUBLIC_URL . PHP_SCRIPT_PRINT_QR_CODE . "?projectId=" . $projectId . "&type=public", "xhtml", "");
+
+// Link to email QR code
+$emailQrCodeLink = escape_and_encode(PUBLIC_URL . PHP_SCRIPT_EMAIL_QR_CODE . "?projectId=" . $projectId . "&type=public", "xhtml", "");
 
 // Load project template
 $templatePath = "../includes/xhtml_templates/template_project.xhtml";
@@ -370,26 +373,27 @@ if (empty($projectTemplate))
 
 // Replace items in template text
 // No header information
-// Body information
-$projectTemplate = str_replace("_--TEMPLATE_NAME--_", $name, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_EMAIL_HTML--_", $emailHTML, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_PROJECTNAME--_", $projectName, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_LICENSE--_", $licenseString, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_DESCRIPTION--_", $description, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_TOOLS_HTML--_", $toolsHTML, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_REFERENCES_HTML--_", $referencesHTML, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_DATE--_", $dateString, $projectTemplate);
+// Content information
+$projectTemplate = str_replace("&&&TEMPLATE_NAME&&&", $name, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_EMAIL_HTML&&&", $emailHTML, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_PROJECTNAME&&&", $projectName, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_LICENSE&&&", $licenseString, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_DESCRIPTION&&&", $description, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_TOOLS_HTML&&&", $toolsHTML, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_REFERENCES_HTML&&&", $referencesHTML, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_DATE&&&", $dateString, $projectTemplate);
 
-$projectTemplate = str_replace("_--TEMPLATE_IMAGE_SCHEME_LINK--_", $imageLinkScheme, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_IMAGE_REAL_LINK--_", $imageLinkReal, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_IMAGE_QR_CODE_LINK--_", $imageLinkQrCode, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_IMAGE_REAL_VISIBLE--_", $imageRealVisible, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_IMAGE_SCHEME_LINK&&&", $imageLinkScheme, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_IMAGE_REAL_LINK&&&", $imageLinkReal, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_IMAGE_QR_CODE_LINK&&&", $imageLinkQrCode, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_IMAGE_REAL_VISIBLE&&&", $imageRealVisible, $projectTemplate);
 
-$projectTemplate = str_replace("_--TEMPLATE_PRINTQRCODELINK--_", $printQrCodeLink, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_PRINTQRCODELINK&&&", $printQrCodeLink, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_EMAILQRCODELINK&&&", $emailQrCodeLink, $projectTemplate);
 
-$projectTemplate = str_replace("_--TEMPLATE_PROJECTLINK--_", $projectLink, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_PROJECTID--_", $projectId, $projectTemplate);
-$projectTemplate = str_replace("_--TEMPLATE_PROJECTFILELINK--_", $projectFileLink, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_PROJECTLINK&&&", $projectLink, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_PROJECTID&&&", escape_and_encode($projectId, "xhtml", ""), $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_PROJECTFILELINK&&&", $projectFileLink, $projectTemplate);
 
 // Write content to file
 $projectFilePath = DIR_PUBLIC_PATH . $projectId . "/" . FILENAME_PROJECT_XHTML;

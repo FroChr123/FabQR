@@ -21,10 +21,10 @@
         # fail2ban expects a time information string in matched strings!
         # Otherwise regex will not work! fail2ban-regex command helps debugging!
         LogFormat "%h -- [%t] -- \"%r\"" fabqraccesslog
-        CustomLog /home/fabqr/fabqr_data/apache_logs/fabqr_private_access.log fabqraccesslog
+        CustomLog /home/fabqr/fabqr_data/logs/fabqr_private_access.log fabqraccesslog
 
         # Error logging, needed for fail2ban network protection rules
-        ErrorLog /home/fabqr/fabqr_data/apache_logs/fabqr_private_error.log
+        ErrorLog /home/fabqr/fabqr_data/logs/fabqr_private_error.log
 
         <Directory /home/fabqr/fabqr_data/www/private/>
                 # Options only allow to follow symlinks

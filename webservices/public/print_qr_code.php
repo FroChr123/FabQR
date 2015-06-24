@@ -20,7 +20,15 @@ require_once("../includes/config.php");
 require_once("../includes/functions.php");
 
 // Get FILES data, PNG bytes
-if (empty($_GET) || empty($_GET["projectId"]))
+if (empty($_GET) || empty($_GET["projectId"]) || empty($_GET["type"]))
+{
+    quit_errorcode();
+}
+
+// Check type valid
+$type = $_GET["type"];
+
+if ($type != "public" && $type != "private")
 {
     quit_errorcode();
 }
@@ -36,10 +44,17 @@ if (!is_project_id_syntax_valid($projectId))
 // Check if file exists
 $qrCodeFilePath = DIR_PUBLIC_PATH . $projectId . "/" . FILENAME_IMAGE_QR_CODE;
 
+if ($type == "private")
+{
+    $qrCodeFilePath = DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" $projectId . ".png";
+}
+
 if (!file_exists($qrCodeFilePath))
 {
     quit_errorcode();
 }
+
+// Can not use default header template here, body onload print
 
 // Load print template
 $templatePath = "../includes/xhtml_templates/template_print.xhtml";
@@ -56,16 +71,24 @@ if (empty($printTemplate))
     quit_errorcode();
 }
 
-$pageTitle = FABLAB_NAME . TITLE_SEPERATOR . TITLE_PRINT_QR_CODE;
-$pageIcon = PUBLIC_URL . ICON_NAME;
-$imageLinkQrCode = PUBLIC_URL . $projectId . "/" . FILENAME_IMAGE_QR_CODE;
-
 // Header information
-$printTemplate = str_replace("_--TEMPLATE_PAGE_TITLE--_", $pageTitle, $printTemplate);
-$printTemplate = str_replace("_--TEMPLATE_PAGE_ICON--_", $pageIcon, $printTemplate);
+$pageTitle = escape_and_encode(TITLE_PREFIX . FABLAB_NAME . TITLE_SEPERATOR . TITLE_PRINT_QR_CODE, "xhtml", "");
+$pageIcon = escape_and_encode(PUBLIC_URL . ICON_NAME, "xhtml", "");
+$pageStyle = escape_and_encode(PUBLIC_URL . STYLE_NAME, "xhtml", "");
 
-// Body information
-$printTemplate = str_replace("_--TEMPLATE_IMAGE_QR_CODE_LINK--_", $imageLinkQrCode, $printTemplate);
+$printTemplate = str_replace("&&&TEMPLATE_PAGE_TITLE&&&", $pageTitle, $printTemplate);
+$printTemplate = str_replace("&&&TEMPLATE_PAGE_ICON&&&", $pageIcon, $printTemplate);
+$printTemplate = str_replace("&&&TEMPLATE_PAGE_STYLE&&&", $pageStyle, $printTemplate);
+
+// Content information
+$imageLinkQrCode = escape_and_encode(PUBLIC_URL . $projectId . "/" . FILENAME_IMAGE_QR_CODE, "xhtml", "");
+
+if ($type == "private")
+{
+    $imageLinkQrCode = escape_and_encode(DIR_PUBLIC_PATH . DIR_NAME_PRIVATE_QR_CODES . "/" . $projectId . ".png", "xhtml", "");
+}
+
+$printTemplate = str_replace("&&&TEMPLATE_IMAGE_QR_CODE_LINK&&&", $imageLinkQrCode, $printTemplate);
 
 // Output page
 echo $printTemplate;
