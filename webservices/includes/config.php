@@ -54,6 +54,8 @@ define("DIR_LOGS", "/home/fabqr/fabqr_data/logs/");
 define("FABQR_PREFIX", "FabQR: ");
 
 // Misc file system paths and names
+define("DIR_LOCAL", ".");
+define("DIR_PARENT", "..");
 define("DIR_NAME_PRIVATE_QR_CODES", "private_qr_codes");
 define("PHP_SCRIPT_UPLOAD_FILE", "upload_file.php");
 define("PHP_SCRIPT_PRINT_QR_CODE", "print_qr_code.php");

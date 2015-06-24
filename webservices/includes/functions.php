@@ -255,7 +255,7 @@ function remove_project($projectId, $isPrivate)
             foreach ($files as $file)
             {
                 // Scandir also returns . and .. as relative paths to directories, ignore them in iteration
-                if ($file == "." || $file == "..")
+                if ($file == DIR_LOCAL || $file == DIR_PARENT)
                 {
                     continue;
                 }

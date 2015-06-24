@@ -15,22 +15,28 @@
 
 <VirtualHost *:8090>
 
-        DocumentRoot /home/fabqr/fabqr_data/www/public
+    DocumentRoot /home/fabqr/fabqr_data/www/public
 
-        # Custom access logging, needed for fail2ban network protection rules
-        # fail2ban expects a time information string in matched strings!
-        # Otherwise regex will not work! fail2ban-regex command helps debugging!
-        LogFormat "%h -- [%t] -- \"%r\"" fabqraccesslog
-        CustomLog /home/fabqr/fabqr_data/logs/fabqr_public_access.log fabqraccesslog
+    # Custom access logging, needed for fail2ban network protection rules
+    # fail2ban expects a time information string in matched strings!
+    # Otherwise regex will not work! fail2ban-regex command helps debugging!
+    LogFormat "%h -- [%t] -- \"%r\"" fabqraccesslog
+    CustomLog /home/fabqr/fabqr_data/logs/fabqr_public_access.log fabqraccesslog
 
-        <Directory /home/fabqr/fabqr_data/www/public/>
-                # Options only allow to follow symlinks
-                Options +FollowSymLinks -Indexes -Includes -ExecCGI
+    <Directory /home/fabqr/fabqr_data/www/public/>
+        # Options only allow to follow symlinks
+        Options +FollowSymLinks -Indexes -Includes -ExecCGI
 
-                # Allowed access from all
-                AllowOverride All
-                Order Allow,Deny
-                Allow from all
-        </Directory>
+        # Allow override
+        AllowOverride All
+
+        # Allowed access from all
+        Order Allow,Deny
+        Allow from all
+
+        # Redirect rule
+        RewriteEngine on
+        RewriteRule ^(.*)(d|t)/([a-z0-9]{7,7})$ $1/redirect.php?marker=$2&projectId=$3 [L,R=301]
+    </Directory>
 
 </VirtualHost>
