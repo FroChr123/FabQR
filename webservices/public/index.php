@@ -82,7 +82,13 @@ $linkMain = escape_and_encode(PUBLIC_URL, "xhtml", "");
 // Compute project indexes and pages
 // Page count and project count start at 0
 $page = 0;
-$projectCount = count_projects_in_xml(false);
+$projectCount = count_projects_in_xml(false) - 1;
+
+if ($projectCount < 0)
+{
+    $projectCount = 0;
+}
+
 $maxPage = (int)($projectCount / PROJECTS_PER_SITE);
 
 // Check GET for optional page parameter, check valid range, fallback to page 0 otherwise
@@ -121,13 +127,15 @@ foreach ($projectIds as $projectId)
 // Compute navigation values
 $goPageDisabledAttribute = (($page <= 0 && $page == $maxPage) ? " disabled=\"disabled\"" : "");
 
-$previousPageLink = (($page <= 0) ? "#" : PUBLIC_URL . PHP_SCRIPT_INDEX . "?page=" . ($page - 1));
+// Note: Page indexes shifted here
+$previousPageLink = (($page <= 0) ? "#" : PUBLIC_URL . PHP_SCRIPT_INDEX . "?page=" . $page);
 $previousPageDisabledClass = (($page <= 0) ? " main-previous-link-disabled" : "");
 $previousPageDisabledJs = (($page <= 0) ? " onclick=\"return false;\"" : "");
 
-$nextPageLink = (($page >= $maxPage) ? "#" : PUBLIC_URL . PHP_SCRIPT_INDEX . "?page=" . ($page + 1));
+// Note: Page indexes shifted here
+$nextPageLink = (($page >= $maxPage) ? "#" : PUBLIC_URL . PHP_SCRIPT_INDEX . "?page=" . ($page + 2));
 $nextPageDisabledClass = (($page >= $maxPage) ? " main-next-link-disabled" : "");
-$nextPageDisabledJs = (($page <= 0) ? " onclick=\"return false;\"" : "");
+$nextPageDisabledJs = (($page >= $maxPage) ? " onclick=\"return false;\"" : "");
 
 // Prepare variables
 $pageText = escape_and_encode(($page + 1), "xhtml", "");
