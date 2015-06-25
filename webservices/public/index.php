@@ -35,7 +35,7 @@ if (empty($headerTemplate))
 }
 
 // Process header template
-$pageTitle = escape_and_encode(FABQR_PREFIX . FABLAB_NAME, "xhtml", "");
+$pageTitle = escape_and_encode(SYSTEM_NAME, "xhtml", "");
 $pageIcon = escape_and_encode(PUBLIC_URL . ICON_NAME, "xhtml", "");
 $pageStyle = escape_and_encode(PUBLIC_URL . STYLE_NAME, "xhtml", "");
 
@@ -76,7 +76,7 @@ if (empty($contentTemplate))
 
 // Process main content template
 $allProjectTexts = "";
-$pageMainHeading = escape_and_encode(FABQR_PREFIX . FABLAB_NAME, "xhtml", "");
+$pageMainHeading = escape_and_encode(SYSTEM_NAME, "xhtml", "");
 $linkMain = escape_and_encode(PUBLIC_URL, "xhtml", "");
 
 // Compute project indexes and pages

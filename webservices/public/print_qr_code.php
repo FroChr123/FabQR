@@ -72,7 +72,7 @@ if (empty($printTemplate))
 }
 
 // Header information
-$pageTitle = escape_and_encode(FABQR_PREFIX . FABLAB_NAME . TITLE_SEPERATOR . TITLE_PRINT_QR_CODE, "xhtml", "");
+$pageTitle = escape_and_encode(SYSTEM_NAME . TITLE_SEPERATOR . TITLE_PRINT_QR_CODE, "xhtml", "");
 $pageIcon = escape_and_encode(PUBLIC_URL . ICON_NAME, "xhtml", "");
 $pageStyle = escape_and_encode(PUBLIC_URL . STYLE_NAME, "xhtml", "");
 

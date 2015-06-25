@@ -57,7 +57,7 @@ if (empty($headerTemplate))
 }
 
 // Process header template
-$pageTitle = escape_and_encode(FABQR_PREFIX . FABLAB_NAME, "xhtml", "");
+$pageTitle = escape_and_encode(SYSTEM_NAME, "xhtml", "");
 $pageIcon = escape_and_encode(PUBLIC_URL . ICON_NAME, "xhtml", "");
 $pageStyle = escape_and_encode(PUBLIC_URL . STYLE_NAME, "xhtml", "");
 
@@ -105,7 +105,7 @@ if (empty($projectText))
 }
 
 // Main content information
-$pageMainHeading = escape_and_encode(FABQR_PREFIX . FABLAB_NAME, "xhtml", "");
+$pageMainHeading = escape_and_encode(SYSTEM_NAME, "xhtml", "");
 $linkMain = escape_and_encode(PUBLIC_URL, "xhtml", "");
 
 $contentTemplate = str_replace("&&&TEMPLATE_PAGE_MAIN_HEADING&&&", $pageMainHeading, $contentTemplate);

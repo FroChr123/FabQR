@@ -44,12 +44,13 @@ function quit_removeproject_errorcode($projectId, $isPrivate)
 }
 
 // Function which tries to find a new unused project id and adds a new empty project with this id
-function add_new_project($isPrivate, $projectName)
+function add_new_project($isPrivate, $projectName, $projectLocation)
 {
     // Variables
     $resultProjectId = "";
     $path = DIR_PUBLIC_PATH;
     $projectNameProcessed = "";
+    $projectLocationProcessed = "";
 
     // Process variables
     if (!empty($isPrivate))
@@ -59,6 +60,7 @@ function add_new_project($isPrivate, $projectName)
     else
     {
         $projectNameProcessed = escape_and_encode(trim($projectName), "xml", "");
+        $projectLocationProcessed = escape_and_encode(trim($projectLocation), "xml", "");
     }
 
     // Try multiple times to find a new project id
@@ -128,7 +130,6 @@ function add_new_project($isPrivate, $projectName)
     if (empty($indexNode))
     {
         $indexNode = $domDoc->createElement("index");
-        $indexNode->setAttribute("fablab-name", escape_and_encode(FABLAB_NAME, "xml", ""));
         $indexNode->setAttribute("url", escape_and_encode(((!empty($isPrivate)) ? PRIVATE_URL : PUBLIC_URL), "xml", ""));
         $indexNode->setAttribute("type", ((!empty($isPrivate)) ? "private" : "public"));
         $domDoc->appendChild($indexNode);
@@ -138,6 +139,7 @@ function add_new_project($isPrivate, $projectName)
     $projectNode = $domDoc->createElement("project");
     $projectNode->setAttribute("id", $resultProjectId);
     $projectNode->setAttribute("name", $projectNameProcessed);
+    $projectNode->setAttribute("location", $projectLocationProcessed);
     $projectNode->setAttribute("create-timestamp", time());
 
     if (empty($indexNode->firstChild))
@@ -592,7 +594,7 @@ function send_email($recipientMail, $subject, $htmlBody, $plainBody, $projectId 
     $email->Port = SMTP_PORT;
     $email->Timeout = SMTP_TIMEOUT;
     $email->From = SMTP_MAIL;
-    $email->FromName = FABLAB_NAME;
+    $email->FromName = SYSTEM_NAME;
     $email->addAddress($recipientMail);
 
     // Add attachment, if specified and valid

@@ -64,17 +64,24 @@ if (isset($_POST["description"]))
     $descriptionTmp = trim($_POST["description"]);
 }
 
+$locationTmp = "";
+
+if (isset($_POST["location"]))
+{
+    $locationTmp = trim($_POST["location"]);
+}
+
 if (empty($_POST)
     || !isset($_POST["name"]) || !isset($_POST["email"]) || !isset($_POST["licenseIndex"])
     || (intval(trim($_POST["licenseIndex"])) != LICENSE_CC0_INDEX && (empty($nameTmp) || empty($emailTmp)))
     || empty($projectNameTmp) || strlen(trim($_POST["projectName"])) < PROJECT_NAME_MINIMUM_LENGTH
-    || empty($toolsTmp) || empty($descriptionTmp))
+    || empty($toolsTmp) || empty($descriptionTmp) || empty($locationTmp))
 {
     quit_errorcode();
 }
 
 // Get a free new identifier
-$projectId = add_new_project(false, $_POST["projectName"]);
+$projectId = add_new_project(false, $_POST["projectName"], $_POST["location"]);
 
 if (empty($projectId))
 {
@@ -199,6 +206,9 @@ if (empty($licenseString))
 
 // Description
 $description = escape_and_encode(trim($_POST["description"]), "xhtml", "<br />");
+
+// Location
+$location = escape_and_encode(trim($_POST["location"]), "xhtml", "");
 
 // Tools
 $tools = trim($_POST["tools"]);
@@ -382,6 +392,7 @@ $projectTemplate = str_replace("&&&TEMPLATE_EMAIL_HTML&&&", $emailHTML, $project
 $projectTemplate = str_replace("&&&TEMPLATE_PROJECTNAME&&&", $projectName, $projectTemplate);
 $projectTemplate = str_replace("&&&TEMPLATE_LICENSE&&&", $licenseString, $projectTemplate);
 $projectTemplate = str_replace("&&&TEMPLATE_DESCRIPTION&&&", $description, $projectTemplate);
+$projectTemplate = str_replace("&&&TEMPLATE_LOCATION&&&", $location, $projectTemplate);
 $projectTemplate = str_replace("&&&TEMPLATE_TOOLS_HTML&&&", $toolsHTML, $projectTemplate);
 $projectTemplate = str_replace("&&&TEMPLATE_REFERENCES_HTML&&&", $referencesHTML, $projectTemplate);
 $projectTemplate = str_replace("&&&TEMPLATE_DATE&&&", $dateString, $projectTemplate);

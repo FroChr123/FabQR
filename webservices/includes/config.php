@@ -25,8 +25,8 @@ define("PUBLIC_URL", "http://192.168.178.38:8090/");
 // Private area URL
 define("PRIVATE_URL", "http://192.168.178.38:8081/");
 
-// Name of the FabLab, used in titles
-define("FABLAB_NAME", "FabLab");
+// Name of the system, used in titles and headings
+define("SYSTEM_NAME", "FabQR: Filesharing with QR Codes");
 
 // Email config
 define("SMTP_MAIL", "mail@example.com");
@@ -51,9 +51,6 @@ define("DIR_PRIVATE_PATH", "/home/fabqr/fabqr_data/www/private/");
 
 // Absolute directory path of logs area
 define("DIR_LOGS", "/home/fabqr/fabqr_data/logs/");
-
-// FabQR prefix
-define("FABQR_PREFIX", "FabQR: ");
 
 // Max elements per main site, related to fail2ban settings
 define("PROJECTS_PER_SITE", 10);

@@ -50,7 +50,7 @@ if (empty($footerTemplate))
 }
 
 // Header information
-$pageTitle = escape_and_encode(FABQR_PREFIX . FABLAB_NAME . TITLE_SEPERATOR . TITLE_UPLOAD_FILE, "xhtml", "");
+$pageTitle = escape_and_encode(SYSTEM_NAME . TITLE_SEPERATOR . TITLE_UPLOAD_FILE, "xhtml", "");
 $pageIcon = escape_and_encode(PUBLIC_URL . ICON_NAME, "xhtml", "");
 $pageStyle = escape_and_encode(PUBLIC_URL . STYLE_NAME, "xhtml", "");
 
@@ -60,7 +60,7 @@ $headerTemplate = str_replace("&&&TEMPLATE_PAGE_STYLE&&&", $pageStyle, $headerTe
 
 // Prepare Content information
 $contentTemplate = "";
-$pageMainHeading = escape_and_encode(FABQR_PREFIX . FABLAB_NAME, "xhtml", "");
+$pageMainHeading = escape_and_encode(SYSTEM_NAME, "xhtml", "");
 $pageSubHeading = escape_and_encode(TITLE_UPLOAD_FILE, "xhtml", "");
 $linkMain = escape_and_encode(PUBLIC_URL, "xhtml", "");
 
@@ -114,7 +114,7 @@ else
     }
 
     // Get a free new identifier
-    $projectId = add_new_project(true, "");
+    $projectId = add_new_project(true, "", "");
 
     if (empty($projectId))
     {
