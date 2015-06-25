@@ -14,28 +14,28 @@ a:hover, a:active { color: #3774E6; }
 .project-main { border: 2px solid #4C78A8; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding-top: 10px; padding-bottom: 10px; }
 .project-main-text { display: table; width: 100%; }
 .project-paragraph { margin: 0px; line-height: 24px; }
-.project-information { display: table-cell; padding-left: 10px; }
+.project-information { display: table-cell; padding-left: 10px; width: 33%; }
 .project-header-information { margin: 0px; padding-bottom: 10px; font-size: 16px; font-weight: bold; }
-.project-tools { display: table-cell; padding-left: 10px; }
+.project-tools { display: table-cell; padding-left: 10px; width: 33%; }
 .project-tools-list { list-style-type: disc; }
 .project-tool-lasercutter-extended-list { list-style-type: square; }
 .project-header-tools { margin: 0px; padding-bottom: 10px; font-size: 16px; font-weight: bold; }
-.project-description { display: table-cell; padding-left: 10px; padding-right: 10px; }
+.project-description { display: table-cell; padding-left: 10px; padding-right: 10px; width: 34%; }
 .project-header-description { margin: 0px; padding-bottom: 10px; font-size: 16px; font-weight: bold; }
 .project-references { padding-top: 10px; }
 .project-main-image { display: table; width: 100%; margin-top: 25px; }
-.project-image-scheme-div { display: table-cell; padding-left: 10px; vertical-align: middle; text-align: center; }
-.project-image-real-div { display: table-cell; padding-left: 10px; vertical-align: middle; text-align: center; }
-.project-image-qr-code-div { display: table-cell; padding-left: 10px; padding-right: 10px; vertical-align: middle; text-align: center; }
+.project-image-scheme-div { display: table-cell; padding-left: 10px; vertical-align: middle; text-align: center; width: 33%; }
+.project-image-real-div { display: table-cell; padding-left: 10px; vertical-align: middle; text-align: center; width: 33%; }
+.project-image-qr-code-div { display: table-cell; padding-left: 10px; padding-right: 10px; vertical-align: middle; text-align: center; width: 34%; }
 .project-image-scheme-link { text-decoration: none; }
 .project-image-real-link { text-decoration: none; }
 .project-image-qr-code-link { text-decoration: none; }
 .project-image-scheme-image { max-width: 320px; width: 100%; }
 .project-image-real-image { max-width: 320px; width: 100%; }
 .project-main-footer { display: table; width: 100%; margin-top: 25px; }
-.project-footer-download-file-div { display: table-cell; padding-left: 10px; text-align: center; }
-.project-footer-email-qr-code-div { display: table-cell; padding-left: 10px; text-align: center; }
-.project-footer-print-qr-code-div { display: table-cell; padding-left: 10px; padding-right: 10px; text-align: center; }
+.project-footer-download-file-div { display: table-cell; padding-left: 10px; text-align: center; width: 33%; }
+.project-footer-email-qr-code-div { display: table-cell; padding-left: 10px; text-align: center; width: 33%; }
+.project-footer-print-qr-code-div { display: table-cell; padding-left: 10px; padding-right: 10px; text-align: center; width: 34%; }
 .project-footer-download-file-link { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; }
 .project-footer-download-file-link:hover, .project-footer-download-file-link:active { color: #FFFFFF; background-color: #2E4966; }
 .project-footer-email-qr-code-link { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; }
@@ -58,6 +58,7 @@ a:hover, a:active { color: #3774E6; }
 #file-upload-input-submit-wrapper:hover, #file-upload-input-submit-wrapper:active { color: #FFFFFF; background-color: #2E4966; }
 #file-upload-input-submit { display: block; text-align: right; position: absolute; top: 0; right: 0; min-height: 100%; min-width: 100%; opacity: 0; background: none transparent scroll repeat 0 0; cursor: pointer; }
 #file-upload-footer { margin-top: 25px; }
+#file-upload-footer-success { padding-bottom: 25px; }
 #file-upload-footer-email-qr-code-link { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; margin-right: 40px; }
 #file-upload-footer-email-qr-code-link:hover, #file-upload-footer-email-qr-code-link:active { color: #FFFFFF; background-color: #2E4966; }
 #file-upload-footer-print-qr-code-link { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; }
@@ -71,6 +72,25 @@ a:hover, a:active { color: #3774E6; }
 #email-qr-code-main { border: 2px solid #4C78A8; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 10px; text-align: center; }
 #email-qr-code-footer { margin-top: 25px; }
 #email-qr-code-input-text { display: inline-block; width: 200px; height: 25px; margin-right: 10px; border-radius: 5px; border: 1px solid #888888; }
-#email-qr-code-input-submit { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; border: none transparent; cursor: pointer; }
+#email-qr-code-input-submit { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; border: medium none transparent; cursor: pointer; }
 #email-qr-code-input-submit:hover, #email-qr-code-input-submit:active { color: #FFFFFF; background-color: #2E4966; }
 #email-qr-code-input-hidden-project, #email-qr-code-input-hidden-type { display: none; }
+
+/* Styles for main */
+.main-navigation { padding-top: 40px; text-align: center; }
+.main-upload-file-link { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; margin-right: 150px; }
+.main-upload-file-link:hover, .main-upload-file-link:active { color: #FFFFFF; background-color: #2E4966; }
+.main-previous-link { display: inline-block; text-align: center; width: 40px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; margin-right: 5px; font-weight: bold; }
+.main-previous-link:hover, .main-previous-link:active { color: #FFFFFF; background-color: #2E4966; }
+.main-previous-link-disabled { background-color: #CCCCCC !important; cursor: default !important; }
+.main-previous-link-disabled:hover, .main-previous-link-disabled:active { background-color: #CCCCCC !important; }
+.main-next-link { display: inline-block; text-align: center; width: 40px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; font-weight: bold; }
+.main-next-link:hover, .main-next-link:active { color: #FFFFFF; background-color: #2E4966; }
+.main-next-link-disabled { background-color: #CCCCCC !important; cursor: default !important; }
+.main-next-link-disabled:hover, .main-next-link-disabled:active { background-color: #CCCCCC !important; }
+.main-page-input-form { display: inline-block; margin-right: 5px; }
+.main-page-input-text { display: inline-block; width: 35px; height: 25px; margin-right: 2px; margin-left: 2px; border-radius: 5px; border: 1px solid #888888; text-align: center; }
+.main-page-input-text:disabled { background-color: #CCCCCC !important; color: #FFFFFF !important; }
+.main-page-input-submit { display: inline-block; text-align: center; width: 50px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; border: medium none transparent; cursor: pointer; margin-left: 5px; }
+.main-page-input-submit:hover, .main-page-input-submit:active { color: #FFFFFF; background-color: #2E4966; }
+.main-page-input-submit:disabled { background-color: #CCCCCC !important; cursor: default !important; }

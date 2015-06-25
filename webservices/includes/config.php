@@ -36,9 +36,8 @@ define("SMTP_SECURE", "tls");
 define("SMTP_USER", "SMTP-USER");
 define("SMTP_PASSWORD", "SMTP-PASSWORD");
 
-
 /* **********************************
- * CONSTANTS
+ * CONSTANTS, CAUTION IF CHANGED
  * ********************************** */
 
 // Absolute directory path of public area
@@ -53,6 +52,9 @@ define("DIR_LOGS", "/home/fabqr/fabqr_data/logs/");
 // FabQR prefix
 define("FABQR_PREFIX", "FabQR: ");
 
+// Max elements per main site, related to fail2ban settings
+define("PROJECTS_PER_SITE", 10);
+
 // Misc file system paths and names
 define("DIR_LOCAL", ".");
 define("DIR_PARENT", "..");
@@ -60,6 +62,7 @@ define("DIR_NAME_PRIVATE_QR_CODES", "private_qr_codes");
 define("PHP_SCRIPT_UPLOAD_FILE", "upload_file.php");
 define("PHP_SCRIPT_PRINT_QR_CODE", "print_qr_code.php");
 define("PHP_SCRIPT_EMAIL_QR_CODE", "email_qr_code.php");
+define("PHP_SCRIPT_INDEX", "index.php");
 define("FILENAME_PROJECTS_XML", "projects.xml");
 define("LOGNAME_EMAIL", "fabqr_email.log");
 define("LOGNAME_TEMPORARY_UPLOAD", "fabqr_temporary_upload.log");

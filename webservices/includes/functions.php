@@ -152,7 +152,8 @@ function add_new_project($isPrivate, $projectName)
     // Write contents to file
     if (file_put_contents($path . FILENAME_PROJECTS_XML, $domDoc->saveXML()) === false)
     {
-        return "";
+        // Do not immediately return here, file lock is still set
+        $resultProjectId = "";
     }
 
     // Unlock file
@@ -173,6 +174,9 @@ function add_new_project($isPrivate, $projectName)
 // Function which tries to remove a project
 function remove_project($projectId, $isPrivate)
 {
+    // Error variable, use to unlock file correctly
+    $error = false;
+
     // Set correct target path
     $path = DIR_PUBLIC_PATH;
 
@@ -211,27 +215,24 @@ function remove_project($projectId, $isPrivate)
         }
 
         // Load contents, file must now be valid
-        if (@$domDoc->load($path . FILENAME_PROJECTS_XML) === false)
+        if (@$domDoc->load($path . FILENAME_PROJECTS_XML) === true)
         {
-            return false;
-        }
+            // Get project node with project id from file, must be valid, use XPath
+            $xpath = new DOMXPath($domDoc);
+            $projectNode = $xpath->query("/index/project[@id='$projectId']")->item(0);
 
-        // Get project node with project id from file, must be valid, use XPath
-        $xpath = new DOMXPath($domDoc);
-        $projectNode = $xpath->query("/index/project[@id='$projectId']")->item(0);
+            if (!empty($projectNode) && !empty($projectNode->parentNode))
+            {
+                // Remove node in parent
+                $projectNode->parentNode->removeChild($projectNode);
 
-        if (empty($projectNode) || empty($projectNode->parentNode))
-        {
-            return false;
-        }
-
-        // Remove node in parent
-        $projectNode->parentNode->removeChild($projectNode);
-
-        // Write contents to file
-        if (file_put_contents($path . FILENAME_PROJECTS_XML, $domDoc->saveXML()) === false)
-        {
-            return false;
+                // Write contents to file
+                if (file_put_contents($path . FILENAME_PROJECTS_XML, $domDoc->saveXML()) === false)
+                {
+                    // Use error variable to abort execution after file was unlocked
+                    $error = true;
+                }
+            }
         }
 
         // Unlock file
@@ -242,6 +243,12 @@ function remove_project($projectId, $isPrivate)
 
         // Close file handle
         if (!fclose($fileDescriptor))
+        {
+            return false;
+        }
+
+        // Check error variable
+        if (!empty($error))
         {
             return false;
         }
@@ -613,6 +620,178 @@ function send_email($recipientMail, $subject, $htmlBody, $plainBody, $projectId 
     }
 
     return true;
+}
+
+// Function to count elements in XML DOM documents
+function count_projects_in_xml($isPrivate)
+{
+    // Result variable
+    $result = 0;
+
+    // Determine path of XML DOM document file
+    $domPath = DIR_PUBLIC_PATH . FILENAME_PROJECTS_XML;
+
+    if (!empty($isPrivate))
+    {
+        $domPath = DIR_PRIVATE_PATH . FILENAME_PROJECTS_XML;
+    }
+
+    // Check if file exists
+    if (!file_exists($domPath))
+    {
+        return 0;
+    }
+
+    // Deal with index file
+    $domDoc = new DOMDocument("1.0", "UTF-8");
+    $domDoc->preserveWhiteSpace = false;
+    $domDoc->formatOutput = true;
+
+    // Open file descriptor
+    $fileDescriptor = fopen($domPath, "a+");
+
+    // Check if file opening is successful
+    if ($fileDescriptor === false)
+    {
+        return 0;
+    }
+
+    // Lock file, check if successful
+    if (!flock($fileDescriptor, LOCK_EX))
+    {
+        return 0;
+    }
+
+    // Try to load contents with warning suppression
+    if (@$domDoc->load($domPath) == true)
+    {
+        // Get main node to count projects
+        $indexNode = $domDoc->firstChild;
+
+        if (!empty($indexNode))
+        {
+            // List of child nodes
+            if (!empty($indexNode->childNodes))
+            {
+                $result = $indexNode->childNodes->length;
+            }
+        }
+    }
+
+    // Unlock file
+    if (!flock($fileDescriptor, LOCK_UN))
+    {
+        return 0;
+    }
+
+    // Close file handle
+    if (!fclose($fileDescriptor))
+    {
+        return 0;
+    }
+
+    return $result;
+}
+
+// Function to get latest project ids from XML DOM documents
+function get_latest_projects_in_xml($count, $offset, $isPrivate)
+{
+    // Variables
+    $result = array();
+    $countClean = intval($count);
+    $offsetClean = intval($offset);
+
+    // Determine path of XML DOM document file
+    $domPath = DIR_PUBLIC_PATH . FILENAME_PROJECTS_XML;
+
+    if (!empty($isPrivate))
+    {
+        $domPath = DIR_PRIVATE_PATH . FILENAME_PROJECTS_XML;
+    }
+
+    // Check if file exists
+    if (!file_exists($domPath))
+    {
+        return array();
+    }
+
+    // Deal with index file
+    $domDoc = new DOMDocument("1.0", "UTF-8");
+    $domDoc->preserveWhiteSpace = false;
+    $domDoc->formatOutput = true;
+
+    // Open file descriptor
+    $fileDescriptor = fopen($domPath, "a+");
+
+    // Check if file opening is successful
+    if ($fileDescriptor === false)
+    {
+        return array();
+    }
+
+    // Lock file, check if successful
+    if (!flock($fileDescriptor, LOCK_EX))
+    {
+        return array();
+    }
+
+    // Try to load contents with warning suppression
+    if (@$domDoc->load($domPath) == true)
+    {
+        // Get main node to count projects
+        $indexNode = $domDoc->firstChild;
+
+        if (!empty($indexNode))
+        {
+            // List of child nodes
+            if (!empty($indexNode->childNodes))
+            {
+                // Determine maximum index for iteration
+                $maxCount = min($indexNode->childNodes->length, $offsetClean + $countClean);
+
+                // Iterate project nodes
+                for ($i = $offsetClean; $i < $maxCount; $i++)
+                {
+                    $projectNode = $indexNode->childNodes->item($i);
+
+                    // Safely access id field of projectNode
+                    if (!empty($projectNode))
+                    {
+                        $projectNodeAttributes = $projectNode->attributes;
+
+                        if (!empty($projectNodeAttributes))
+                        {
+                            $projectNodeAttributesId = $projectNodeAttributes->getNamedItem("id");
+
+                            if (!empty($projectNodeAttributesId))
+                            {
+                                $projectNodeAttributesIdValue = $projectNodeAttributesId->nodeValue;
+
+                                if (!empty($projectNodeAttributesIdValue))
+                                {
+                                    $result[$i] = $projectNodeAttributesIdValue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Unlock file
+    if (!flock($fileDescriptor, LOCK_UN))
+    {
+        return array();
+    }
+
+    // Close file handle
+    if (!fclose($fileDescriptor))
+    {
+        return array();
+    }
+
+    return $result;
 }
 
 ?>
