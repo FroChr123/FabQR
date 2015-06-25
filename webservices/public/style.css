@@ -3,7 +3,7 @@ html { width: 100%; height: 100%; }
 body { width: 100%; height: 100%; background-color: #FFFFFF; color: #2F2F2F; font-family: Arial,Helvetica,sans-serif; font-size: 14px; margin: 0px; min-width: 735px; }
 a { color: #2C5DB8; text-decoration: underline; }
 a:hover, a:active { color: #3774E6; }
-#main { padding-left: 10px; padding-right: 10px; }
+#main { padding: 10px; }
 #main-heading { color: #2F2F2F; display: block; text-align: center; padding-top: 20px; font-size: 24px; text-decoration: underline; font-style: italic; }
 .image-qr-code-fixed-size { width: 328px; }
 
@@ -16,9 +16,10 @@ a:hover, a:active { color: #3774E6; }
 .project-paragraph { margin: 0px; line-height: 24px; }
 .project-information { display: table-cell; padding-left: 10px; width: 33%; }
 .project-header-information { margin: 0px; padding-bottom: 10px; font-size: 16px; font-weight: bold; }
+.project-email-link { display: inline-block; word-break: break-all; }
 .project-tools { display: table-cell; padding-left: 10px; width: 33%; }
-.project-tools-list { list-style-type: disc; }
-.project-tool-lasercutter-extended-list { list-style-type: square; }
+.project-tools-list { list-style-type: disc; line-height: 24px; padding-left: 20px; margin: 0px; }
+.project-tool-lasercutter-extended-list { list-style-type: square; line-height: 24px; padding-left: 25px; margin: 0px; }
 .project-header-tools { margin: 0px; padding-bottom: 10px; font-size: 16px; font-weight: bold; }
 .project-description { display: table-cell; padding-left: 10px; padding-right: 10px; width: 34%; }
 .project-header-description { margin: 0px; padding-bottom: 10px; font-size: 16px; font-weight: bold; }
@@ -30,8 +31,8 @@ a:hover, a:active { color: #3774E6; }
 .project-image-scheme-link { text-decoration: none; }
 .project-image-real-link { text-decoration: none; }
 .project-image-qr-code-link { text-decoration: none; }
-.project-image-scheme-image { max-width: 320px; width: 100%; }
-.project-image-real-image { max-width: 320px; width: 100%; }
+.project-image-scheme-image { width: 100%; }
+.project-image-real-image { width: 100%; }
 .project-main-footer { display: table; width: 100%; margin-top: 25px; }
 .project-footer-download-file-div { display: table-cell; padding-left: 10px; text-align: center; width: 33%; }
 .project-footer-email-qr-code-div { display: table-cell; padding-left: 10px; text-align: center; width: 33%; }

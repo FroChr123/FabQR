@@ -101,13 +101,13 @@ define("LICENSE_CCBYNC_INDEX", 3);
 define("LICENSE_CCBYND_INDEX", 4);
 define("LICENSE_CCBYNCSA_INDEX", 5);
 define("LICENSE_CCBYNCND_INDEX", 6);
-define("LICENSE_CC0_TEXT", "Creative Commons: CC0 1.0 (no restrictions)");
-define("LICENSE_CCBY_TEXT", "Creative Commons: CC BY 4.0");
-define("LICENSE_CCBYSA_TEXT", "Creative Commons: CC BY-SA 4.0");
-define("LICENSE_CCBYNC_TEXT", "Creative Commons: CC BY-NC 4.0");
-define("LICENSE_CCBYND_TEXT", "Creative Commons: CC BY-ND 4.0");
-define("LICENSE_CCBYNCSA_TEXT", "Creative Commons: CC BY-NC-SA 4.0");
-define("LICENSE_CCBYNCND_TEXT", "Creative Commons: CC BY-NC-ND 4.0");
+define("LICENSE_CC0_TEXT", "CC0 1.0 (no restrictions)");
+define("LICENSE_CCBY_TEXT", "CC BY 4.0");
+define("LICENSE_CCBYSA_TEXT", "CC BY-SA 4.0");
+define("LICENSE_CCBYNC_TEXT", "CC BY-NC 4.0");
+define("LICENSE_CCBYND_TEXT", "CC BY-ND 4.0");
+define("LICENSE_CCBYNCSA_TEXT", "CC BY-NC-SA 4.0");
+define("LICENSE_CCBYNCND_TEXT", "CC BY-NC-ND 4.0");
 
 // Defines for tools
 define("TOOL_LASERCUTTER", "Laser cutter");
@@ -133,7 +133,7 @@ define("REFERENCES_HTML_SEPERATOR", " - ");
 
 // Indentation related stuff
 define("GENERAL_INDENTATION", "    ");
-define("TOOLS_MAIN_INDENTATION", 8);
+define("TOOLS_MAIN_INDENTATION", 7);
 define("REFERENCES_MAIN_INDENTATION", 9);
 
 // Header settings
