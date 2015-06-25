@@ -174,8 +174,8 @@ function add_new_project($isPrivate, $projectName)
 // Function which tries to remove a project
 function remove_project($projectId, $isPrivate)
 {
-    // Error variable, use to unlock file correctly
-    $error = false;
+    // XML error variable, use to unlock file correctly
+    $xmlError = false;
 
     // Set correct target path
     $path = DIR_PUBLIC_PATH;
@@ -229,8 +229,8 @@ function remove_project($projectId, $isPrivate)
                 // Write contents to file
                 if (file_put_contents($path . FILENAME_PROJECTS_XML, $domDoc->saveXML()) === false)
                 {
-                    // Use error variable to abort execution after file was unlocked
-                    $error = true;
+                    // Use XML error variable to abort execution after file was unlocked
+                    $xmlError = true;
                 }
             }
         }
@@ -243,12 +243,6 @@ function remove_project($projectId, $isPrivate)
 
         // Close file handle
         if (!fclose($fileDescriptor))
-        {
-            return false;
-        }
-
-        // Check error variable
-        if (!empty($error))
         {
             return false;
         }
@@ -273,7 +267,7 @@ function remove_project($projectId, $isPrivate)
         }
 
         // Check if removing directory is successful
-        if (rmdir($path . $projectId))
+        if (rmdir($path . $projectId) && empty($xmlError))
         {
             return true;
         }

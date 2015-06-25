@@ -36,6 +36,9 @@ define("SMTP_SECURE", "tls");
 define("SMTP_USER", "SMTP-USER");
 define("SMTP_PASSWORD", "SMTP-PASSWORD");
 
+// Admin password config
+define("ADMIN_PASSWORD", "PASSWORD");
+
 /* **********************************
  * CONSTANTS, CAUTION IF CHANGED
  * ********************************** */
@@ -63,6 +66,7 @@ define("PHP_SCRIPT_UPLOAD_FILE", "upload_file.php");
 define("PHP_SCRIPT_PRINT_QR_CODE", "print_qr_code.php");
 define("PHP_SCRIPT_EMAIL_QR_CODE", "email_qr_code.php");
 define("PHP_SCRIPT_INDEX", "index.php");
+define("PHP_SCRIPT_REMOVE_PROJECT", "remove_project.php");
 define("FILENAME_PROJECTS_XML", "projects.xml");
 define("LOGNAME_EMAIL", "fabqr_email.log");
 define("LOGNAME_TEMPORARY_UPLOAD", "fabqr_temporary_upload.log");
@@ -136,10 +140,11 @@ define("GENERAL_INDENTATION", "    ");
 define("TOOLS_MAIN_INDENTATION", 7);
 define("REFERENCES_MAIN_INDENTATION", 9);
 
-// Header settings
+// Title settings
 define("TITLE_SEPERATOR", " - ");
 define("TITLE_PRINT_QR_CODE", "Print QR Code");
 define("TITLE_EMAIL_QR_CODE", "Email QR Code");
 define("TITLE_UPLOAD_FILE", "File Upload");
+define("TITLE_REMOVE_PROJECT", "Remove Project");
 
 ?>

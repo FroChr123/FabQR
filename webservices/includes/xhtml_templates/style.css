@@ -94,3 +94,17 @@ a:hover, a:active { color: #3774E6; }
 .main-page-input-submit { display: inline-block; text-align: center; width: 50px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; border: medium none transparent; cursor: pointer; margin-left: 5px; }
 .main-page-input-submit:hover, .main-page-input-submit:active { color: #FFFFFF; background-color: #2E4966; }
 .main-page-input-submit:disabled { background-color: #CCCCCC !important; cursor: default !important; }
+
+/* Styles for remove project */
+#remove-project { padding-top: 40px; }
+#remove-project-header { background-color: #4C78A8; color: #FFFFFF; font-size: 16px; font-weight: bold; padding: 7px 10px; border-top-right-radius: 10px; border-top-left-radius: 10px; }
+#remove-project-main { border: 2px solid #4C78A8; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; padding: 10px; }
+#remove-project-admin-password-wrapper { line-height: 50px; }
+#remove-project-admin-password-input-password { display: inline-block; width: 200px; height: 25px; border-radius: 5px; border: 1px solid #888888; margin-left: 5px; }
+#remove-project-id-wrapper { line-height: 50px; }
+#remove-project-id-input-text { display: inline-block; width: 100px; height: 25px; border-radius: 5px; border: 1px solid #888888; margin-left: 50px; }
+#remove-project-private-wrapper { line-height: 50px; }
+#remove-project-private-input-checkbox { margin: 0 0 0 67px; }
+#remove-project-input-submit { display: inline-block; text-align: center; width: 110px; padding: 10px 5px; color: #FFFFFF; text-decoration: none; background-color: #4C78A8; border-radius: 5px; border: medium none transparent; cursor: pointer; }
+#remove-project-input-submit:hover, #remove-project-input-submit:active { color: #FFFFFF; background-color: #2E4966; }
+#remove-project-result { line-height: 50px; }
