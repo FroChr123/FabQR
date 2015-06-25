@@ -77,7 +77,7 @@ define("FILENAME_PROJECT_XHTML", "project.xhtml");
 
 // Configs for email
 define("EMAIL_QR_CODE_SUBJECT_PREFIX", "QR Code - ");
-define("EMAIL_QR_CODE_BODY", "This email contains your requested QR Code as an attachment.");
+define("EMAIL_QR_CODE_BODY", "This email contains your requested QR code as an attachment.");
 define("SMTP_TIMEOUT", 30);
 
 // Configs for file upload
