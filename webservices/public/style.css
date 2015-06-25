@@ -45,7 +45,6 @@ a:hover, a:active { color: #3774E6; }
 .project-footer-print-qr-code-link:hover, .project-footer-print-qr-code-link:active { color: #FFFFFF; background-color: #2E4966; }
 
 /* Styles for print */
-#print-qr-code-image { margin-top: 10px; }
 #print-qr-code-image-link { text-decoration: none; }
 
 /* Styles for file upload */

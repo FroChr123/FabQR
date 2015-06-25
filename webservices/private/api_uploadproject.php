@@ -146,7 +146,10 @@ if (empty($name))
 // Email
 $emailHTML = escape_and_encode(trim($_POST["email"]), "xhtml", "");
 
-if (empty($emailHTML))
+// Simple regex email check
+$regex_email = "/^.+@.+\..+$/";
+
+if (empty($emailHTML) || !preg_match($regex_email, $emailHTML))
 {
     $emailHTML = escape_and_encode(EMAIL_NOT_SPECIFIED, "xhtml", "");
 }
