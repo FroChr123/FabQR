@@ -39,7 +39,8 @@
 
         # Redirect rule
         RewriteEngine on
-        RewriteRule ^(.*)(d|t)/([a-z0-9]{7,7})$ $1/redirect.php?marker=$2&projectId=$3 [L,R=301]
+        RewriteRule ^(d|t)/([a-z0-9]{7,7})$ /redirect.php?marker=$1&projectId=$2 [L,R=301]
+        RewriteRule ^(.*)/(d|t)/([a-z0-9]{7,7})$ $1/redirect.php?marker=$2&projectId=$3 [L,R=301]
     </Directory>
 
 </VirtualHost>

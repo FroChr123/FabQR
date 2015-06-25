@@ -94,13 +94,13 @@ if (!empty($_POST))
 {
     $removeProjectResult = "Project was successfully removed.";
 
-    if (!empty($_POST["admin-password"]) && !empty($_POST["project-id"]))
+    if (!empty($_POST["admin-password"]) && !empty($_POST["projectId"]))
     {
         $adminPassword = $_POST["admin-password"];
 
         if ($adminPassword === ADMIN_PASSWORD)
         {
-            $projectId = $_POST["project-id"];
+            $projectId = $_POST["projectId"];
             $isPrivate = isset($_POST["private"]);
 
             if (is_project_id_syntax_valid($projectId))
