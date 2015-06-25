@@ -5,7 +5,7 @@ a { color: #2C5DB8; text-decoration: underline; }
 a:hover, a:active { color: #3774E6; }
 #main { padding: 10px; }
 #main-heading { color: #2F2F2F; display: block; text-align: center; padding-top: 20px; font-size: 24px; text-decoration: underline; font-style: italic; }
-.image-qr-code-fixed-size { width: 328px; }
+.image-qr-code-fixed-size { width: 348px; }
 
 /* Styles for projects */
 .project { padding-top: 40px; }

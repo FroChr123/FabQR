@@ -287,8 +287,8 @@ function generate_qr_code($text, $filepath)
 {
     // Generate QR code with modified background color
     // QR code configs
-    $pixelConfig = 10;
-    $frameConfig = 4;
+    $pixelConfig = 11;
+    $frameConfig = 3;
     $eclevelConfig = QR_ECLEVEL_M;
 
     // Color configs
