@@ -52,7 +52,10 @@ define("DIR_PRIVATE_PATH", "/home/fabqr/fabqr_data/www/private/");
 // Absolute directory path of logs area
 define("DIR_LOGS", "/home/fabqr/fabqr_data/logs/");
 
-// Max elements per main site, related to fail2ban settings
+// Seconds after which a temporary project is removed (2419200 = 4 weeks)
+define("DELETE_TEMPORARY_FILE_INTERVAL", 2419200);
+
+// Max elements per main site, related to fail2ban settings (requests per time)
 define("PROJECTS_PER_SITE", 10);
 
 // Misc file system paths and names
