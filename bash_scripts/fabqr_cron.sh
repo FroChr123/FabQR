@@ -79,78 +79,78 @@ then
 fi
 
 # Truncate apache private access log size to last 200000 lines if line count exceeds 300000
-if [ -e "/home/fabqr_data/logs/fabqr_private_access.log" ]
+if [ -e "/home/fabqr/fabqr_data/logs/fabqr_private_access.log" ]
 then
-    if [ $( cat /home/fabqr_data/logs/fabqr_private_access.log | wc -l ) -gt 300000 ]
+    if [ $( cat /home/fabqr/fabqr_data/logs/fabqr_private_access.log | wc -l ) -gt 300000 ]
     then
-        command_success "tail -n 200000 /home/fabqr_data/logs/fabqr_private_access.log > /home/fabqr_data/logs/tmp_fabqr_private_access.log"
-        command_success "mv /home/fabqr_data/logs/tmp_fabqr_private_access.log /home/fabqr_data/logs/fabqr_private_access.log"
+        command_success "tail -n 200000 /home/fabqr/fabqr_data/logs/fabqr_private_access.log > /home/fabqr/fabqr_data/logs/tmp_fabqr_private_access.log"
+        command_success "mv /home/fabqr/fabqr_data/logs/tmp_fabqr_private_access.log /home/fabqr/fabqr_data/logs/fabqr_private_access.log"
         output_text_log "[INFO] Truncated apache private access log to 200000 entries"
     fi
 fi
 
 # Truncate apache private error log size to last 200000 lines if line count exceeds 300000
-if [ -e "/home/fabqr_data/logs/fabqr_private_error.log" ]
+if [ -e "/home/fabqr/fabqr_data/logs/fabqr_private_error.log" ]
 then
-    if [ $( cat /home/fabqr_data/logs/fabqr_private_error.log | wc -l ) -gt 300000 ]
+    if [ $( cat /home/fabqr/fabqr_data/logs/fabqr_private_error.log | wc -l ) -gt 300000 ]
     then
-        command_success "tail -n 200000 /home/fabqr_data/logs/fabqr_private_error.log > /home/fabqr_data/logs/tmp_fabqr_private_error.log"
-        command_success "mv /home/fabqr_data/logs/tmp_fabqr_private_error.log /home/fabqr_data/logs/fabqr_private_error.log"
+        command_success "tail -n 200000 /home/fabqr/fabqr_data/logs/fabqr_private_error.log > /home/fabqr/fabqr_data/logs/tmp_fabqr_private_error.log"
+        command_success "mv /home/fabqr/fabqr_data/logs/tmp_fabqr_private_error.log /home/fabqr/fabqr_data/logs/fabqr_private_error.log"
         output_text_log "[INFO] Truncated apache private error log to 200000 entries"
     fi
 fi
 
 # Truncate apache public access log size to last 200000 lines if line count exceeds 300000
-if [ -e "/home/fabqr_data/logs/fabqr_public_access.log" ]
+if [ -e "/home/fabqr/fabqr_data/logs/fabqr_public_access.log" ]
 then
-    if [ $( cat /home/fabqr_data/logs/fabqr_public_access.log | wc -l ) -gt 300000 ]
+    if [ $( cat /home/fabqr/fabqr_data/logs/fabqr_public_access.log | wc -l ) -gt 300000 ]
     then
-        command_success "tail -n 200000 /home/fabqr_data/logs/fabqr_public_access.log > /home/fabqr_data/logs/tmp_fabqr_public_access.log"
-        command_success "mv /home/fabqr_data/logs/tmp_fabqr_public_access.log /home/fabqr_data/logs/fabqr_public_access.log"
+        command_success "tail -n 200000 /home/fabqr/fabqr_data/logs/fabqr_public_access.log > /home/fabqr/fabqr_data/logs/tmp_fabqr_public_access.log"
+        command_success "mv /home/fabqr/fabqr_data/logs/tmp_fabqr_public_access.log /home/fabqr/fabqr_data/logs/fabqr_public_access.log"
         output_text_log "[INFO] Truncated apache public access log to 200000 entries"
     fi
 fi
 
 # Truncate apache both access log size to last 200000 lines if line count exceeds 300000
-if [ -e "/home/fabqr_data/logs/fabqr_both_access.log" ]
+if [ -e "/home/fabqr/fabqr_data/logs/fabqr_both_access.log" ]
 then
-    if [ $( cat /home/fabqr_data/logs/fabqr_both_access.log | wc -l ) -gt 300000 ]
+    if [ $( cat /home/fabqr/fabqr_data/logs/fabqr_both_access.log | wc -l ) -gt 300000 ]
     then
-        command_success "tail -n 200000 /home/fabqr_data/logs/fabqr_both_access.log > /home/fabqr_data/logs/tmp_fabqr_both_access.log"
-        command_success "mv /home/fabqr_data/logs/tmp_fabqr_both_access.log /home/fabqr_data/logs/fabqr_both_access.log"
+        command_success "tail -n 200000 /home/fabqr/fabqr_data/logs/fabqr_both_access.log > /home/fabqr/fabqr_data/logs/tmp_fabqr_both_access.log"
+        command_success "mv /home/fabqr/fabqr_data/logs/tmp_fabqr_both_access.log /home/fabqr/fabqr_data/logs/fabqr_both_access.log"
         output_text_log "[INFO] Truncated apache both access log to 200000 entries"
     fi
 fi
 
 # Truncate apache both error log size to last 200000 lines if line count exceeds 300000
-if [ -e "/home/fabqr_data/logs/fabqr_both_error.log" ]
+if [ -e "/home/fabqr/fabqr_data/logs/fabqr_both_error.log" ]
 then
-    if [ $( cat /home/fabqr_data/logs/fabqr_both_error.log | wc -l ) -gt 300000 ]
+    if [ $( cat /home/fabqr/fabqr_data/logs/fabqr_both_error.log | wc -l ) -gt 300000 ]
     then
-        command_success "tail -n 200000 /home/fabqr_data/logs/fabqr_both_error.log > /home/fabqr_data/logs/tmp_fabqr_both_error.log"
-        command_success "mv /home/fabqr_data/logs/tmp_fabqr_both_error.log /home/fabqr_data/logs/fabqr_both_error.log"
+        command_success "tail -n 200000 /home/fabqr/fabqr_data/logs/fabqr_both_error.log > /home/fabqr/fabqr_data/logs/tmp_fabqr_both_error.log"
+        command_success "mv /home/fabqr/fabqr_data/logs/tmp_fabqr_both_error.log /home/fabqr/fabqr_data/logs/fabqr_both_error.log"
         output_text_log "[INFO] Truncated apache both error log to 200000 entries"
     fi
 fi
 
 # Truncate fabqr temporary file upload log size to last 2000 lines if line count exceeds 2500
-if [ -e "/home/fabqr_data/logs/fabqr_temporary_upload.log" ]
+if [ -e "/home/fabqr/fabqr_data/logs/fabqr_temporary_upload.log" ]
 then
-    if [ $( cat /home/fabqr_data/logs/fabqr_temporary_upload.log | wc -l ) -gt 2500 ]
+    if [ $( cat /home/fabqr/fabqr_data/logs/fabqr_temporary_upload.log | wc -l ) -gt 2500 ]
     then
-        command_success "tail -n 2000 /home/fabqr_data/logs/fabqr_temporary_upload.log > /home/fabqr_data/logs/tmp_fabqr_temporary_upload.log"
-        command_success "mv /home/fabqr_data/logs/tmp_fabqr_temporary_upload.log /home/fabqr_data/logs/fabqr_temporary_upload.log"
+        command_success "tail -n 2000 /home/fabqr/fabqr_data/logs/fabqr_temporary_upload.log > /home/fabqr/fabqr_data/logs/tmp_fabqr_temporary_upload.log"
+        command_success "mv /home/fabqr/fabqr_data/logs/tmp_fabqr_temporary_upload.log /home/fabqr/fabqr_data/logs/fabqr_temporary_upload.log"
         output_text_log "[INFO] Truncated temporary file upload log to 2000 entries"
     fi
 fi
 
 # Truncate fabqr email log size to last 2000 lines if line count exceeds 2500
-if [ -e "/home/fabqr_data/logs/fabqr_email.log" ]
+if [ -e "/home/fabqr/fabqr_data/logs/fabqr_email.log" ]
 then
-    if [ $( cat /home/fabqr_data/logs/fabqr_email.log | wc -l ) -gt 2500 ]
+    if [ $( cat /home/fabqr/fabqr_data/logs/fabqr_email.log | wc -l ) -gt 2500 ]
     then
-        command_success "tail -n 2000 /home/fabqr_data/logs/fabqr_email.log > /home/fabqr_data/logs/tmp_fabqr_email.log"
-        command_success "mv /home/fabqr_data/logs/tmp_fabqr_email.log /home/fabqr_data/logs/fabqr_email.log"
+        command_success "tail -n 2000 /home/fabqr/fabqr_data/logs/fabqr_email.log > /home/fabqr/fabqr_data/logs/tmp_fabqr_email.log"
+        command_success "mv /home/fabqr/fabqr_data/logs/tmp_fabqr_email.log /home/fabqr/fabqr_data/logs/fabqr_email.log"
         output_text_log "[INFO] Truncated email log to 2000 entries"
     fi
 fi
