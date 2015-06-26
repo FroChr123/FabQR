@@ -64,7 +64,7 @@ function quit_error
 output_text_log "[INFO] START FABQR CRON LOG"
 
 # ##################################################################
-# CRONJOB LOG
+# CRONJOB LOGS
 # ##################################################################
 
 # Truncate fabqr log size to last 2000 lines if line count exceeds 2500
@@ -76,8 +76,6 @@ then
         command_success "mv /home/fabqr/tmp_fabqr.log /home/fabqr/fabqr.log"
         output_text_log "[INFO] Truncated fabqr log to 2000 entries"
     fi
-
-    output_text_log "[INFO] QUIT FABQR CRON LOG SUCCESSFULLY"
 fi
 
 # Truncate apache private access log size to last 200000 lines if line count exceeds 300000
@@ -156,6 +154,10 @@ then
         output_text_log "[INFO] Truncated email log to 2000 entries"
     fi
 fi
+
+# ##################################################################
+# CRONJOB PROJECTS
+# ##################################################################
 
 # Remove outdated temporary projects
 if [ -e "/home/fabqr/fabqr_data/www/includes/cronjob.php" ]

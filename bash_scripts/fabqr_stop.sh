@@ -111,6 +111,8 @@ then
     command_success "a2dissite fabqr_apache_both"
 fi
 
+command_success "service apache2 reload"
+
 # ##################################################################
 # GRAPHICS
 # ##################################################################

@@ -116,6 +116,9 @@ then
     command_success "a2ensite fabqr_apache_both"
 fi
 
+output_text "[INFO] Reloading apache2 configuration"
+command_success "service apache2 reload"
+
 # ##################################################################
 # GRAPHICS
 # ##################################################################
@@ -128,8 +131,8 @@ then
         command_success "echo 0 > /sys/class/graphics/fbcon/cursor_blink"
 
         # Read values from files
-        $width=$( head -n 1 /home/fabqr/fabqr_framebuffer_png_width )
-        $height=$( head -n 1 /home/fabqr/fabqr_framebuffer_png_height )
+        width=$( head -n 1 /home/fabqr/fabqr_framebuffer_png_width )
+        height=$( head -n 1 /home/fabqr/fabqr_framebuffer_png_height )
 
         # Set resolution to screen
         command_success "fbset -g $width $height $width $height 16"

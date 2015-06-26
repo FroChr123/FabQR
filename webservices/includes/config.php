@@ -20,24 +20,24 @@
  * ********************************** */
 
 // Public area URL
-define("PUBLIC_URL", "http://192.168.178.38:8090/");
+define("PUBLIC_URL", "http://CONFIGURE.ME:8090/");
 
 // Private area URL
-define("PRIVATE_URL", "http://192.168.178.38:8081/");
+define("PRIVATE_URL", "http://CONFIGURE.ME:8081/");
 
 // Name of the system, used in titles and headings
 define("SYSTEM_NAME", "FabQR: Filesharing with QR Codes");
 
 // Email config
-define("SMTP_MAIL", "mail@example.com");
-define("SMTP_HOST", "example.com");
+define("SMTP_MAIL", "CONFIGURE-ME");
+define("SMTP_HOST", "CONFIGURE-ME");
 define("SMTP_PORT", "587");
 define("SMTP_SECURE", "tls");
-define("SMTP_USER", "SMTP-USER");
-define("SMTP_PASSWORD", "SMTP-PASSWORD");
+define("SMTP_USER", "CONFIGURE-ME");
+define("SMTP_PASSWORD", "CONFIGURE-ME");
 
 // Admin password config
-define("ADMIN_PASSWORD", "PASSWORD");
+define("ADMIN_PASSWORD", "CONFIGURE-ME");
 
 /* **********************************
  * CONSTANTS, CAUTION IF CHANGED

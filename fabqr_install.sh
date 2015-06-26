@@ -163,7 +163,6 @@ function copy_fabqr_file
     then
         output_text "[INFO] Copying FabQR file $1 to target $2"
         command_success "cp /home/fabqr/fabqr_repository/$1 $2"
-        return 0
     else
         output_text "[ERROR] File /home/fabqr/fabqr_repository/$1 not found, quit"
         quit_error
@@ -243,6 +242,9 @@ function config_webservices
         output_text "[ERROR] Config webservices called, but /home/fabqr/fabqr_data/www/includes/config.php does not contain option '$1'!"
         quit_error
     fi
+
+    # Read value from current config file
+    value=$( cat "/home/fabqr/fabqr_data/www/includes/config.php" | grep ^define\(\"$1\",[[:space:]]\".*\"\)\;$ | awk -F ', ' '{print $2}' | awk -F '"' '{print $2}' )
 
     # Loop will be stopped if syntactically correct value was entered
     while ( true )
@@ -754,7 +756,39 @@ command_success "ln -s $newdir /home/fabqr/fabqr_data"
 # webservices : Copy all files recursively to correct location
 # For /media/usb* devices setting the properties from before might fail, thus unchecked
 # Silent output for owner, is intended to output errors for /media/usb* devices
+
+# Ask user to keep settings
+if [ -e "/home/fabqr/fabqr_data/www/includes/config.php" ]
+then
+    if user_confirm "[INFO] Optional: Do you want to keep your current webservice configuration" "false"
+    then
+        command_success "cp /home/fabqr/fabqr_data/www/includes/config.php /home/fabqr/fabqr_data/www/includes/tmp-config.php"
+    fi
+fi
+
+if [ -e "/home/fabqr/fabqr_data/www/private/.htpasswd" ] && [ -s "/home/fabqr/fabqr_data/www/private/.htpasswd" ]
+then
+    if user_confirm "[INFO] Optional: Do you want to keep your current private section password" "false"
+    then
+        command_success "cp /home/fabqr/fabqr_data/www/private/.htpasswd /home/fabqr/fabqr_data/www/private/tmp.htpasswd"
+    fi
+fi
+
+# Copy and overwrite all files
 command_success "cp -R /home/fabqr/fabqr_repository/webservices/* /home/fabqr/fabqr_data/www/"
+
+# Restore previous settings, if they were saved
+if [ -e "/home/fabqr/fabqr_data/www/includes/tmp-config.php" ]
+then
+    command_success "mv /home/fabqr/fabqr_data/www/includes/tmp-config.php /home/fabqr/fabqr_data/www/includes/config.php"
+fi
+
+if [ -e "/home/fabqr/fabqr_data/www/private/tmp.htpasswd" ]
+then
+    command_success "mv /home/fabqr/fabqr_data/www/private/tmp.htpasswd /home/fabqr/fabqr_data/www/private/.htpasswd"
+fi
+
+# Set permissions (unchecked, see above)
 chown "fabqr" "/home/fabqr/fabqr_data/www/" -R &> "/dev/null"
 chgrp "fabqr" "/home/fabqr/fabqr_data/www/" -R
 chmod "770" "/home/fabqr/fabqr_data/www/" -R
@@ -783,6 +817,9 @@ config_webservices "SMTP_SECURE" "^(none|ssl|tls)$" "SMTP security"
 output_text "[INFO] SMTP authentication details, here your authentication credentials are needed."
 config_webservices "SMTP_USER" "^.+$" "SMTP user"
 config_webservices "SMTP_PASSWORD" "^.+$" "SMTP password"
+
+output_text "[INFO] Admin password for removing projects is needed."
+config_webservices "ADMIN_PASSWORD" "^.+$" "Admin password"
 
 # php5 : Config file for upload file sizes
 copy_fabqr_file "php_configs/fabqr.ini" "/etc/php5/conf.d/fabqr.ini"
@@ -813,11 +850,11 @@ file_properties "/etc/apache2/conf.d/security_fabqr_apache" "root" "root" "-rw-r
 echo '*' | a2dissite &> "/dev/null"
 
 # apache2 : Ask for public and private port numbers
-publicport=0
-privateport=0
+publicport=""
+privateport=""
 publicportvalid=false
 privateportvalid=false
-output_text "[INFO] Enter the port numbers. These are needed for apache and fail2ban configuration."
+output_text "[INFO] Enter the port numbers. These are needed for apache and fail2ban configuration. 80 can be used."
 output_text "[INFO] You can specify the same port for public and private access."
 
 while ! ( $publicportvalid )
@@ -829,7 +866,7 @@ do
     then
         publicportvalid=true
     else
-        output_text "[INFO] '$value' is invalid value for public port"
+        output_text "[INFO] '$publicport' is invalid value for public port"
     fi
 done
 
@@ -842,7 +879,7 @@ do
     then
         privateportvalid=true
     else
-        output_text "[INFO] '$value' is invalid value for private port"
+        output_text "[INFO] '$privateport' is invalid value for private port"
     fi
 done
 
@@ -888,13 +925,29 @@ fi
 if [ $publicport -eq $privateport ]
 then
     copy_fabqr_file "apache_configs/fabqr_apache_both_template" "/etc/apache2/sites-available/fabqr_apache_both"
+
+    # Replace ports in file
+    command_success "sed -r -i 's/TEMPLATEPORTPUBLIC/$publicport/g' /etc/apache2/sites-available/fabqr_apache_both"
+    command_success "sed -r -i 's/TEMPLATEPORTPRIVATE/$privateport/g' /etc/apache2/sites-available/fabqr_apache_both"
+
     file_properties "/etc/apache2/sites-available/fabqr_apache_both" "root" "root" "-rw-r--r--" "644" "false"
     command_success "a2ensite fabqr_apache_both"
 else
     copy_fabqr_file "apache_configs/fabqr_apache_public_template" "/etc/apache2/sites-available/fabqr_apache_public"
+
+    # Replace ports in file
+    command_success "sed -r -i 's/TEMPLATEPORTPUBLIC/$publicport/g' /etc/apache2/sites-available/fabqr_apache_public"
+    command_success "sed -r -i 's/TEMPLATEPORTPRIVATE/$privateport/g' /etc/apache2/sites-available/fabqr_apache_public"
+
     file_properties "/etc/apache2/sites-available/fabqr_apache_public" "root" "root" "-rw-r--r--" "644" "false"
     command_success "a2ensite fabqr_apache_public"
+
     copy_fabqr_file "apache_configs/fabqr_apache_private_template" "/etc/apache2/sites-available/fabqr_apache_private"
+
+    # Replace ports in file
+    command_success "sed -r -i 's/TEMPLATEPORTPUBLIC/$publicport/g' /etc/apache2/sites-available/fabqr_apache_private"
+    command_success "sed -r -i 's/TEMPLATEPORTPRIVATE/$privateport/g' /etc/apache2/sites-available/fabqr_apache_private"
+
     file_properties "/etc/apache2/sites-available/fabqr_apache_private" "root" "root" "-rw-r--r--" "644" "false"
     command_success "a2ensite fabqr_apache_private"
 fi
@@ -1044,8 +1097,8 @@ then
         command_success "g++ /home/fabqr/framebuffer_png_source/lodepng.cpp /home/fabqr/framebuffer_png_source/fabqr_framebuffer_png.cpp -o /home/fabqr/fabqr_framebuffer_png -ansi -pedantic -Wall -Wextra -O3"
 
         # Ask for resolutions
-        resolutionwidth=0
-        resolutionheight=0
+        resolutionwidth=""
+        resolutionheight=""
         resolutionwidthvalid=false
         resolutionheightvalid=false
         output_text "[INFO] Enter the resolution values of your output device, the PNG files need to have the same resolution."
@@ -1059,7 +1112,7 @@ then
             then
                 resolutionwidthvalid=true
             else
-                output_text "[INFO] '$value' is invalid value for resolution width"
+                output_text "[INFO] '$resolutionwidth' is invalid value for resolution width"
             fi
         done
 
@@ -1072,7 +1125,7 @@ then
             then
                 resolutionheightvalid=true
             else
-                output_text "[INFO] '$value' is invalid value for resolution height"
+                output_text "[INFO] '$resolutionheight' is invalid value for resolution height"
             fi
         done
 
@@ -1087,6 +1140,7 @@ then
         if [ -e "/etc/kbd/config.bak" ]
         then
             command_success "cp /etc/kbd/config.bak /etc/kbd/config"
+            command_success "rm /etc/kbd/config.bak"
             reboot=true
             file_properties "/etc/kbd/config" "root" "root" "-rw-r--r--" "644" "false"
         fi
