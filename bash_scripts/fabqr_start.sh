@@ -95,24 +95,49 @@ fi
 # ##################################################################
 # STOP FABQR
 # ##################################################################
-
+command_success "service fabqr stop"
 
 # ##################################################################
 # APACHE
 # ##################################################################
 
+if [ -e "/etc/apache2/sites-available/fabqr_apache_public" ] && ! [ -e "/etc/apache2/sites-enabled/fabqr_apache_public" ]
+then
+    command_success "a2ensite fabqr_apache_public"
+fi
 
+if [ -e "/etc/apache2/sites-available/fabqr_apache_private" ] && ! [ -e "/etc/apache2/sites-enabled/fabqr_apache_private" ]
+then
+    command_success "a2ensite fabqr_apache_private"
+fi
+
+if [ -e "/etc/apache2/sites-available/fabqr_apache_both" ] && ! [ -e "/etc/apache2/sites-enabled/fabqr_apache_both" ]
+then
+    command_success "a2ensite fabqr_apache_both"
+fi
 
 # ##################################################################
 # GRAPHICS
 # ##################################################################
 
-# TODO cursor_blink
-# File: System startup
-# echo 0 > /sys/class/graphics/fbcon/cursor_blink
+# Check if graphics are activated
+if [ -e "/dev/fb0" ]
+then
+    if [ -e "/home/fabqr/fabqr_framebuffer_png_width" ] && [ -e "/home/fabqr/fabqr_framebuffer_png_height" ]
+    then
+        command_success "echo 0 > /sys/class/graphics/fbcon/cursor_blink"
 
-# 
-fbset -g 854 480 854 480 16
+        # Read values from files
+        $width=$( head -n 1 /home/fabqr/fabqr_framebuffer_png_width )
+        $height=$( head -n 1 /home/fabqr/fabqr_framebuffer_png_height )
+
+        # Set resolution to screen
+        command_success "fbset -g $width $height $width $height 16"
+
+        # Start program
+        command_success "screen -dmS fabqr_framebuffer_png /home/fabqr/fabqr_framebuffer_png /dev/fb0 /run/shm/pngdisplay.png"
+    fi
+fi
 
 output_text "[INFO] QUIT FABQR START SCRIPT SUCCESSFULLY"
 exit 0

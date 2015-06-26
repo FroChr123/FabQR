@@ -331,6 +331,7 @@ check_package_install "sed"
 check_package_install "wget"
 check_package_install "mawk"
 check_package_install "cron"
+check_package_install "screen"
 check_package_install "git"
 
 # Check system paths
@@ -967,66 +968,141 @@ output_text "[INFO] FabQR files and settings checked successfully"
 
 output_text "[INFO] Checking FabQR graphics"
 
-# Display settings: disable standby of display
-if [ -e "/etc/kbd/config" ]
+# graphics : Check if framebuffer 0 exists, main framebuffer
+if [ -e "/dev/fb0" ]
 then
-    # Display settings: Create backup
-    if ! [ -e "/etc/kbd/config.bak" ]
+
+    # graphics : Ask if graphics should be enabled
+    graphicsenabled=false
+
+    if user_confirm "[INFO] Optional: Activate PNG display graphics support" "false"
     then
-        output_text "[INFO] Backup original display settings config file for kbd /etc/kbd/config"
-        command_success "cp /etc/kbd/config /etc/kbd/config.bak"
-        file_properties "/etc/kbd/config.bak" "root" "root" "-rw-r--r--" "644" "false"
+        graphicsenabled=true
     fi
 
-    # Display settings : Place hash in front of all BLANK_TIME= and POWERDOWN_TIME= lines
-    command_success "sed -r -i 's/^(BLANK_TIME=.*)$/# \1/g' /etc/kbd/config"
-    command_success "sed -r -i 's/^(POWERDOWN_TIME=.*)$/# \1/g' /etc/kbd/config"
-
-    # Display settings : Remove hash in front of BLANK_TIME=0 or POWERDOWN_TIME=0
-    command_success "sed -r -i 's/^# (BLANK_TIME=0)$/\1/g' /etc/kbd/config"
-    command_success "sed -r -i 's/^# (POWERDOWN_TIME=0)$/\1/g' /etc/kbd/config"
-
-    # Display settings : If file does not contain line BLANK_TIME=0, then add it
-    if ! ( ( cat "/etc/kbd/config" | grep ^BLANK_TIME=0$ ) > "/dev/null" )
+    if ( $graphicsenabled )
     then
-        output_text "[INFO] Adding line BLANK_TIME=0 to file /etc/kbd/config"
-        output_text "[INFO] You need to reboot to activate changes!"
-        reboot=true
-        command_success "echo >> /etc/kbd/config"
-        command_success "echo '# FabQR display setting' >> /etc/kbd/config"
-        command_success "echo 'BLANK_TIME=0' >> /etc/kbd/config"
-    fi
+        # Display settings: disable standby of display
+        if [ -e "/etc/kbd/config" ]
+        then
+            # Display settings: Create backup
+            if ! [ -e "/etc/kbd/config.bak" ]
+            then
+                output_text "[INFO] Backup original display settings config file for kbd /etc/kbd/config"
+                command_success "cp /etc/kbd/config /etc/kbd/config.bak"
+                file_properties "/etc/kbd/config.bak" "root" "root" "-rw-r--r--" "644" "false"
+            fi
 
-    # Display settings : If file does not contain line POWERDOWN_TIME=0, then add it
-    if ! ( ( cat "/etc/kbd/config" | grep ^POWERDOWN_TIME=0$ ) > "/dev/null" )
-    then
-        output_text "[INFO] Adding line POWERDOWN_TIME=0 to file /etc/kbd/config"
-        output_text "[INFO] You need to reboot to activate changes!"
-        reboot=true
-        command_success "echo >> /etc/kbd/config"
-        command_success "echo '# FabQR display setting' >> /etc/kbd/config"
-        command_success "echo 'POWERDOWN_TIME=0' >> /etc/kbd/config"
+            # Display settings : Place hash in front of all BLANK_TIME= and POWERDOWN_TIME= lines
+            command_success "sed -r -i 's/^(BLANK_TIME=.*)$/# \1/g' /etc/kbd/config"
+            command_success "sed -r -i 's/^(POWERDOWN_TIME=.*)$/# \1/g' /etc/kbd/config"
+
+            # Display settings : Remove hash in front of BLANK_TIME=0 or POWERDOWN_TIME=0
+            command_success "sed -r -i 's/^# (BLANK_TIME=0)$/\1/g' /etc/kbd/config"
+            command_success "sed -r -i 's/^# (POWERDOWN_TIME=0)$/\1/g' /etc/kbd/config"
+
+            # Display settings : If file does not contain line BLANK_TIME=0, then add it
+            if ! ( ( cat "/etc/kbd/config" | grep ^BLANK_TIME=0$ ) > "/dev/null" )
+            then
+                output_text "[INFO] Adding line BLANK_TIME=0 to file /etc/kbd/config"
+                output_text "[INFO] You need to reboot to activate changes!"
+                reboot=true
+                command_success "echo >> /etc/kbd/config"
+                command_success "echo '# FabQR display setting' >> /etc/kbd/config"
+                command_success "echo 'BLANK_TIME=0' >> /etc/kbd/config"
+            fi
+
+            # Display settings : If file does not contain line POWERDOWN_TIME=0, then add it
+            if ! ( ( cat "/etc/kbd/config" | grep ^POWERDOWN_TIME=0$ ) > "/dev/null" )
+            then
+                output_text "[INFO] Adding line POWERDOWN_TIME=0 to file /etc/kbd/config"
+                output_text "[INFO] You need to reboot to activate changes!"
+                reboot=true
+                command_success "echo >> /etc/kbd/config"
+                command_success "echo '# FabQR display setting' >> /etc/kbd/config"
+                command_success "echo 'POWERDOWN_TIME=0' >> /etc/kbd/config"
+            fi
+        fi
+
+        # FabQR graphics: Directory
+        if ! [ -d "/home/fabqr/framebuffer_png_source" ]
+        then
+            command_success "mkdir /home/fabqr/framebuffer_png_source"
+        fi
+
+        command_success "chown fabqr /home/fabqr/framebuffer_png_source -R"
+        command_success "chgrp fabqr /home/fabqr/framebuffer_png_source -R"
+        command_success "chmod 770 /home/fabqr/framebuffer_png_source -R"
+
+        # FabQR graphics: Files
+        copy_fabqr_file "framebuffer_png_source/fabqr_framebuffer_png.cpp" "/home/fabqr/framebuffer_png_source/fabqr_framebuffer_png.cpp"
+        copy_fabqr_file "framebuffer_png_source/lodepng.cpp" "/home/fabqr/framebuffer_png_source/lodepng.cpp"
+        copy_fabqr_file "framebuffer_png_source/lodepng.h" "/home/fabqr/framebuffer_png_source/lodepng.h"
+
+        # Compile program
+        output_text "[INFO] Compile FabQR framebuffer PNG graphics"
+        command_success "g++ /home/fabqr/framebuffer_png_source/lodepng.cpp /home/fabqr/framebuffer_png_source/fabqr_framebuffer_png.cpp -o /home/fabqr/fabqr_framebuffer_png -ansi -pedantic -Wall -Wextra -O3"
+
+        # Ask for resolutions
+        resolutionwidth=0
+        resolutionheight=0
+        resolutionwidthvalid=false
+        resolutionheightvalid=false
+        output_text "[INFO] Enter the resolution values of your output device, the PNG files need to have the same resolution."
+
+        while ! ( $resolutionwidthvalid )
+        do
+            read -e -p "Resolution width: " -i "$resolutionwidth" resolutionwidth
+
+            # Check for syntactically valid input
+            if ( ( echo $resolutionwidth | grep -E "^[1-9][0-9]*$" ) > "/dev/null" )
+            then
+                resolutionwidthvalid=true
+            else
+                output_text "[INFO] '$value' is invalid value for resolution width"
+            fi
+        done
+
+        while ! ( $resolutionheightvalid )
+        do
+            read -e -p "Resolution height: " -i "$resolutionheight" resolutionheight
+
+            # Check for syntactically valid input
+            if ( ( echo $resolutionheight | grep -E "^[1-9][0-9]*$" ) > "/dev/null" )
+            then
+                resolutionheightvalid=true
+            else
+                output_text "[INFO] '$value' is invalid value for resolution height"
+            fi
+        done
+
+        # Write resolutions to files
+        command_success "echo '$resolutionwidth' > /home/fabqr/fabqr_framebuffer_png_width"
+        file_properties "/home/fabqr/fabqr_framebuffer_png_width" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
+        command_success "echo '$resolutionheight' > /home/fabqr/fabqr_framebuffer_png_height"
+        file_properties "/home/fabqr/fabqr_framebuffer_png_height" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
+    else
+
+        # graphics : Reset graphics settings
+        if [ -e "/etc/kbd/config.bak" ]
+        then
+            command_success "cp /etc/kbd/config.bak /etc/kbd/config"
+            reboot=true
+            file_properties "/etc/kbd/config" "root" "root" "-rw-r--r--" "644" "false"
+        fi
+
+        # graphics : Remove fabqr graphics resolution files
+        if [ -e "/home/fabqr/fabqr_framebuffer_png_width" ]
+        then
+            command_success "rm /home/fabqr/fabqr_framebuffer_png_width"
+        fi
+
+        if [ -e "/home/fabqr/fabqr_framebuffer_png_height" ]
+        then
+            command_success "rm /home/fabqr/fabqr_framebuffer_png_height"
+        fi
     fi
 fi
-
-# FabQR graphics: Directory
-if ! [ -d "/home/fabqr/framebuffer_png_source" ]
-then
-    command_success "mkdir /home/fabqr/framebuffer_png_source"
-fi
-
-command_success "chown fabqr /home/fabqr/framebuffer_png_source -R"
-command_success "chgrp fabqr /home/fabqr/framebuffer_png_source -R"
-command_success "chmod 770 /home/fabqr/framebuffer_png_source -R"
-
-# FabQR graphics: Files
-copy_fabqr_file "framebuffer_png_source/fabqr_framebuffer_png.cpp" "/home/fabqr/framebuffer_png_source/fabqr_framebuffer_png.cpp"
-copy_fabqr_file "framebuffer_png_source/lodepng.cpp" "/home/fabqr/framebuffer_png_source/lodepng.cpp"
-copy_fabqr_file "framebuffer_png_source/lodepng.h" "/home/fabqr/framebuffer_png_source/lodepng.h"
-
-# Compile program
-output_text "[INFO] Compile FabQR framebuffer PNG graphics"
-command_success "g++ /home/fabqr/framebuffer_png_source/lodepng.cpp /home/fabqr/framebuffer_png_source/fabqr_framebuffer_png.cpp -o /home/fabqr/fabqr_framebuffer_png -ansi -pedantic -Wall -Wextra -O3"
 
 output_text "[INFO] FabQR graphics checked successfully"
 

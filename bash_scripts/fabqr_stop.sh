@@ -96,10 +96,26 @@ fi
 # APACHE
 # ##################################################################
 
+if [ -e "/etc/apache2/sites-enabled/fabqr_apache_public" ]
+then
+    command_success "a2dissite fabqr_apache_public"
+fi
+
+if [ -e "/etc/apache2/sites-enabled/fabqr_apache_private" ]
+then
+    command_success "a2dissite fabqr_apache_private"
+fi
+
+if [ -e "/etc/apache2/sites-enabled/fabqr_apache_both" ]
+then
+    command_success "a2dissite fabqr_apache_both"
+fi
 
 # ##################################################################
 # GRAPHICS
 # ##################################################################
 
+command_success "echo 1 > /sys/class/graphics/fbcon/cursor_blink"
+screen -S fabqr_framebuffer_png -X quit &> "/dev/null"
 output_text "[INFO] QUIT FABQR STOP SCRIPT SUCCESSFULLY"
 exit 0
