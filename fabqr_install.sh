@@ -238,7 +238,7 @@ function config_webservices
     fi
 
     # Config file must already contain a valid row for this config option
-    if ! ( ( cat "/home/fabqr/fabqr_data/www/includes/config.php" | grep ^define\(\"$1\",\s\".*?\"\)\;$ ) > "/dev/null" )
+    if ! ( ( cat "/home/fabqr/fabqr_data/www/includes/config.php" | grep ^define\(\"$1\",[[:space:]]\".*\"\)\;$ ) > "/dev/null" )
     then
         output_text "[ERROR] Config webservices called, but /home/fabqr/fabqr_data/www/includes/config.php does not contain option '$1'!"
         quit_error
@@ -250,9 +250,11 @@ function config_webservices
         read -e -p "$3: " -i "$value" value
 
         # Check for syntactically valid input
-        if ( ( echo $value | grep $2 ) > "/dev/null" )
+        if ( ( echo $value | grep -E $2 ) > "/dev/null" )
         then
-            command_success "sed -r -i 's/^define\(\"$1\",\s\".*?\"\)\;$/define(\"$1\", \"$value\");/g' /home/fabqr/fabqr_data/www/includes/config.php"
+            valueEscaped=$( echo $value | sed 's/\//\\\//g' )
+            command_success "sed -r -i 's/^define\(\"$1\",\s\".*\"\)\;$/define(\"$1\", \"$valueEscaped\");/g' /home/fabqr/fabqr_data/www/includes/config.php"
+            return 0
         else
             output_text "[INFO] '$value' is invalid value for configuration $1"
         fi
@@ -760,8 +762,8 @@ chmod "770" "/home/fabqr/fabqr_data/www/" -R
 output_text "[INFO] Insert the configuration values for the webservices!"
 
 output_text "[INFO] Public and private URLs need to start with the protocol and they end with an ending slash."
-config_webservices "PUBLIC_URL" "^https{0,1}://.*?/$" "Public URL"
-config_webservices "PRIVATE_URL" "^https{0,1}://.*?/$" "Private URL"
+config_webservices "PUBLIC_URL" "^https{0,1}://.+/$" "Public URL"
+config_webservices "PRIVATE_URL" "^https{0,1}://.+/$" "Private URL"
 
 output_text "[INFO] You can choose a name for your installation of the system, it will be displayed in headings and emails."
 config_webservices "SYSTEM_NAME" "^.+$" "Name of your installation"
@@ -772,7 +774,7 @@ config_webservices "SMTP_MAIL" "^.+@.+\..+$" "Email"
 config_webservices "SMTP_HOST" "^.+$" "SMTP server"
 
 output_text "[INFO] SMTP port, often 25 or 465 or 587 are used as default values."
-config_webservices "SMTP_PORT" "^[0-9]+$" "SMTP port"
+config_webservices "SMTP_PORT" "^[1-9][0-9]*$" "SMTP port"
 
 output_text "[INFO] SMTP security, allowed values: none, ssl, tls. Usually tls is used."
 config_webservices "SMTP_SECURE" "^(none|ssl|tls)$" "SMTP security"
@@ -784,14 +786,6 @@ config_webservices "SMTP_PASSWORD" "^.+$" "SMTP password"
 # php5 : Config file for upload file sizes
 copy_fabqr_file "php_configs/fabqr.ini" "/etc/php5/conf.d/fabqr.ini"
 file_properties "/etc/php5/conf.d/fabqr.ini" "root" "root" "-rw-r--r--" "644" "false"
-
-# apache2 : FabQR public config, get file
-copy_fabqr_file "apache_configs/fabqr_apache_public" "/etc/apache2/sites-available/fabqr_apache_public"
-file_properties "/etc/apache2/sites-available/fabqr_apache_public" "root" "root" "-rw-r--r--" "644" "false"
-
-# apache2 : FabQR private config, get file
-copy_fabqr_file "apache_configs/fabqr_apache_private" "/etc/apache2/sites-available/fabqr_apache_private"
-file_properties "/etc/apache2/sites-available/fabqr_apache_private" "root" "root" "-rw-r--r--" "644" "false"
 
 # apache2 : Password for private section
 if [ -e "/home/fabqr/fabqr_data/www/private/.htpasswd" ] && [ -s "/home/fabqr/fabqr_data/www/private/.htpasswd" ]
@@ -814,11 +808,42 @@ fi
 copy_fabqr_file "apache_configs/security_fabqr_apache" "/etc/apache2/conf.d/security_fabqr_apache"
 file_properties "/etc/apache2/conf.d/security_fabqr_apache" "root" "root" "-rw-r--r--" "644" "false"
 
-# apache2 : Warning default site enabled
-if [ -e "/etc/apache2/sites-enabled/000-default" ]
-then
-    output_text "[INFO] Default site of apache is enabled, you might want to disable it and remove port 80 from port config"
-fi
+# apache2 : Disable all sites without error checks and text warnings
+echo '*' | a2dissite &> "/dev/null"
+
+# apache2 : Ask for public and private port numbers
+publicport=0
+privateport=0
+publicportvalid=false
+privateportvalid=false
+output_text "[INFO] Enter the port numbers. These are needed for apache and fail2ban configuration."
+output_text "[INFO] You can specify the same port for public and private access."
+
+while ! ( $publicportvalid )
+do
+    read -e -p "Public port: " -i "$publicport" publicport
+
+    # Check for syntactically valid input
+    if ( ( echo $publicport | grep -E "^[1-9][0-9]*$" ) > "/dev/null" )
+    then
+        publicportvalid=true
+    else
+        output_text "[INFO] '$value' is invalid value for public port"
+    fi
+done
+
+while ! ( $privateportvalid )
+do
+    read -e -p "Private port: " -i "$privateport" privateport
+
+    # Check for syntactically valid input
+    if ( ( echo $privateport | grep -E "^[1-9][0-9]*$" ) > "/dev/null" )
+    then
+        privateportvalid=true
+    else
+        output_text "[INFO] '$value' is invalid value for private port"
+    fi
+done
 
 # apache2 : Create backup of file /etc/apache2/ports.conf
 if ! [ -e "/etc/apache2/ports.conf.bak" ]
@@ -828,85 +853,68 @@ then
     file_properties "/etc/apache2/ports.conf.bak" "root" "root" "-rw-r--r--" "644" "false"
 fi
 
-# apache2 : Add port configs for ports 8081 and 8090 to file /etc/apache2/ports.conf
-# apache2 : Config is reloaded in FabQR start script
-if ! ( ( cat "/etc/apache2/ports.conf" | grep '^NameVirtualHost \*\:8081$' ) > "/dev/null" )
+# apache2 : Copy correct ports.conf file for selected ports
+if [ $publicport -eq $privateport ]
 then
-    output_text "[INFO] Adding line NameVirtualHost *:8081 to file /etc/apache2/ports.conf"
-    command_success "echo >> /etc/apache2/ports.conf"
-    command_success "echo '# FabQR port 8081' >> /etc/apache2/ports.conf"
-    command_success "echo 'NameVirtualHost *:8081' >> /etc/apache2/ports.conf"
+    copy_fabqr_file "apache_configs/ports_both.conf_template" "/etc/apache2/ports.conf"
+else
+    copy_fabqr_file "apache_configs/ports.conf_template" "/etc/apache2/ports.conf"
 fi
 
-if ! ( ( cat "/etc/apache2/ports.conf" | grep '^Listen 8081$' ) > "/dev/null" )
+file_properties "/etc/apache2/ports.conf" "root" "root" "-rw-r--r--" "644" "false"
+
+# Replace ports in file
+command_success "sed -r -i 's/TEMPLATEPORTPUBLIC/$publicport/g' /etc/apache2/ports.conf"
+command_success "sed -r -i 's/TEMPLATEPORTPRIVATE/$privateport/g' /etc/apache2/ports.conf"
+
+# apache2 : Remove old sites from apache
+if [ -e "/etc/apache2/sites-available/fabqr_apache_both" ]
 then
-    output_text "[INFO] Adding line Listen 8081 to file /etc/apache2/ports.conf"
-    command_success "echo >> /etc/apache2/ports.conf"
-    command_success "echo '# FabQR port 8081' >> /etc/apache2/ports.conf"
-    command_success "echo 'Listen 8081' >> /etc/apache2/ports.conf"
+    command_success "rm /etc/apache2/sites-available/fabqr_apache_both"
 fi
 
-if ! ( ( cat "/etc/apache2/ports.conf" | grep '^NameVirtualHost \*\:8090$' ) > "/dev/null" )
+if [ -e "/etc/apache2/sites-available/fabqr_apache_public" ]
 then
-    output_text "[INFO] Adding line NameVirtualHost *:8090 to file /etc/apache2/ports.conf"
-    command_success "echo >> /etc/apache2/ports.conf"
-    command_success "echo '# FabQR port 8090' >> /etc/apache2/ports.conf"
-    command_success "echo 'NameVirtualHost *:8090' >> /etc/apache2/ports.conf"
+    command_success "rm /etc/apache2/sites-available/fabqr_apache_public"
 fi
 
-if ! ( ( cat "/etc/apache2/ports.conf" | grep '^Listen 8090$' ) > "/dev/null" )
+if [ -e "/etc/apache2/sites-available/fabqr_apache_private" ]
 then
-    output_text "[INFO] Adding line Listen 8090 to file /etc/apache2/ports.conf"
-    command_success "echo >> /etc/apache2/ports.conf"
-    command_success "echo '# FabQR port 8090' >> /etc/apache2/ports.conf"
-    command_success "echo 'Listen 8090' >> /etc/apache2/ports.conf"
+    command_success "rm /etc/apache2/sites-available/fabqr_apache_private"
 fi
 
-# apache2 : Reload config
-if ! [ -e "/etc/apache2/sites-enabled/fabqr_apache_public" ]
+# apache2 : Add new correct sites to apache
+if [ $publicport -eq $privateport ]
 then
+    copy_fabqr_file "apache_configs/fabqr_apache_both_template" "/etc/apache2/sites-available/fabqr_apache_both"
+    file_properties "/etc/apache2/sites-available/fabqr_apache_both" "root" "root" "-rw-r--r--" "644" "false"
+    command_success "a2ensite fabqr_apache_both"
+else
+    copy_fabqr_file "apache_configs/fabqr_apache_public_template" "/etc/apache2/sites-available/fabqr_apache_public"
+    file_properties "/etc/apache2/sites-available/fabqr_apache_public" "root" "root" "-rw-r--r--" "644" "false"
     command_success "a2ensite fabqr_apache_public"
-fi
-
-if ! [ -e "/etc/apache2/sites-enabled/fabqr_apache_private" ]
-then
+    copy_fabqr_file "apache_configs/fabqr_apache_private_template" "/etc/apache2/sites-available/fabqr_apache_private"
+    file_properties "/etc/apache2/sites-available/fabqr_apache_private" "root" "root" "-rw-r--r--" "644" "false"
     command_success "a2ensite fabqr_apache_private"
 fi
 
+# apache2 : Enable module rewrite, reload config
+command_success "a2enmod rewrite"
 command_success "service apache2 reload"
 
-# USB power settings: enable maximum power on usb
-if [ -e "/boot/config.txt" ]
+# fail2ban : FabQR jail config, get correct file
+if [ $publicport -eq $privateport ]
 then
-    # USB power settings: Create backup
-    if ! [ -e "/boot/config.txt.bak" ]
-    then
-        output_text "[INFO] Backup original boot settings config file /boot/config.txt"
-        command_success "cp /boot/config.txt /boot/config.txt.bak"
-        file_properties "/boot/config.txt.bak" "root" "root" "-rwxr-xr-x" "755" "false"
-    fi
-
-    # USB power settings : Place hash in front of all max_usb_current= lines
-    command_success "sed -r -i 's/^(max_usb_current=.*)$/# \1/g' /boot/config.txt"
-
-    # USB power settings : Remove hash in front of BLANK_TIME=1
-    command_success "sed -r -i 's/^# (max_usb_current=1)$/\1/g' /boot/config.txt"
-
-    # USB power settings : If file does not contain line max_usb_current=1, then add it
-    if ! ( ( cat "/boot/config.txt" | grep ^max_usb_current=1$ ) > "/dev/null" )
-    then
-        output_text "[INFO] Adding line max_usb_current=1 to file /boot/config.txt"
-        output_text "[INFO] You need to reboot to activate changes!"
-        reboot=true
-        command_success "echo >> /boot/config.txt"
-        command_success "echo '# FabQR USB power setting' >> /boot/config.txt"
-        command_success "echo 'max_usb_current=1' >> /boot/config.txt"
-    fi
+    copy_fabqr_file "fail2ban_configs/jail_both.local_template" "/etc/fail2ban/jail.local"
+else
+    copy_fabqr_file "fail2ban_configs/jail.local_template" "/etc/fail2ban/jail.local"
 fi
 
-# fail2ban : FabQR jail config, get file
-copy_fabqr_file "fail2ban_configs/jail.local" "/etc/fail2ban/jail.local"
 file_properties "/etc/fail2ban/jail.local" "root" "root" "-rw-r--r--" "644" "false"
+
+# Replace ports in file
+command_success "sed -r -i 's/TEMPLATEPORTPUBLIC/$publicport/g' /etc/fail2ban/jail.local"
+command_success "sed -r -i 's/TEMPLATEPORTPRIVATE/$privateport/g' /etc/fail2ban/jail.local"
 
 # fail2ban : FabQR http filter config, get file
 copy_fabqr_file "fail2ban_configs/fabqr-http.conf" "/etc/fail2ban/filter.d/fabqr-http.conf"
@@ -918,6 +926,38 @@ file_properties "/etc/fail2ban/filter.d/fabqr-auth.conf" "root" "root" "-rw-r--r
 
 # fail2ban : Reload config
 command_success "service fail2ban reload"
+
+# USB power settings for Raspberry Pi: enable maximum power on usb
+if ( ( ls -l "/boot" | grep rpi ) > "/dev/null" )
+then
+    if [ -e "/boot/config.txt" ]
+    then
+        # USB power settings: Create backup
+        if ! [ -e "/boot/config.txt.bak" ]
+        then
+            output_text "[INFO] Backup original boot settings config file /boot/config.txt"
+            command_success "cp /boot/config.txt /boot/config.txt.bak"
+            file_properties "/boot/config.txt.bak" "root" "root" "-rwxr-xr-x" "755" "false"
+        fi
+
+        # USB power settings : Place hash in front of all max_usb_current= lines
+        command_success "sed -r -i 's/^(max_usb_current=.*)$/# \1/g' /boot/config.txt"
+
+        # USB power settings : Remove hash in front of BLANK_TIME=1
+        command_success "sed -r -i 's/^# (max_usb_current=1)$/\1/g' /boot/config.txt"
+
+        # USB power settings : If file does not contain line max_usb_current=1, then add it
+        if ! ( ( cat "/boot/config.txt" | grep ^max_usb_current=1$ ) > "/dev/null" )
+        then
+            output_text "[INFO] Adding line max_usb_current=1 to file /boot/config.txt"
+            output_text "[INFO] You need to reboot to activate changes!"
+            reboot=true
+            command_success "echo >> /boot/config.txt"
+            command_success "echo '# FabQR USB power setting' >> /boot/config.txt"
+            command_success "echo 'max_usb_current=1' >> /boot/config.txt"
+        fi
+    fi
+fi
 
 output_text "[INFO] FabQR files and settings checked successfully"
 

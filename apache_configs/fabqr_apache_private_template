@@ -13,17 +13,20 @@
 #    You should have received a copy of the GNU Lesser General Public License
 #    along with FabQR.  If not, see <http://www.gnu.org/licenses/>.
 
-<VirtualHost *:8090>
+<VirtualHost *:TEMPLATEPORTPRIVATE>
 
-    DocumentRoot /home/fabqr/fabqr_data/www/public
+    DocumentRoot /home/fabqr/fabqr_data/www/private
 
     # Custom access logging, needed for fail2ban network protection rules
     # fail2ban expects a time information string in matched strings!
     # Otherwise regex will not work! fail2ban-regex command helps debugging!
     LogFormat "%h -- [%t] -- \"%r\"" fabqraccesslog
-    CustomLog /home/fabqr/fabqr_data/logs/fabqr_public_access.log fabqraccesslog
+    CustomLog /home/fabqr/fabqr_data/logs/fabqr_private_access.log fabqraccesslog
 
-    <Directory /home/fabqr/fabqr_data/www/public/>
+    # Error logging, needed for fail2ban network protection rules
+    ErrorLog /home/fabqr/fabqr_data/logs/fabqr_private_error.log
+
+    <Directory /home/fabqr/fabqr_data/www/private/>
         # Options only allow to follow symlinks
         Options +FollowSymLinks -Indexes -Includes -ExecCGI
 
@@ -34,12 +37,10 @@
         Order Allow,Deny
         Allow from all
 
-        # Redirect rules
+        # Redirect rule
         RewriteEngine on
         RewriteRule ^(d|t)/([a-z0-9]{7,7})$ /redirect.php?marker=$1&projectId=$2 [L,R=301]
         RewriteRule ^(.*)/(d|t)/([a-z0-9]{7,7})$ $1/redirect.php?marker=$2&projectId=$3 [L,R=301]
-        RewriteRule ^([a-z0-9]{7,7})$ /display_project.php?projectId=$1 [L,R=301]
-        RewriteRule ^(.*)/([a-z0-9]{7,7})$ $1/display_project.php?projectId=$2 [L,R=301]
     </Directory>
 
 </VirtualHost>

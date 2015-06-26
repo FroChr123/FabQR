@@ -39,52 +39,39 @@ maxretry = 5
 findtime = 60
 
 # ##################################################################
-# FABQR PORT 8081 PROTECTION
+# FABQR PORT PROTECTION
 # ##################################################################
 
-[fabqr-private]
+[fabqr]
 enabled  = true
-port     = 8081
+port     = TEMPLATEPORTPUBLIC
 filter   = fabqr-http
-logpath  = /home/fabqr/fabqr_data/logs/fabqr_private_access.log
+logpath  = /home/fabqr/fabqr_data/logs/fabqr_both_access.log
 bantime  = 3600
 maxretry = 800
 findtime = 20
 
-[fabqr-private-auth]
+[fabqr-auth]
 enabled  = true
-port     = 8081
+port     = TEMPLATEPORTPUBLIC
 filter   = fabqr-auth
-logpath  = /home/fabqr/fabqr_data/logs/fabqr_private_error.log
+logpath  = /home/fabqr/fabqr_data/logs/fabqr_both_error.log
 bantime  = 3600
 maxretry = 5
 findtime = 600
 
-# ##################################################################
-# FABQR PORT 8090 PROTECTION
-# ##################################################################
-
-[fabqr-public]
+[fabqr-file]
 enabled  = true
-port     = 8090
-filter   = fabqr-http
-logpath  = /home/fabqr/fabqr_data/logs/fabqr_public_access.log
-bantime  = 3600
-maxretry = 800
-findtime = 20
-
-[fabqr-public-file]
-enabled  = true
-port     = 8090
+port     = TEMPLATEPORTPUBLIC
 filter   = fabqr-http
 logpath  = /home/fabqr/fabqr_data/logs/fabqr_temporary_upload.log
 bantime  = 3600
 maxretry = 6
 findtime = 3600
 
-[fabqr-public-email]
+[fabqr-email]
 enabled  = true
-port     = 8090
+port     = TEMPLATEPORTPUBLIC
 filter   = fabqr-http
 logpath  = /home/fabqr/fabqr_data/logs/fabqr_email.log
 bantime  = 3600

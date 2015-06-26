@@ -1,0 +1,48 @@
+#    This file is part of FabQR. (https://github.com/FroChr123/FabQR)
+#
+#    FabQR is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    FabQR is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with FabQR.  If not, see <http://www.gnu.org/licenses/>.
+
+<VirtualHost *:TEMPLATEPORTPUBLIC>
+
+    DocumentRoot /home/fabqr/fabqr_data/www/
+
+    # Custom access logging, needed for fail2ban network protection rules
+    # fail2ban expects a time information string in matched strings!
+    # Otherwise regex will not work! fail2ban-regex command helps debugging!
+    LogFormat "%h -- [%t] -- \"%r\"" fabqraccesslog
+    CustomLog /home/fabqr/fabqr_data/logs/fabqr_both_access.log fabqraccesslog
+
+    # Error logging, needed for fail2ban network protection rules
+    ErrorLog /home/fabqr/fabqr_data/logs/fabqr_both_error.log
+
+    <Directory /home/fabqr/fabqr_data/www/>
+        # Options only allow to follow symlinks
+        Options +FollowSymLinks -Indexes -Includes -ExecCGI
+
+        # Allow override
+        AllowOverride All
+
+        # Allowed access from all
+        Order Allow,Deny
+        Allow from all
+
+        # Redirect rules
+        RewriteEngine on
+        RewriteRule ^(d|t)/([a-z0-9]{7,7})$ /redirect.php?marker=$1&projectId=$2 [L,R=301]
+        RewriteRule ^(.*)/(d|t)/([a-z0-9]{7,7})$ $1/redirect.php?marker=$2&projectId=$3 [L,R=301]
+        RewriteRule ^([a-z0-9]{7,7})$ /display_project.php?projectId=$1 [L,R=301]
+        RewriteRule ^(.*)/([a-z0-9]{7,7})$ $1/display_project.php?projectId=$2 [L,R=301]
+    </Directory>
+
+</VirtualHost>
