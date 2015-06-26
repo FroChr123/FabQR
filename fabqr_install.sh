@@ -222,6 +222,45 @@ function file_properties
     return 0
 }
 
+# Function to configure defines for webservices
+# Argument 1: Config value name
+# Argument 2: Regex to check validity of input
+# Argument 3: Text asking for input
+function config_webservices
+{
+    value=""
+
+    # When this is called, config file must exist at correct path
+    if ! [ -e "/home/fabqr/fabqr_data/www/includes/config.php" ]
+    then
+        output_text "[ERROR] Config webservices called, but /home/fabqr/fabqr_data/www/includes/config.php does not exist!"
+        quit_error
+    fi
+
+    # Config file must already contain a valid row for this config option
+    if ! ( ( cat "/home/fabqr/fabqr_data/www/includes/config.php" | grep ^define\(\"$1\",\s\".*?\"\)\;$ ) > "/dev/null" )
+    then
+        output_text "[ERROR] Config webservices called, but /home/fabqr/fabqr_data/www/includes/config.php does not contain option '$1'!"
+        quit_error
+    fi
+
+    # Loop will be stopped if syntactically correct value was entered
+    while ( true )
+    do
+        read -e -p "$3: " -i "$value" value
+
+        # Check for syntactically valid input
+        if ( ( echo $value | grep $2 ) > "/dev/null" )
+        then
+            command_success "sed -r -i 's/^define\(\"$1\",\s\".*?\"\)\;$/define(\"$1\", \"$value\");/g' /home/fabqr/fabqr_data/www/includes/config.php"
+        else
+            output_text "[INFO] '$value' is invalid value for configuration $1"
+        fi
+    done
+
+    return 0
+}
+
 # ##################################################################
 # MAIN
 # ##################################################################
@@ -661,21 +700,6 @@ do
                 command_success "mkdir ${newdir}www"
             fi
 
-            if ! [ -d "${newdir}www/public" ]
-            then
-                command_success "mkdir ${newdir}www/public"
-            fi
-
-            if ! [ -d "${newdir}www/private" ]
-            then
-                command_success "mkdir ${newdir}www/private"
-            fi
-
-            if ! [ -d "${newdir}www/includes" ]
-            then
-                command_success "mkdir ${newdir}www/includes"
-            fi
-
             if ! [ -d "${newdir}logs" ]
             then
                 command_success "mkdir ${newdir}logs"
@@ -724,13 +748,38 @@ fi
 
 command_success "ln -s $newdir /home/fabqr/fabqr_data"
 
-# webservices : Includes
-copy_fabqr_file "webservices/includes/config.php" "/home/fabqr/fabqr_data/www/includes/config.php"
-copy_fabqr_file "webservices/includes/functions.php" "/home/fabqr/fabqr_data/www/includes/functions.php"
+# webservices : Copy all files recursively to correct location
+# For /media/usb* devices setting the properties from before might fail, thus unchecked
+# Silent output for owner, is intended to output errors for /media/usb* devices
+command_success "cp -R /home/fabqr/fabqr_repository/webservices/* /home/fabqr/fabqr_data/www/"
+chown "fabqr" "/home/fabqr/fabqr_data/www/" -R &> "/dev/null"
+chgrp "fabqr" "/home/fabqr/fabqr_data/www/" -R
+chmod "770" "/home/fabqr/fabqr_data/www/" -R
 
-# webservices : Private
-copy_fabqr_file "webservices/private/api_pngdisplay.php" "/home/fabqr/fabqr_data/www/private/api_pngdisplay.php"
-copy_fabqr_file "webservices/private/api_uploadproject.php" "/home/fabqr/fabqr_data/www/private/api_uploadproject.php"
+# webservices : Ask for configuration values
+output_text "[INFO] Insert the configuration values for the webservices!"
+
+output_text "[INFO] Public and private URLs need to start with the protocol and they end with an ending slash."
+config_webservices "PUBLIC_URL" "^https{0,1}://.*?/$" "Public URL"
+config_webservices "PRIVATE_URL" "^https{0,1}://.*?/$" "Private URL"
+
+output_text "[INFO] You can choose a name for your installation of the system, it will be displayed in headings and emails."
+config_webservices "SYSTEM_NAME" "^.+$" "Name of your installation"
+
+output_text "[INFO] Email settings, SMTP is used to access your provided email."
+config_webservices "SMTP_MAIL" "^.+@.+\..+$" "Email"
+
+config_webservices "SMTP_HOST" "^.+$" "SMTP server"
+
+output_text "[INFO] SMTP port, often 25 or 465 or 587 are used as default values."
+config_webservices "SMTP_PORT" "^[0-9]+$" "SMTP port"
+
+output_text "[INFO] SMTP security, allowed values: none, ssl, tls. Usually tls is used."
+config_webservices "SMTP_SECURE" "^(none|ssl|tls)$" "SMTP security"
+
+output_text "[INFO] SMTP authentication details, here your authentication credentials are needed."
+config_webservices "SMTP_USER" "^.+$" "SMTP user"
+config_webservices "SMTP_PASSWORD" "^.+$" "SMTP password"
 
 # php5 : Config file for upload file sizes
 copy_fabqr_file "php_configs/fabqr.ini" "/etc/php5/conf.d/fabqr.ini"
@@ -745,13 +794,8 @@ copy_fabqr_file "apache_configs/fabqr_apache_private" "/etc/apache2/sites-availa
 file_properties "/etc/apache2/sites-available/fabqr_apache_private" "root" "root" "-rw-r--r--" "644" "false"
 
 # apache2 : Password for private section
-if ! [ -e "/home/fabqr/fabqr_data/www/private/.htpasswd" ]
+if [ -e "/home/fabqr/fabqr_data/www/private/.htpasswd" ] && [ -s "/home/fabqr/fabqr_data/www/private/.htpasswd" ]
 then
-    output_text "[INFO] File /home/fabqr/fabqr_data/www/private/.htpasswd does not exist"
-    output_text "[INFO] Create fabqr user and set password for private www section"
-    output_text "[INFO] Remember the www password for your fabqr user!"
-    command_success "htpasswd -c /home/fabqr/fabqr_data/www/private/.htpasswd fabqr"
-else
     if user_confirm "[INFO] Optional: Reset password for fabqr user in private www section" "false"
     then
         output_text "[INFO] File /home/fabqr/fabqr_data/www/private/.htpasswd does exists"
@@ -759,6 +803,11 @@ else
         output_text "[INFO] Remember the www password for your fabqr user!"
         command_success "htpasswd -c /home/fabqr/fabqr_data/www/private/.htpasswd fabqr"
     fi
+else
+    output_text "[INFO] File /home/fabqr/fabqr_data/www/private/.htpasswd does not exist or is empty"
+    output_text "[INFO] Create fabqr user and set password for private www section"
+    output_text "[INFO] Remember the www password for your fabqr user!"
+    command_success "htpasswd -c /home/fabqr/fabqr_data/www/private/.htpasswd fabqr"
 fi
 
 # apache2 : FabQR security config, get file

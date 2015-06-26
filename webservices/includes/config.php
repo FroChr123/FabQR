@@ -31,7 +31,7 @@ define("SYSTEM_NAME", "FabQR: Filesharing with QR Codes");
 // Email config
 define("SMTP_MAIL", "mail@example.com");
 define("SMTP_HOST", "example.com");
-define("SMTP_PORT", 587);
+define("SMTP_PORT", "587");
 define("SMTP_SECURE", "tls");
 define("SMTP_USER", "SMTP-USER");
 define("SMTP_PASSWORD", "SMTP-PASSWORD");
