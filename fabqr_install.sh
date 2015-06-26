@@ -244,7 +244,8 @@ function config_webservices
     fi
 
     # Read value from current config file
-    value=$( cat "/home/fabqr/fabqr_data/www/includes/config.php" | grep ^define\(\"$1\",[[:space:]]\".*\"\)\;$ | awk -F ', ' '{print $2}' | awk -F '"' '{print $2}' )
+    originalValue=$( cat "/home/fabqr/fabqr_data/www/includes/config.php" | grep ^define\(\"$1\",[[:space:]]\".*\"\)\;$ | awk -F ', ' '{print $2}' | awk -F '"' '{print $2}' )
+    value=$originalValue
 
     # Loop will be stopped if syntactically correct value was entered
     while ( true )
@@ -256,6 +257,34 @@ function config_webservices
         then
             valueEscaped=$( echo $value | sed 's/\//\\\//g' )
             command_success "sed -r -i 's/^define\(\"$1\",\s\".*\"\)\;$/define(\"$1\", \"$valueEscaped\");/g' /home/fabqr/fabqr_data/www/includes/config.php"
+
+            # If URL was changed, replace in all stored files
+            if [ $1 = "PUBLIC_URL" ] || [ $1 = "PRIVATE_URL" ]
+            then
+                if ! [ $originalValue = $value ]
+                then
+                    output_text "[INFO] Old $1: $originalValue - New $1 : $value"
+                    output_text "[INFO] Replace URLs in all files"
+                    originalValueEscaped=$( echo $originalValue | sed 's/\//\\\//g' )
+
+                    # Do not use any quotes on this command, otherwise it will break
+                    if ls /home/fabqr/fabqr_data/www/public/*/project.xhtml &> /dev/null
+                    then
+                        command_success "sed -r -i 's/$originalValueEscaped/$valueEscaped/g' /home/fabqr/fabqr_data/www/public/*/project.xhtml"
+                    fi
+
+                    if [ -e "/home/fabqr/fabqr_data/www/public/projects.xml" ]
+                    then
+                        command_success "sed -r -i 's/$originalValueEscaped/$valueEscaped/g' /home/fabqr/fabqr_data/www/public/projects.xml"
+                    fi
+
+                    if [ -e "/home/fabqr/fabqr_data/www/private/projects.xml" ]
+                    then
+                        command_success "sed -r -i 's/$originalValueEscaped/$valueEscaped/g' /home/fabqr/fabqr_data/www/private/projects.xml"
+                    fi
+                fi
+            fi
+
             return 0
         else
             output_text "[INFO] '$value' is invalid value for configuration $1"
@@ -760,7 +789,7 @@ command_success "ln -s $newdir /home/fabqr/fabqr_data"
 # Ask user to keep settings
 if [ -e "/home/fabqr/fabqr_data/www/includes/config.php" ]
 then
-    if user_confirm "[INFO] Optional: Do you want to keep your current webservice configuration" "false"
+    if user_confirm "[INFO] Optional: Keep current webservice configuration" "false"
     then
         command_success "cp /home/fabqr/fabqr_data/www/includes/config.php /home/fabqr/fabqr_data/www/includes/tmp-config.php"
     fi
@@ -768,7 +797,7 @@ fi
 
 if [ -e "/home/fabqr/fabqr_data/www/private/.htpasswd" ] && [ -s "/home/fabqr/fabqr_data/www/private/.htpasswd" ]
 then
-    if user_confirm "[INFO] Optional: Do you want to keep your current private section password" "false"
+    if user_confirm "[INFO] Optional: Keep current private section password" "false"
     then
         command_success "cp /home/fabqr/fabqr_data/www/private/.htpasswd /home/fabqr/fabqr_data/www/private/tmp.htpasswd"
     fi
