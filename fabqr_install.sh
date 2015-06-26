@@ -276,11 +276,23 @@ function config_webservices
                     if [ -e "/home/fabqr/fabqr_data/www/public/projects.xml" ]
                     then
                         command_success "sed -r -i 's/$originalValueEscaped/$valueEscaped/g' /home/fabqr/fabqr_data/www/public/projects.xml"
+
+                        if [ $1 = "PUBLIC_URL" ]
+                        then
+                            output_text "[INFO] Start QR code regeneration for public QR codes, this might take a long time!"
+                            php /home/fabqr/fabqr_data/www/includes/regenerate_all_qr_codes.php public
+                        fi
                     fi
 
                     if [ -e "/home/fabqr/fabqr_data/www/private/projects.xml" ]
                     then
                         command_success "sed -r -i 's/$originalValueEscaped/$valueEscaped/g' /home/fabqr/fabqr_data/www/private/projects.xml"
+
+                        if [ $1 = "PRIVATE_URL" ]
+                        then
+                            output_text "[INFO] Start QR code regeneration for private QR codes, this might take a long time!"
+                            php /home/fabqr/fabqr_data/www/includes/regenerate_all_qr_codes.php private
+                        fi
                     fi
                 fi
             fi
@@ -826,6 +838,8 @@ chmod "770" "/home/fabqr/fabqr_data/www/" -R
 output_text "[INFO] Insert the configuration values for the webservices!"
 
 output_text "[INFO] Public and private URLs need to start with the protocol and they end with an ending slash."
+output_text "[INFO] WARNING: Changing the URL of the system causes old QR codes to become invalid!"
+output_text "[INFO] WARNING: QR codes will be regenerated, which might cause long loading times!"
 config_webservices "PUBLIC_URL" "^https{0,1}://.+/$" "Public URL"
 config_webservices "PRIVATE_URL" "^https{0,1}://.+/$" "Private URL"
 
