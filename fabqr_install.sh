@@ -999,6 +999,56 @@ fi
 command_success "a2enmod rewrite"
 command_success "service apache2 reload"
 
+# logs : Create empty log files if they do not exist, so fail2ban will immediately recognize them
+if ! [ -e "/home/fabqr/fabqr_data/logs/fabqr_private_access.log" ]
+then
+    output_text "[INFO] Create empty log file: /home/fabqr/fabqr_data/logs/fabqr_private_access.log"
+    command_success "touch /home/fabqr/fabqr_data/logs/fabqr_private_access.log"
+    file_properties "/home/fabqr/fabqr_data/logs/fabqr_private_access.log" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
+fi
+
+if ! [ -e "/home/fabqr/fabqr_data/logs/fabqr_private_error.log" ]
+then
+    output_text "[INFO] Create empty log file: /home/fabqr/fabqr_data/logs/fabqr_private_error.log"
+    command_success "touch /home/fabqr/fabqr_data/logs/fabqr_private_error.log"
+    file_properties "/home/fabqr/fabqr_data/logs/fabqr_private_error.log" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
+fi
+
+if ! [ -e "/home/fabqr/fabqr_data/logs/fabqr_public_access.log" ]
+then
+    output_text "[INFO] Create empty log file: /home/fabqr/fabqr_data/logs/fabqr_public_access.log"
+    command_success "touch /home/fabqr/fabqr_data/logs/fabqr_public_access.log"
+    file_properties "/home/fabqr/fabqr_data/logs/fabqr_public_access.log" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
+fi
+
+if ! [ -e "/home/fabqr/fabqr_data/logs/fabqr_both_access.log" ]
+then
+    output_text "[INFO] Create empty log file: /home/fabqr/fabqr_data/logs/fabqr_both_access.log"
+    command_success "touch /home/fabqr/fabqr_data/logs/fabqr_both_access.log"
+    file_properties "/home/fabqr/fabqr_data/logs/fabqr_both_access.log" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
+fi
+
+if ! [ -e "/home/fabqr/fabqr_data/logs/fabqr_both_error.log" ]
+then
+    output_text "[INFO] Create empty log file: /home/fabqr/fabqr_data/logs/fabqr_both_error.log"
+    command_success "touch /home/fabqr/fabqr_data/logs/fabqr_both_error.log"
+    file_properties "/home/fabqr/fabqr_data/logs/fabqr_both_error.log" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
+fi
+
+if ! [ -e "/home/fabqr/fabqr_data/logs/fabqr_temporary_upload.log" ]
+then
+    output_text "[INFO] Create empty log file: /home/fabqr/fabqr_data/logs/fabqr_temporary_upload.log"
+    command_success "touch /home/fabqr/fabqr_data/logs/fabqr_temporary_upload.log"
+    file_properties "/home/fabqr/fabqr_data/logs/fabqr_temporary_upload.log" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
+fi
+
+if ! [ -e "/home/fabqr/fabqr_data/logs/fabqr_email.log" ]
+then
+    output_text "[INFO] Create empty log file: /home/fabqr/fabqr_data/logs/fabqr_email.log"
+    command_success "touch /home/fabqr/fabqr_data/logs/fabqr_email.log"
+    file_properties "/home/fabqr/fabqr_data/logs/fabqr_email.log" "fabqr" "fabqr" "-rwxrwx---" "770" "false"
+fi
+
 # fail2ban : FabQR jail config, get correct file
 if [ $publicport -eq $privateport ]
 then
