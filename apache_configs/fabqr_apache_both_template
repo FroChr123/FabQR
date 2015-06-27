@@ -45,4 +45,12 @@
         RewriteRule ^(.*)/([a-z0-9]{7,7})$ $1/display_project.php?projectId=$2 [L,R=301]
     </Directory>
 
+    <Directory /home/fabqr/fabqr_data/www/private/>
+        # Authentication for private directory
+        AuthName "FabQR private access"
+        AuthType Basic
+        AuthUserFile /home/fabqr/fabqr_data/www/private/.htpasswd
+        require valid-user
+    </Directory>
+
 </VirtualHost>

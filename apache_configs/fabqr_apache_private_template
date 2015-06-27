@@ -37,6 +37,12 @@
         Order Allow,Deny
         Allow from all
 
+        # Authentication for private directory
+        AuthName "FabQR private access"
+        AuthType Basic
+        AuthUserFile /home/fabqr/fabqr_data/www/private/.htpasswd
+        require valid-user
+
         # Redirect rule
         RewriteEngine on
         RewriteRule ^(d|t)/([a-z0-9]{7,7})$ /redirect.php?marker=$1&projectId=$2 [L,R=301]
