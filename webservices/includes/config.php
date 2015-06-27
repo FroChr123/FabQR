@@ -74,7 +74,7 @@ define("ICON_NAME", "favicon.ico");
 define("STYLE_NAME", "style.css");
 
 // Filenames in project directories
-define("FILENAME_IMAGE_REAL", "image_real.png");
+define("FILENAME_IMAGE_REAL", "image_real.jpg");
 define("FILENAME_IMAGE_SCHEME", "image_scheme.png");
 define("FILENAME_IMAGE_QR_CODE", "qr_code.png");
 define("FILENAME_PROJECT_XHTML", "project.xhtml");
