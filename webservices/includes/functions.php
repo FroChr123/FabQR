@@ -423,7 +423,7 @@ function upload_temporary_private_file($filesArray, $projectId)
         $logFileName = $filesArray["inputFile"]["name"];
     }
 
-    $logEntry = $_SERVER["REMOTE_ADDR"] . " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "File Upload: " . $logFileName . "\"\n";
+    $logEntry = getRealRequestIP() . " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "File Upload: " . $logFileName . "\"\n";
     if (file_put_contents(DIR_LOGS . LOGNAME_TEMPORARY_UPLOAD, $logEntry, FILE_APPEND) === false)
     {
         return "";
@@ -546,7 +546,7 @@ function send_email($recipientMail, $subject, $htmlBody, $plainBody, $projectId 
         $logPrivate = "false";
     }
 
-    $logEntry = $_SERVER["REMOTE_ADDR"] . " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "Email: Recipient: '" . $logRecipientMail . "', Subject: '" . $logSubject . "', ProjectId: '" . $logProjectId . "', Private: '" . $logPrivate . "'\"\n";
+    $logEntry = getRealRequestIP() . " -- [[" . date("Y/m/d H:i:s") . "]] -- \"POST " . "Email: Recipient: '" . $logRecipientMail . "', Subject: '" . $logSubject . "', ProjectId: '" . $logProjectId . "', Private: '" . $logPrivate . "'\"\n";
     if (file_put_contents(DIR_LOGS . LOGNAME_EMAIL, $logEntry, FILE_APPEND) === false)
     {
         return "";
@@ -788,6 +788,33 @@ function get_latest_projects_in_xml($count, $offset, $isPrivate)
     }
 
     return $result;
+}
+
+// Function to get real IP of requester, server might be hidden behind a proxy, try to find correct header entry
+function getRealRequestIP()
+{
+    if (!empty($_SERVER["HTTP_X_REAL_IP"]))
+    {
+        return $_SERVER["HTTP_X_REAL_IP"];
+    }
+    else if (!empty($_SERVER["HTTP_X_FORWARDED_FOR"]))
+    {
+        return $_SERVER["HTTP_X_FORWARDED_FOR"];
+    }
+    else if (!empty($_SERVER["X-FORWARDED-FOR"]))
+    {
+        return $_SERVER["X-FORWARDED-FOR"];
+    }
+    else if (!empty($_SERVER["X-Forwarded-For"]))
+    {
+        return $_SERVER["X-Forwarded-For"];
+    }
+    else if (!empty($_SERVER["REMOTE_ADDR"]))
+    {
+        return $_SERVER["REMOTE_ADDR"];
+    }
+
+    return "";
 }
 
 ?>
