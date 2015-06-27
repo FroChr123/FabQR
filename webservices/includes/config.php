@@ -70,7 +70,7 @@ define("PHP_SCRIPT_REMOVE_PROJECT", "remove_project.php");
 define("FILENAME_PROJECTS_XML", "projects.xml");
 define("LOGNAME_EMAIL", "fabqr_email.log");
 define("LOGNAME_TEMPORARY_UPLOAD", "fabqr_temporary_upload.log");
-define("ICON_NAME", "icon.ico");
+define("ICON_NAME", "favicon.ico");
 define("STYLE_NAME", "style.css");
 
 // Filenames in project directories
