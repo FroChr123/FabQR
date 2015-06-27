@@ -5,12 +5,19 @@
                 </div>
                 <div id="file-upload-main">
                     <form action="&&&TEMPLATE_LINK_UPLOAD&&&" method="POST" enctype="multipart/form-data">
+                        <noscript>
+                            <div id="file-upload-noscript-hint">
+                                You do not have JavaScript enabled. Please select the file first and upload it afterwards.
+                            </div>
+                        </noscript>
                         <span id="file-upload-input-file-wrapper">
-                            Select File<input id="file-upload-input-file" name="inputFile" accept="&&&TEMPLATE_UPLOAD_ALLOWED_EXTENSIONS&&&" maxlength="&&&TEMPLATE_UPLOAD_MAXIMUM_SIZE_BYTES&&&" type="file" />
+                            Select File<input id="file-upload-input-file" name="inputFile" accept="&&&TEMPLATE_UPLOAD_ALLOWED_EXTENSIONS&&&" maxlength="&&&TEMPLATE_UPLOAD_MAXIMUM_SIZE_BYTES&&&" type="file" onchange="this.form.submit();" />
                         </span>
-                        <span id="file-upload-input-submit-wrapper">
-                            Upload File<input id="file-upload-input-submit" type="submit" value="Submit" />
-                        </span>
+                        <noscript>
+                            <span id="file-upload-input-submit-wrapper">
+                                Upload File<input id="file-upload-input-submit" type="submit" value="Submit" />
+                            </span>
+                        </noscript>
                     </form>
                     <div id="file-upload-footer">
                         <span id="file-upload-footer-info">You can upload your project file to the FabLab here.<br />The file is temporarily stored for some weeks and it can only be accessed from the FabLab.<br />In the FabLab you can permanently publish your project after you have created it.<br />Maximum file size: 10 MB, Allowed file types: &&&TEMPLATE_UPLOAD_ALLOWED_EXTENSIONS&&&</span>
