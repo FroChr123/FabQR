@@ -88,6 +88,16 @@ define("SMTP_TIMEOUT", 30);
 define("FILE_UPLOAD_MAXIMUM_SIZE_BYTES", 10000000);
 define("FILE_UPLOAD_EXTENSIONS", ".plf,.svg");
 
+// Configs for QR codes
+define("QR_CODE_PIXEL_MIN_PIXEL_SIZE", 348);
+define("QR_CODE_FRAME_CONFIG", 3);
+define("QR_CODE_COLOR_BG_R", 229);
+define("QR_CODE_COLOR_BG_G", 229);
+define("QR_CODE_COLOR_BG_B", 229);
+define("QR_CODE_COLOR_FG_R", 0);
+define("QR_CODE_COLOR_FG_G", 0);
+define("QR_CODE_COLOR_FG_B", 0);
+
 // Project name minimum length
 define("PROJECT_NAME_MINIMUM_LENGTH", 3);
 

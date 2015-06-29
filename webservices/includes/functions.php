@@ -283,17 +283,17 @@ function generate_qr_code($text, $filepath)
 {
     // Generate QR code with modified background color
     // QR code configs
-    $pixelConfig = 11;
-    $frameConfig = 3;
+    $pixelMinSizeConfig = QR_CODE_PIXEL_MIN_PIXEL_SIZE;
+    $frameConfig = QR_CODE_FRAME_CONFIG;
     $eclevelConfig = QR_ECLEVEL_M;
 
     // Color configs
-    $bg_r = 229;
-    $bg_g = 229;
-    $bg_b = 229;
-    $fg_r = 0;
-    $fg_g = 0;
-    $fg_b = 0;
+    $bg_r = QR_CODE_COLOR_BG_R;
+    $bg_g = QR_CODE_COLOR_BG_G;
+    $bg_b = QR_CODE_COLOR_BG_B;
+    $fg_r = QR_CODE_COLOR_FG_R;
+    $fg_g = QR_CODE_COLOR_FG_G;
+    $fg_b = QR_CODE_COLOR_FG_B;
 
     // Start processing
     $qrFrame = QRcode::text($text, false, $eclevelConfig);
@@ -303,6 +303,9 @@ function generate_qr_code($text, $filepath)
     $width = strlen($qrFrame[0]);
     $imageWidth = $width + 2 * $frameConfig;
     $imageHeight = $height + 2 * $frameConfig;
+
+    // Compute integer number for pixel resize, need to exceed $pixelMinSizeConfig
+    $pixelMultiplier = ceil($pixelMinSizeConfig / $imageWidth);
 
     // Prepare base image
     $base_image = imagecreate($imageWidth, $imageHeight);
@@ -325,8 +328,8 @@ function generate_qr_code($text, $filepath)
     }
 
     // Resize to final format
-    $target_image = imagecreate($imageWidth * $pixelConfig, $imageHeight * $pixelConfig);
-    imagecopyresized($target_image, $base_image, 0, 0, 0, 0, $imageWidth * $pixelConfig, $imageHeight * $pixelConfig, $imageWidth, $imageHeight);
+    $target_image = imagecreate($imageWidth * $pixelMultiplier, $imageHeight * $pixelMultiplier);
+    imagecopyresized($target_image, $base_image, 0, 0, 0, 0, $imageWidth * $pixelMultiplier, $imageHeight * $pixelMultiplier, $imageWidth, $imageHeight);
 
     // Deallocate base image
     imagecolordeallocate($base_image, $color_bg_base);
@@ -335,7 +338,7 @@ function generate_qr_code($text, $filepath)
 
     // Draw 1 pixel border on QR code, for printing and cutting out the image
     $color_fg_target = imagecolorallocate($target_image, $fg_r, $fg_g, $fg_b);
-    imagerectangle($target_image, 0, 0, ($imageWidth * $pixelConfig) - 1, ($imageHeight * $pixelConfig) - 1, $color_fg_target);
+    imagerectangle($target_image, 0, 0, ($imageWidth * $pixelMultiplier) - 1, ($imageHeight * $pixelMultiplier) - 1, $color_fg_target);
 
     // Save target image to filesystem and deallocate
     imagepng($target_image, $filepath);
