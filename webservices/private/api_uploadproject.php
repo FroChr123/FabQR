@@ -332,7 +332,7 @@ if (isset($_POST["references"]))
                 $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<span class="project-references-seperator">' . escape_and_encode(REFERENCES_HTML_SEPERATOR, "xhtml", "") . '</span>' . "\n";
             }
 
-            $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<a href="' . escape_and_encode($ref) . '" class="project-references-link-' . $referencesCounter . '" target="_blank">' . escape_and_encode(REFERENCES_LINK_TEXT, "xhtml", "") . $referencesCounter . '</a>' . "\n";
+            $referencesHTML = $referencesHTML . indentation($referencesIndentation + 1) . '<a href="' . escape_and_encode($ref, "xhtml", "") . '" class="project-references-link-' . $referencesCounter . '" target="_blank">' . escape_and_encode(REFERENCES_LINK_TEXT, "xhtml", "") . $referencesCounter . '</a>' . "\n";
         }
 
         $referencesHTML = $referencesHTML . indentation($referencesIndentation + 0) . '</span>';
