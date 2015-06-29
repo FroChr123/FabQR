@@ -610,6 +610,9 @@ if ! [ -d "/home/fabqr/fabqr_repository" ]
 then
     output_text "[INFO] Download FabQR repository"
     command_success "git clone https://github.com/FroChr123/FabQR.git /home/fabqr/fabqr_repository"
+    command_success "chown fabqr /home/fabqr/fabqr_repository -R"
+    command_success "chgrp fabqr /home/fabqr/fabqr_repository -R"
+    command_success "chmod 770 /home/fabqr/fabqr_repository -R"
 fi
 
 # FabQR start : Copy file
